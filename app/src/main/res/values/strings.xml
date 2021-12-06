@@ -1,3 +1,13 @@
 <resources>
+    <!-- Global -->
     <string name="app_name">Go4Lunch</string>
+    <string name="main_activity_description">Find a nice restaurant and invite your co-workers for lunch!</string>
+    <string name="login">Connexion</string>
+
+    <!-- Main Activity -->
+    <string name="error_authentication_canceled">Authentification annulée&#8230;</string>
+    <string name="error_no_internet">Aucune connexion internet !</string>
+    <string name="error_unknown_error">Une erreur inconnue s\'est produite&#8230;</string>
+    <string name="connection_succeed">Authentification réussie !</string>
+
 </resources>
