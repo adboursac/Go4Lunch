@@ -1,4 +1,4 @@
-package com.alexdb.go4lunch.ui;
+package com.alexdb.go4lunch.Activity;
 
 import android.os.Bundle;
 import android.view.View;

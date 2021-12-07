@@ -1,15 +1,14 @@
-package com.alexdb.go4lunch.ui;
+package com.alexdb.go4lunch.Activity;
 
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
 
 import com.alexdb.go4lunch.R;
-import com.alexdb.go4lunch.databinding.ActivityMainBinding;
+import com.alexdb.go4lunch.databinding.ActivityLoginBinding;
+import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
@@ -22,7 +21,7 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.Arrays;
 import java.util.List;
 
-public class MainActivity extends BaseActivity<ActivityMainBinding> {
+public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -31,8 +30,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     }
 
     @Override
-    ActivityMainBinding getViewBinding() {
-        return ActivityMainBinding.inflate(getLayoutInflater());
+    ActivityLoginBinding getViewBinding() {
+        return ActivityLoginBinding.inflate(getLayoutInflater());
     }
 
     private void setupListeners(){
@@ -43,16 +42,23 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     private void startSignInActivity(){
         // Authentication providers
         List<AuthUI.IdpConfig> providers = Arrays.asList(
-                new AuthUI.IdpConfig.GoogleBuilder().build());
-                //new AuthUI.IdpConfig.FacebookBuilder().build());
+                new AuthUI.IdpConfig.GoogleBuilder().build(),
+                new AuthUI.IdpConfig.FacebookBuilder().build());
+
+        // Custom layout
+        AuthMethodPickerLayout customLayout = new AuthMethodPickerLayout
+                .Builder(R.layout.activity_auth_ui)
+                .setGoogleButtonId(R.id.btn_google_login)
+                .setFacebookButtonId(R.id.btn_facebook_login)
+                .build();
 
         // Create and launch sign-in intent
         Intent signInIntent = AuthUI.getInstance()
                 .createSignInIntentBuilder()
-                .setTheme(R.style.AppTheme_NoTitle)
+                .setTheme(R.style.AppTheme_Authentication)
                 .setAvailableProviders(providers)
                 .setIsSmartLockEnabled(false, true)
-                //.setLogo(R.drawable.ic_go4lunch_logo)
+                .setAuthMethodPickerLayout(customLayout)
                 .build();
         signInLauncher.launch(signInIntent);
     }

@@ -3,9 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.MainActivity"
-    android:id="@+id/main_layout">
+    android:layout_height="match_parent">
 
     <!-- Logo-->
     <ImageView
@@ -44,15 +42,37 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:id="@+id/main_description"/>
 
-    <!-- Logging button -->
+    <!-- Logging buttons -->
     <Button
-        android:id="@+id/loginButton"
+        android:id="@+id/btn_google_login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/default_large_margin"
+        android:layout_marginRight="@dimen/default_large_margin"
+        android:layout_marginBottom="@dimen/default_margin"
         android:padding="@dimen/default_button_padding"
-        android:text="@string/login"
-        android:textSize="@dimen/default_text_size"
-        android:layout_margin="@dimen/default_large_margin"
+        android:backgroundTint="@color/white"
+        android:textColor="@color/grey"
+        tools:ignore="RtlHardcoded"
+        android:drawableLeft="@drawable/fui_ic_googleg_color_24dp"
+        android:text="@string/sign_in_with_google"
+        app:layout_constraintBottom_toTopOf="@id/btn_facebook_login"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/btn_facebook_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/default_large_margin"
+        android:layout_marginRight="@dimen/default_large_margin"
+        android:layout_marginBottom="@dimen/default_large_margin"
+        android:padding="@dimen/default_button_padding"
+        android:backgroundTint="@color/facebook"
+        android:textColor="@color/white"
+        tools:ignore="RtlHardcoded"
+        android:drawableLeft="@drawable/fui_ic_facebook_white_22dp"
+        android:text="@string/sign_in_with_facebook"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
