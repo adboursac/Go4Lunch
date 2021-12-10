@@ -63,7 +63,7 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
         // Create and launch sign-in intent
         Intent signInIntent = AuthUI.getInstance()
                 .createSignInIntentBuilder()
-                .setTheme(R.style.AppTheme_Authentication)
+                .setTheme(R.style.AppTheme_NoTitle)
                 .setAvailableProviders(providers)
                 .setIsSmartLockEnabled(false, true)
                 .setAuthMethodPickerLayout(customLayout)
