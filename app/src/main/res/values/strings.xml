@@ -13,4 +13,19 @@
     <string name="sign_in_with_google">Sign in with Google</string>
     <string name="sign_in_with_facebook">Sign in with Facebook</string>
 
+    <!-- Toolbar -->
+    <string name="toolbar_default">I\'m hungry</string>
+    <string name="toolbar_settings">Settings</string>
+    <string name="toolbar_workmates">Available workmates</string>
+
+    <!-- Navigation Drawer-->
+    <string name="navigation_drawer_your_lunch">YOUR LUNCH</string>
+    <string name="navigation_drawer_settings">SETTINGS</string>
+    <string name="navigation_drawer_logout">LOGOUT</string>
+
+    <!-- Bottom navigation view -->
+    <string name="bottom_navigation_mapview">Map View</string>
+    <string name="bottom_navigation_listview">List View</string>
+    <string name="bottom_navigation_workmates">Workmates</string>
+
 </resources>

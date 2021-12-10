@@ -1,22 +1,20 @@
-package com.alexdb.go4lunch.viewmodel;
+package com.alexdb.go4lunch.data.viewmodel;
 
 import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 
-import com.alexdb.go4lunch.repository.UserRepository;
+import com.alexdb.go4lunch.data.repository.UserRepository;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
-
-import org.jetbrains.annotations.NotNull;
 
 public class UserViewModel extends ViewModel {
 
     @NonNull
     private final UserRepository mUserRepository;
 
-    public UserViewModel (@NotNull UserRepository userRepository) {
+    public UserViewModel (@NonNull UserRepository userRepository) {
         mUserRepository = userRepository;
     }
 

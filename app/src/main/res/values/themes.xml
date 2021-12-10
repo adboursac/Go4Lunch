@@ -15,12 +15,22 @@
     </style>
 
     <!-- Login Activity -->
-    <style name="AppTheme.NoTitle" parent="AppTheme">
+    <style name="AppTheme.Login" parent="AppTheme">
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
         <item name="actionBarTheme">@null</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:windowBackground">@color/grey</item>
+    </style>
+
+    <!-- Main Activity -->
+    <style name="AppTheme.MainActivity" parent="AppTheme">
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+    </style>
+
+    <!-- Toolbar -->
+    <style name="AppTheme.Toolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
     </style>
 
 </resources>

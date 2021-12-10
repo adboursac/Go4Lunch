@@ -1,14 +1,12 @@
-package com.alexdb.go4lunch.viewmodel;
+package com.alexdb.go4lunch.data.viewmodel;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.alexdb.go4lunch.repository.UserRepository;
+import com.alexdb.go4lunch.data.repository.UserRepository;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.time.format.DateTimeFormatter;
 
 public class ViewModelFactory implements ViewModelProvider.Factory {
 

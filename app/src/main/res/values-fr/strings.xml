@@ -14,4 +14,19 @@
     <string name="sign_in_with_google">Connexion avec Google</string>
     <string name="sign_in_with_facebook">Connexion avec Facebook</string>
 
+    <!-- Toolbar -->
+    <string name="toolbar_default">J\'ai faim</string>
+    <string name="toolbar_settings">Paramètres</string>
+    <string name="toolbar_workmates">Collègues</string>
+
+    <!-- Navigation Drawer-->
+    <string name="navigation_drawer_your_lunch">MON RESTO</string>
+    <string name="navigation_drawer_settings">PARAMETRES</string>
+    <string name="navigation_drawer_logout">DECONNEXION</string>
+
+    <!-- Bottom navigation view -->
+    <string name="bottom_navigation_mapview">Carte</string>
+    <string name="bottom_navigation_listview">Liste</string>
+    <string name="bottom_navigation_workmates">Collègues</string>
+
 </resources>

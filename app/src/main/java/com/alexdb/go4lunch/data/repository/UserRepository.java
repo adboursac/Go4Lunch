@@ -1,4 +1,4 @@
-package com.alexdb.go4lunch.repository;
+package com.alexdb.go4lunch.data.repository;
 
 import android.content.Context;
 

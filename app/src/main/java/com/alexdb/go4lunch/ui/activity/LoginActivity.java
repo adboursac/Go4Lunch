@@ -1,4 +1,4 @@
-package com.alexdb.go4lunch.activity;
+package com.alexdb.go4lunch.ui.activity;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.Nullable;
@@ -9,8 +9,8 @@ import android.os.Bundle;
 
 import com.alexdb.go4lunch.R;
 import com.alexdb.go4lunch.databinding.ActivityLoginBinding;
-import com.alexdb.go4lunch.viewmodel.UserViewModel;
-import com.alexdb.go4lunch.viewmodel.ViewModelFactory;
+import com.alexdb.go4lunch.data.viewmodel.UserViewModel;
+import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
 import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
@@ -35,11 +35,7 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
     @Override
     protected void onResume() {
         super.onResume();
-        if (!mUserViewModel.isCurrentUserLogged()){
-            startSignInActivity();
-        } else {
-            launchMainActivity();
-        }
+        checkSignInStatusAndRedirect();
     }
 
     @Override
@@ -47,6 +43,22 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
         return ActivityLoginBinding.inflate(getLayoutInflater());
     }
 
+    /**
+     * Check if user is already logged in.
+     * If user is logged in, starts main activity, or display sign in interface instead.
+     */
+    private void checkSignInStatusAndRedirect() {
+        if (!mUserViewModel.isCurrentUserLogged()){
+            startSignInActivity();
+        } else {
+            startMainActivity();
+        }
+    }
+
+    /**
+     * Create and launch sign-in intent to log the user in.
+     * Available providers : Google, Facebook.
+     */
     private void startSignInActivity(){
         // Authentication providers
         List<AuthUI.IdpConfig> providers = Arrays.asList(
@@ -63,20 +75,26 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
         // Create and launch sign-in intent
         Intent signInIntent = AuthUI.getInstance()
                 .createSignInIntentBuilder()
-                .setTheme(R.style.AppTheme_NoTitle)
+                .setTheme(R.style.AppTheme_Login)
                 .setAvailableProviders(providers)
                 .setIsSmartLockEnabled(false, true)
                 .setAuthMethodPickerLayout(customLayout)
                 .build();
+
         signInLauncher.launch(signInIntent);
     }
 
-    //Sign In Launcher
+    /**
+     * Sign In Launcher required to launch sign in intent and handle its result.
+     */
     private final ActivityResultLauncher<Intent> signInLauncher = registerForActivityResult(
             new FirebaseAuthUIActivityResultContract(),
             this::onSignInResult
     );
 
+    /**
+     * Informs the user of the result of its connection attempt, showing Snack Bar messages.
+     */
     private void onSignInResult(FirebaseAuthUIAuthenticationResult result) {
         IdpResponse response = result.getIdpResponse();
         if (result.getResultCode() == RESULT_OK) {
@@ -95,12 +113,18 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
         }
     }
 
-    // Show Snack Bar with a message
+    /**
+     * Show Snack Bar with a message
+     * @param message message to display
+     */
     private void showSnackBar( String message){
         Snackbar.make(mBinding.mainLayout, message, Snackbar.LENGTH_SHORT).show();
     }
 
-    private void launchMainActivity() {
+    /**
+     * Starts Main activity
+     */
+    private void startMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
