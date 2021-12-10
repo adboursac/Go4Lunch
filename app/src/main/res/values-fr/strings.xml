@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Global -->
+    <string name="app_name">Go4Lunch</string>
+    <string name="app_logo_description">Trouvez un bon restaurant et invitez vos collègues à déjeuner !</string>
+
+    <!-- Login Activity authentication-->
+    <string name="facebook_application_id">3092308644376950</string>
+    <string name="fb_login_protocol_scheme">fb3092308644376950</string>
+    <string name="error_authentication_canceled">Authentification annulée&#8230;</string>
+    <string name="error_no_internet">Aucune connexion internet !</string>
+    <string name="error_unknown_error">Une erreur inconnue s\'est produite&#8230;</string>
+    <string name="connection_succeed">Authentification réussie !</string>
+    <string name="sign_in_with_google">Connexion avec Google</string>
+    <string name="sign_in_with_facebook">Connexion avec Facebook</string>
+
+</resources>
