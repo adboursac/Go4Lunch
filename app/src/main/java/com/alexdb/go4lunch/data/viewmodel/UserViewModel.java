@@ -5,6 +5,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 
+import com.alexdb.go4lunch.data.model.User;
 import com.alexdb.go4lunch.data.repository.UserRepository;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
@@ -18,19 +19,13 @@ public class UserViewModel extends ViewModel {
         mUserRepository = userRepository;
     }
 
-    public FirebaseUser getCurrentUser(){
-        return mUserRepository.getCurrentUser();
-    }
+    public User getCurrentUser() {return mUserRepository.getCurrentUser(); }
 
     public Boolean isCurrentUserLogged(){
-        return (this.getCurrentUser() != null);
+       return mUserRepository.isCurrentUserLogged();
     }
 
     public Task<Void> signOut(Context context){
         return mUserRepository.signOut(context);
-    }
-
-    public Task<Void> deleteUser(Context context){
-        return mUserRepository.deleteUser(context);
     }
 }

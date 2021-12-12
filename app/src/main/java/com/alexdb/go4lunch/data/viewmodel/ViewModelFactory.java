@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alexdb.go4lunch.data.repository.UserRepository;
+import com.alexdb.go4lunch.data.service.UserApiFirebase;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -15,7 +16,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     private final UserRepository mUserRepository;
 
     private ViewModelFactory() {
-        mUserRepository = new UserRepository();
+        mUserRepository = new UserRepository(new UserApiFirebase());
     }
 
     public static ViewModelFactory getInstance() {
