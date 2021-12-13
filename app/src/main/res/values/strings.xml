@@ -19,6 +19,8 @@
     <string name="toolbar_workmates">Available workmates</string>
 
     <!-- Navigation Drawer-->
+    <string name="noEmail">Email : _</string>
+    <string name="noName">Name : _</string>
     <string name="navigation_drawer_your_lunch">YOUR LUNCH</string>
     <string name="navigation_drawer_settings">SETTINGS</string>
     <string name="navigation_drawer_logout">LOGOUT</string>

@@ -20,6 +20,8 @@
     <string name="toolbar_workmates">Collègues</string>
 
     <!-- Navigation Drawer-->
+    <string name="noEmail">Email : _</string>
+    <string name="noName">Name : _</string>
     <string name="navigation_drawer_your_lunch">MON RESTO</string>
     <string name="navigation_drawer_settings">PARAMETRES</string>
     <string name="navigation_drawer_logout">DECONNEXION</string>

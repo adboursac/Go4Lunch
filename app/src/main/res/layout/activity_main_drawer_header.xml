@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/nav_header_title"
+        android:id="@+id/drawer_logo_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/app_name"
@@ -16,32 +16,30 @@
         android:layout_marginTop="@dimen/default_large_margin"/>
 
     <ImageView
-        android:id="@+id/nav_header_avatar"
+        android:id="@+id/drawer_profile_picture"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:src="@drawable/messenger_button_send_round_shadow"
+        android:src="@drawable/ic_sharp_account_circle_24"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/nav_header_title"
+        app:layout_constraintTop_toBottomOf="@id/drawer_logo_title"
         app:layout_constraintBottom_toBottomOf="parent"
         android:contentDescription="@null"/>
 
     <TextView
-        android:id="@+id/nav_header_name"
+        android:id="@+id/drawer_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/default_margin"
-        app:layout_constraintStart_toEndOf="@id/nav_header_avatar"
-        app:layout_constraintTop_toTopOf="@id/nav_header_avatar"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:text="Nom"/>
+        app:layout_constraintStart_toEndOf="@id/drawer_profile_picture"
+        app:layout_constraintTop_toTopOf="@id/drawer_profile_picture"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
-        android:id="@+id/nav_header_email"
+        android:id="@+id/drawer_email"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/nav_header_name"
-        app:layout_constraintStart_toStartOf="@id/nav_header_name"
-        app:layout_constraintEnd_toEndOf="@id/nav_header_name"
-        android:text="Mail"/>
+        app:layout_constraintTop_toBottomOf="@id/drawer_name"
+        app:layout_constraintStart_toStartOf="@id/drawer_name"
+        app:layout_constraintEnd_toEndOf="@id/drawer_name" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

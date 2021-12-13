@@ -3,9 +3,12 @@ package com.alexdb.go4lunch.ui.activity;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.core.view.GravityCompat;
@@ -16,9 +19,12 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.alexdb.go4lunch.R;
+import com.alexdb.go4lunch.data.model.User;
 import com.alexdb.go4lunch.data.viewmodel.UserViewModel;
 import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
 import com.alexdb.go4lunch.databinding.ActivityMainBinding;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
@@ -31,6 +37,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         initViewModel();
         initNavigationComponents();
         ConfigureNavigationComponentsDisplayRules();
+        updateDrawerHeaderData();
         setupListeners();
     }
 
@@ -46,8 +53,15 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     }
 
     /**
+     * Get required View Model for Main Activity
+     */
+    private void initViewModel() {
+        mUserViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(UserViewModel.class);
+    }
+
+    /**
      * Init navigation components ( navigation drawer, toolbar and bottom navigation)
-     * according with navigation graph with label display on toolbar
+     * according to the navigation graph with label display on toolbar
      */
     private void initNavigationComponents() {
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
@@ -83,7 +97,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     /**
      * Set visibility to both toolbar and bottom navigation
-     * @param visible visibility status
+     * @param visible true show both toolbar and bottom navigation
      */
     private void ShowToolbarAndBottomNavigation( boolean visible) {
         int visibility = visible ? View.VISIBLE : View.GONE;
@@ -91,8 +105,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         mBinding.activityMainContent.bottomNavigation.setVisibility(visibility);
     }
 
-    /**
-     * Set specific listeners for Main Activity
+    /** Set specific listeners for Main Activity
      * - listener on Sign Out button for navigation drawer
      */
     private void setupListeners(){
@@ -101,22 +114,50 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         MenuItem item = menu.findItem(R.id.menu_drawer_logout);
         item.setOnMenuItemClickListener(i -> {
             mBinding.drawerLayout.closeDrawer(GravityCompat.START);
-            signOut();
+            mUserViewModel.signOut(this).addOnSuccessListener(aVoid -> finish());
             return true;
         });
     }
 
     /**
-     * Sign the user out
+     * update drawer header with user data
      */
-    private void signOut() {
-        mUserViewModel.signOut(this).addOnSuccessListener(aVoid -> finish());
+    private void updateDrawerHeaderData(){
+        if(mUserViewModel.isCurrentUserLogged()){
+            User currentUser = mUserViewModel.getCurrentUser();
+            View drawerHeaderView = mBinding.drawerContent.getHeaderView(0);
+
+            if(currentUser.getProfilePictureUrl() != null){
+                setDrawerHeaderProfilePicture(currentUser.getProfilePictureUrl(), drawerHeaderView);
+            }
+            setDrawerHeaderTexts(currentUser, drawerHeaderView);
+        }
     }
 
     /**
-     * Get required View Models for Main Activity
+     * Set drawer header profile picture with given url.
+     * @param profilePictureUrl profile string url
+     * @param drawerHeaderView main activity drawer header view
      */
-    private void initViewModel() {
-        mUserViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(UserViewModel.class);
+    private void setDrawerHeaderProfilePicture(String profilePictureUrl, View drawerHeaderView){
+        Glide.with(this)
+                .load(profilePictureUrl)
+                .apply(RequestOptions.circleCropTransform())
+                .into((ImageView) drawerHeaderView.findViewById(R.id.drawer_profile_picture));
+    }
+
+    /**
+     * Fill drawer header texts with current user data.
+     * @param user current user
+     * @param drawerHeaderView main activity drawer header view
+     */
+    private void setDrawerHeaderTexts(User user, View drawerHeaderView){
+        TextView nameView = drawerHeaderView.findViewById(R.id.drawer_name);
+        TextView emailView = drawerHeaderView.findViewById(R.id.drawer_email);
+        //Get email & username from User and set it to views
+        String email = TextUtils.isEmpty(user.getEmail()) ? getString(R.string.noEmail) : user.getEmail();
+        String name = TextUtils.isEmpty(user.getName()) ? getString(R.string.noName) : user.getName();
+        nameView.setText(name);
+        emailView.setText(email);
     }
 }
