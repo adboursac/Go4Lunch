@@ -5,7 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.activity.LoginActivity"
-    android:id="@+id/main_layout">
+    android:id="@+id/main_layout"
+    android:theme="@style/AppTheme.Default">
+
+    <!-- Background-->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/background"
+        android:scaleType="centerCrop"
+        android:contentDescription="@null" />
 
     <!-- Logo-->
     <ImageView
