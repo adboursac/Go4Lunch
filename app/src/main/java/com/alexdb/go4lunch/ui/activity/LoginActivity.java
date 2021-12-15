@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.alexdb.go4lunch.R;
+import com.alexdb.go4lunch.data.model.User;
 import com.alexdb.go4lunch.databinding.ActivityLoginBinding;
 import com.alexdb.go4lunch.data.viewmodel.UserViewModel;
 import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
@@ -48,11 +49,10 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
      * If user is logged in, starts main activity, or display sign in interface instead.
      */
     private void checkSignInStatusAndRedirect() {
-        if (!mUserViewModel.isCurrentUserLogged()){
-            startSignInActivity();
-        } else {
+        if (mUserViewModel.isCurrentUserLogged()) {
             startMainActivity();
         }
+        else startSignInActivity();
     }
 
     /**
@@ -94,10 +94,13 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
 
     /**
      * Informs the user of the result of its connection attempt, showing Snack Bar messages.
+     * Add user in database if not already stored in.
      */
     private void onSignInResult(FirebaseAuthUIAuthenticationResult result) {
         IdpResponse response = result.getIdpResponse();
         if (result.getResultCode() == RESULT_OK) {
+            User user = mUserViewModel.getCurrentUser();
+            mUserViewModel.createUser(user);
             showSnackBar(getString(R.string.connection_succeed));
         } else {
             // Sign in failed

@@ -7,13 +7,32 @@ import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
-public class UserApiFirebase implements UserApiService {
+public class UserApiFirebase {
 
     /**
-     * {@inheritDoc}
+     * get users collection
+     * @return users collection
      */
-    @Override
+    private CollectionReference getUsersCollection(){
+        return FirebaseFirestore.getInstance().collection("users");
+    }
+
+    /**
+     * Create user from given user instance
+     * @param user user to store in database
+     * @return resulting task
+     */
+    public Task<Void> createUser(User user) {
+        return getUsersCollection().document(user.getUid()).set(user);
+    }
+
+    /**
+     * Get current user.
+     * @return current logged user
+     */
     public User getCurrentUser(){
         FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
         if (fUser != null) return new User(fUser.getUid(),
@@ -24,25 +43,27 @@ public class UserApiFirebase implements UserApiService {
     }
 
     /**
-     * {@inheritDoc}
+     * Tell if current user is already logged
+     * @return true if user is logged, false instead
      */
-    @Override
     public boolean isCurrentUserLogged() {
         return (FirebaseAuth.getInstance().getCurrentUser() != null);
     }
 
     /**
-     * {@inheritDoc}
+     * Sign current user out.
+     * @param context context
+     * @return resulting task
      */
-    @Override
     public Task<Void> signOut(Context context){
         return AuthUI.getInstance().signOut(context);
     }
 
     /**
-     * {@inheritDoc}
+     * Delete current user account.
+     * @param context context
+     * @return resulting task
      */
-    @Override
     public Task<Void> deleteCurrentUserAccount(Context context){
         return AuthUI.getInstance().delete(context);
     }

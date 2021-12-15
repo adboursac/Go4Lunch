@@ -49,7 +49,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     @Override
     protected void onResume() {
         super.onResume();
-        mNavController.navigate(R.id.nav_map_view_fragment);
+        //mNavController.navigate(R.id.nav_map_view_fragment);
     }
 
     /**
