@@ -19,6 +19,10 @@ android {
         viewBinding true
     }
     buildTypes {
+        debug {
+            resValue 'string', "google_maps_api_key", google_maps_api_key
+            it.buildConfigField 'String', 'google_maps_api_key', google_maps_api_key
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -32,15 +36,15 @@ android {
 
 dependencies {
 
+    //Common
     implementation 'androidx.appcompat:appcompat:1.4.0'
     implementation 'com.google.android.material:material:1.4.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+
+    //Navigation component
     implementation 'androidx.navigation:navigation-fragment:2.3.5'
     implementation 'androidx.navigation:navigation-ui:2.3.5'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     //Firebase
     implementation platform('com.google.firebase:firebase-bom:29.0.1')
@@ -51,7 +55,15 @@ dependencies {
     //Firestore
     implementation 'com.google.firebase:firebase-firestore'
 
+    //Google maps
+    implementation 'com.google.android.gms:play-services-maps:18.0.1'
+
     //Glide
     implementation 'com.github.bumptech.glide:glide:4.12.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
+
+    //Testing
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 }
