@@ -22,8 +22,8 @@ public class ListViewModel extends ViewModel {
         mLocationRepository = locationRepository;
     }
 
-    public MutableLiveData<List<RestaurantPlace>> getRestaurantsLiveData() {
-        return mRestaurantRepository.getRestaurantPlacesMutableLiveData();
+    public LiveData<List<RestaurantPlace>> getRestaurantsLiveData() {
+        return mRestaurantRepository.getRestaurantPlacesLiveData();
     }
 
     public void fetchRestaurants() {

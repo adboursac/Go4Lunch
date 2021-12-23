@@ -29,7 +29,7 @@ public class GoogleMapsApiClient {
     public static Call<RestaurantPlacesPage> getRestaurantPlaces(Location location) {
         String locationString = location.getLatitude() + "," + location.getLongitude();
         return getApi().getRestaurantPlaces(locationString,
-                "Restaurants",
+                "restaurant",
                 BuildConfig.google_maps_api_key);
     }
 

@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alexdb.go4lunch.R;
+import com.alexdb.go4lunch.data.model.maps.RestaurantPlace;
 import com.alexdb.go4lunch.data.viewmodel.MapViewModel;
 import com.alexdb.go4lunch.data.viewmodel.UserViewModel;
 import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
@@ -39,14 +40,15 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     private FragmentMapViewBinding mBinding;
     private MapViewModel mMapViewModel;
 
-    public MapViewFragment () { }
+    public MapViewFragment() {
+    }
 
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentMapViewBinding.inflate(inflater, container, false);
-        initViewModel();
+        initViewModels();
         return mBinding.getRoot();
     }
 
@@ -65,12 +67,20 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(@NotNull GoogleMap googleMap) {
         initMapStyle(googleMap);
         mMapViewModel.initMap(googleMap, requireActivity());
-        mBinding.floatingActionButton.setOnClickListener( view -> mMapViewModel.refreshLocation());
+        mBinding.floatingActionButton.setOnClickListener(view -> mMapViewModel.refreshLocation());
     }
 
-    private void initViewModel() {
+    private void initViewModels() {
         mMapViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(MapViewModel.class);
-        mMapViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), mMapViewModel::moveCamera);
+
+        mMapViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), location -> {
+                    mMapViewModel.fetchRestaurants(location);
+                    mMapViewModel.moveCamera(location);
+                }
+        );
+
+        mMapViewModel.getRestaurantsLiveData().observe(getViewLifecycleOwner(), restaurants -> mMapViewModel.addEveryRestaurantsMarkers()
+        );
     }
 
     private void initMapStyle(GoogleMap googleMap) {

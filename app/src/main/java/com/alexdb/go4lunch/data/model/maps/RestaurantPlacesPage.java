@@ -9,17 +9,18 @@ public class RestaurantPlacesPage {
 
     @SerializedName("status")
     @Expose
-    private String status;
+    private final String status;
 
     @SerializedName("results")
     @Expose
-    private List<RestaurantPlace> results;
+    private final List<RestaurantPlace> results;
 
     @SerializedName("next_page_token")
     @Expose
     private final String next_page_token;
 
-    public RestaurantPlacesPage(List<RestaurantPlace> results, String next_page_token) {
+    public RestaurantPlacesPage(String status, List<RestaurantPlace> results, String next_page_token) {
+        this.status = status;
         this.results = results;
         this.next_page_token = next_page_token;
     }

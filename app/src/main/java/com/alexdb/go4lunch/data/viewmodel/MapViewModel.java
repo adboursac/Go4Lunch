@@ -8,12 +8,18 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.alexdb.go4lunch.data.model.maps.RestaurantPlace;
 import com.alexdb.go4lunch.data.repository.LocationRepository;
+import com.alexdb.go4lunch.data.repository.RestaurantRepository;
 import com.alexdb.go4lunch.data.service.PermissionHelper;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.List;
+import java.util.Objects;
 
 public class MapViewModel extends ViewModel {
 
@@ -22,16 +28,29 @@ public class MapViewModel extends ViewModel {
     private final PermissionHelper mPermissionHelper;
     @NonNull
     private final LocationRepository mLocationRepository;
+    @NonNull
+    private final RestaurantRepository mRestaurantRepository;
 
     private GoogleMap mMap;
 
-    public MapViewModel (
+    public MapViewModel(
             @NonNull PermissionHelper permissionHelper,
-            @NonNull LocationRepository locationRepository
+            @NonNull LocationRepository locationRepository,
+            @NonNull RestaurantRepository restaurantRepository
     ) {
         mPermissionHelper = permissionHelper;
         mLocationRepository = locationRepository;
+        mRestaurantRepository = restaurantRepository;
     }
+
+    public LiveData<Location> getLocationLiveData() {
+        return mLocationRepository.getLocationLiveData();
+    }
+
+    public LiveData<List<RestaurantPlace>> getRestaurantsLiveData() {
+        return mRestaurantRepository.getRestaurantPlacesLiveData();
+    }
+
 
     @SuppressLint("MissingPermission")
     public void refreshLocation() {
@@ -43,15 +62,17 @@ public class MapViewModel extends ViewModel {
         }
     }
 
+    public void fetchRestaurants(Location location) {
+        mRestaurantRepository.fetchRestaurantPlaces(location);
+    }
+
     public void initMap(GoogleMap map, Activity activity) {
         mMap = map;
-        if (!mPermissionHelper.hasLocationPermission()) mPermissionHelper.requestLocationPermission(activity);
+        if (!mPermissionHelper.hasLocationPermission())
+            mPermissionHelper.requestLocationPermission(activity);
         refreshLocation();
     }
 
-    public LiveData<Location> getLocationLiveData() {
-        return mLocationRepository.getLocationLiveData();
-    }
 
     public void moveCamera(Location location) {
         if (location == null || mMap == null) return;
@@ -59,8 +80,23 @@ public class MapViewModel extends ViewModel {
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cord, DEFAULT_ZOOM));
     }
 
-    private void addMarker(Location location, String title) {
+    private void createRestaurantMarker(Location location, String title, boolean selected, String placeId) {
         LatLng cord = new LatLng(location.getLatitude(), location.getLongitude());
-        mMap.addMarker(new MarkerOptions().position(cord).title(title));
+        float hue = selected ? BitmapDescriptorFactory.HUE_GREEN : BitmapDescriptorFactory.HUE_ORANGE;
+        Objects.requireNonNull(mMap.addMarker(new MarkerOptions()
+                .position(cord)
+                .title(title)
+                .icon(BitmapDescriptorFactory.defaultMarker(hue))))
+                .setTag(placeId);
+    }
+
+    public void addEveryRestaurantsMarkers() {
+        for (RestaurantPlace restaurant : Objects.requireNonNull(getRestaurantsLiveData().getValue())) {
+            createRestaurantMarker(
+                    restaurant.getLocation(),
+                    restaurant.getName(),
+                    false,
+                    restaurant.getPlaceId());
+        }
     }
 }

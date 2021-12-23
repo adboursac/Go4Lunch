@@ -4,6 +4,7 @@ import android.location.Location;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.alexdb.go4lunch.data.model.maps.RestaurantPlace;
@@ -24,7 +25,7 @@ public class RestaurantRepository {
     private final Executor mExecutor;
     private final MutableLiveData<List<RestaurantPlace>> mRestaurantPlacesMutableLiveData = new MutableLiveData<>();
 
-    public MutableLiveData<List<RestaurantPlace>> getRestaurantPlacesMutableLiveData() {
+    public LiveData<List<RestaurantPlace>> getRestaurantPlacesLiveData() {
         return mRestaurantPlacesMutableLiveData;
     }
 

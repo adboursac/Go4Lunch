@@ -59,7 +59,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
             return (T) new UserViewModel(mUserRepository);
         }
         else if (modelClass.isAssignableFrom(MapViewModel.class)) {
-            return (T) new MapViewModel(mPermissionHelper, mLocationRepository);
+            return (T) new MapViewModel(mPermissionHelper, mLocationRepository, mRestaurantRepository);
         }
         else if (modelClass.isAssignableFrom(ListViewModel.class)) {
             return (T) new ListViewModel(mRestaurantRepository, mLocationRepository);
