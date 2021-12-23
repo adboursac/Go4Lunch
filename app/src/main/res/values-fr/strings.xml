@@ -31,4 +31,16 @@
     <string name="bottom_navigation_listview">Liste</string>
     <string name="bottom_navigation_workmates">Collègues</string>
 
+    <!-- Restaurant -->
+    <string name="restaurant_name">Restaurant</string>
+    <string name="restaurant_address">Adresse</string>
+    <string name="restaurant_hours">Horaires</string>
+    <string name="restaurant_distance">Distance</string>
+    <string name="restaurant_workmates_number">(0)</string>
+    <string name="restaurant_open">Ouvert</string>
+    <string name="restaurant_closed">Fermé</string>
+    <string name="restaurant_closing_soon">Ferme bientôt</string>
+    <string name="restaurant_open_until">Ouvert jusqu\'à </string>
+    <string name="restaurant_no_hours">Horaires non disponible.</string>
+
 </resources>

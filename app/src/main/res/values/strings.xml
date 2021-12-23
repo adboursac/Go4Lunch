@@ -30,4 +30,16 @@
     <string name="bottom_navigation_listview">List View</string>
     <string name="bottom_navigation_workmates">Workmates</string>
 
+    <!-- Restaurant -->
+    <string name="restaurant_name">Restaurant</string>
+    <string name="restaurant_address">Address</string>
+    <string name="restaurant_hours">Hours</string>
+    <string name="restaurant_distance">Distance</string>
+    <string name="restaurant_workmates_number">(0)</string>
+    <string name="restaurant_open">Open</string>
+    <string name="restaurant_closed">Closed</string>
+    <string name="restaurant_closing_soon">Closing soon</string>
+    <string name="restaurant_open_until">Open until </string>
+    <string name="restaurant_no_hours">Schedule not available</string>
+
 </resources>

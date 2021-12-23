@@ -9,37 +9,99 @@
 
     <ImageView
         android:id="@+id/picture"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:contentDescription="@null" />
 
     <TextView
         android:id="@+id/name"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/black"
         android:textSize="@dimen/default_text_size"
         android:textStyle="bold"
+        android:text="@string/restaurant_name"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/picture" />
+        app:layout_constraintTop_toTopOf="@id/picture"/>
 
     <TextView
         android:id="@+id/address"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/default_text_size"
+        android:textColor="@color/grey"
+        android:text="@string/restaurant_address"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/name"
         app:layout_constraintBottom_toTopOf="@id/openingStatus"/>
 
     <TextView
         android:id="@+id/openingStatus"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/default_text_size"
+        android:textColor="@color/grey"
+        android:text="@string/restaurant_open_until"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/picture"/>
+
+    <TextView
+        android:id="@+id/distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/default_margin"
+        android:textSize="@dimen/default_text_size"
+        android:text="@string/restaurant_distance"
+        app:layout_constraintEnd_toStartOf="@id/picture"
+        app:layout_constraintTop_toTopOf="@id/picture"/>
+
+    <TextView
+        android:id="@+id/workmatesNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="2dp"
+        android:layout_marginEnd="@dimen/default_margin"
+        android:textSize="@dimen/default_text_size"
+        android:text="@string/restaurant_workmates_number"
+        app:layout_constraintEnd_toStartOf="@id/picture"
+        app:layout_constraintBottom_toBottomOf="@id/address" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@id/workmatesNumber"
+        app:layout_constraintBottom_toBottomOf="@id/address"
+        android:src="@drawable/ic_outline_person_24"
+        android:contentDescription="@null" />
+
+    <ImageView
+        android:id="@+id/star_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/default_margin"
+        app:layout_constraintEnd_toStartOf="@id/picture"
+        app:layout_constraintBottom_toBottomOf="@id/picture"
+        android:src="@drawable/ic_baseline_star_20"
+        android:contentDescription="@null" />
+
+    <ImageView
+        android:id="@+id/star_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@id/star_1"
+        app:layout_constraintBottom_toBottomOf="@id/picture"
+        android:src="@drawable/ic_baseline_star_20"
+        android:contentDescription="@null" />
+
+    <ImageView
+        android:id="@+id/star_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@id/star_2"
+        app:layout_constraintBottom_toBottomOf="@id/picture"
+        android:src="@drawable/ic_baseline_star_20"
+        android:contentDescription="@null" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
