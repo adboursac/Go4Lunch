@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alexdb.go4lunch.data.repository.LocationRepository;
-import com.alexdb.go4lunch.data.repository.RestaurantRepository;
+import com.alexdb.go4lunch.data.repository.RestaurantPlacesRepository;
 import com.alexdb.go4lunch.data.repository.UserRepository;
 import com.alexdb.go4lunch.data.service.PermissionHelper;
 import com.alexdb.go4lunch.data.service.UserApiFirebase;
@@ -28,7 +28,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     @NonNull
     private final LocationRepository mLocationRepository;
     @NonNull
-    private final RestaurantRepository mRestaurantRepository;
+    private final RestaurantPlacesRepository mMapsPlacesRepository;
 
     private ViewModelFactory() {
         Application application = MainApplication.getApplication();
@@ -37,7 +37,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
         mUserRepository = new UserRepository(new UserApiFirebase());
         mLocationRepository = new LocationRepository(
                 LocationServices.getFusedLocationProviderClient(application));
-        mRestaurantRepository = new RestaurantRepository(Executors.newSingleThreadExecutor());
+        mMapsPlacesRepository = new RestaurantPlacesRepository(Executors.newSingleThreadExecutor());
     }
 
     public static ViewModelFactory getInstance() {
@@ -59,10 +59,10 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
             return (T) new UserViewModel(mUserRepository);
         }
         else if (modelClass.isAssignableFrom(MapViewModel.class)) {
-            return (T) new MapViewModel(mPermissionHelper, mLocationRepository, mRestaurantRepository);
+            return (T) new MapViewModel(mPermissionHelper, mLocationRepository, mMapsPlacesRepository);
         }
         else if (modelClass.isAssignableFrom(ListViewModel.class)) {
-            return (T) new ListViewModel(mRestaurantRepository, mLocationRepository);
+            return (T) new ListViewModel(mMapsPlacesRepository, mLocationRepository);
         }
         throw new IllegalArgumentException("Unknown ViewModel class");
     }

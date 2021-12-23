@@ -1,32 +1,31 @@
 package com.alexdb.go4lunch.data.viewmodel;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.alexdb.go4lunch.data.model.maps.RestaurantPlace;
+import com.alexdb.go4lunch.data.model.maps.MapsPlace;
 import com.alexdb.go4lunch.data.repository.LocationRepository;
-import com.alexdb.go4lunch.data.repository.RestaurantRepository;
+import com.alexdb.go4lunch.data.repository.RestaurantPlacesRepository;
 
 import java.util.List;
 
 public class ListViewModel extends ViewModel {
 
-    private final RestaurantRepository mRestaurantRepository;
+    private final RestaurantPlacesRepository mMapsPlacesRepository;
     private final LocationRepository mLocationRepository;
 
 
-    ListViewModel(RestaurantRepository restaurantRepository,
+    ListViewModel(RestaurantPlacesRepository mapsPlacesRepository,
                   LocationRepository locationRepository) {
-        mRestaurantRepository = restaurantRepository;
+        mMapsPlacesRepository = mapsPlacesRepository;
         mLocationRepository = locationRepository;
     }
 
-    public LiveData<List<RestaurantPlace>> getRestaurantsLiveData() {
-        return mRestaurantRepository.getRestaurantPlacesLiveData();
+    public LiveData<List<MapsPlace>> getRestaurantsLiveData() {
+        return mMapsPlacesRepository.getRestaurantPlacesLiveData();
     }
 
     public void fetchRestaurants() {
-        mRestaurantRepository.fetchRestaurantPlaces(mLocationRepository.getLocationLiveData().getValue());
+        mMapsPlacesRepository.fetchRestaurantPlaces(mLocationRepository.getLocationLiveData().getValue());
     }
 }

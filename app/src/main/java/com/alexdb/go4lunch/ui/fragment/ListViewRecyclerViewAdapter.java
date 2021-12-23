@@ -1,23 +1,30 @@
 package com.alexdb.go4lunch.ui.fragment;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.alexdb.go4lunch.data.model.maps.RestaurantPlace;
+import com.alexdb.go4lunch.R;
+import com.alexdb.go4lunch.data.model.maps.MapsPlace;
+import com.alexdb.go4lunch.data.service.GoogleMapsApiClient;
 import com.alexdb.go4lunch.databinding.FragmentListViewItemBinding;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
 
 public class ListViewRecyclerViewAdapter extends RecyclerView.Adapter<ListViewRecyclerViewAdapter.ViewHolder> {
 
-    private final List<RestaurantPlace> mRestaurants;
+    private final List<MapsPlace> mRestaurants;
     private Context mContext;
 
-    public ListViewRecyclerViewAdapter(List<RestaurantPlace> restaurants) {
+    public ListViewRecyclerViewAdapter(List<MapsPlace> restaurants) {
         mRestaurants = restaurants;
     }
 
@@ -40,14 +47,27 @@ public class ListViewRecyclerViewAdapter extends RecyclerView.Adapter<ListViewRe
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        RestaurantPlace restaurant = mRestaurants.get(position);
+        MapsPlace restaurant = mRestaurants.get(position);
 
         holder.mBinding.name.setText(restaurant.getName());
+        holder.mBinding.address.setText(restaurant.getVicinity());
+        setPicture(GoogleMapsApiClient.getPictureUrl(restaurant.getFirstPhotoReference()), holder.mBinding.picture);
     }
 
     @Override
     public int getItemCount() {
         return mRestaurants.size();
+    }
+
+    private void setPicture(String pictureUrl, ImageView imageView) {
+        if (pictureUrl == null) {
+            imageView.setImageResource(R.drawable.ic_sharp_no_photography_24);
+            return;
+        }
+        Glide.with(mContext)
+                .load(pictureUrl)
+                .apply(new RequestOptions().centerCrop())
+                .into(imageView);
     }
 }
 

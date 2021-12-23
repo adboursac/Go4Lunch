@@ -7,8 +7,8 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.alexdb.go4lunch.data.model.maps.RestaurantPlace;
-import com.alexdb.go4lunch.data.model.maps.RestaurantPlacesPage;
+import com.alexdb.go4lunch.data.model.maps.MapsPlace;
+import com.alexdb.go4lunch.data.model.maps.MapsPlacesPage;
 import com.alexdb.go4lunch.data.service.GoogleMapsApiClient;
 
 import java.util.ArrayList;
@@ -20,16 +20,16 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class RestaurantRepository {
+public class RestaurantPlacesRepository {
 
     private final Executor mExecutor;
-    private final MutableLiveData<List<RestaurantPlace>> mRestaurantPlacesMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<List<MapsPlace>> mRestaurantPlacesMutableLiveData = new MutableLiveData<>();
 
-    public LiveData<List<RestaurantPlace>> getRestaurantPlacesLiveData() {
+    public LiveData<List<MapsPlace>> getRestaurantPlacesLiveData() {
         return mRestaurantPlacesMutableLiveData;
     }
 
-    public RestaurantRepository(Executor executor) {
+    public RestaurantPlacesRepository(Executor executor) {
         mExecutor = executor;
     }
 
@@ -40,11 +40,11 @@ public class RestaurantRepository {
     public void fetchRestaurantPlaces(Location location) {
         if (location == null) return;
 
-        GoogleMapsApiClient.getRestaurantPlaces(location).enqueue(new Callback<RestaurantPlacesPage>() {
+        GoogleMapsApiClient.getRestaurantPlaces(location).enqueue(new Callback<MapsPlacesPage>() {
             @Override
-            public void onResponse(@NonNull Call<RestaurantPlacesPage> call, @NonNull Response<RestaurantPlacesPage> response) {
+            public void onResponse(@NonNull Call<MapsPlacesPage> call, @NonNull Response<MapsPlacesPage> response) {
                 if (response.isSuccessful()) {
-                    RestaurantPlacesPage placesPage = response.body();
+                    MapsPlacesPage placesPage = response.body();
                     if (placesPage != null) {
                         mRestaurantPlacesMutableLiveData.setValue(placesPage.getResults());
 
@@ -57,7 +57,7 @@ public class RestaurantRepository {
             }
 
             @Override
-            public void onFailure(@NonNull Call<RestaurantPlacesPage> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<MapsPlacesPage> call, @NonNull Throwable t) {
                 Log.d("RestaurantRepository", "fetchRestaurantPlaces failure" + t);
             }
         });
@@ -71,14 +71,14 @@ public class RestaurantRepository {
      */
     private void fetchRestaurantPlacesPage(String pageToken, boolean allowRetry) {
 
-        GoogleMapsApiClient.getRestaurantPlacesPage(pageToken).enqueue(new Callback<RestaurantPlacesPage>() {
+        GoogleMapsApiClient.getPlacesPage(pageToken).enqueue(new Callback<MapsPlacesPage>() {
             @Override
-            public void onResponse(@NonNull Call<RestaurantPlacesPage> call, @NonNull Response<RestaurantPlacesPage> response) {
+            public void onResponse(@NonNull Call<MapsPlacesPage> call, @NonNull Response<MapsPlacesPage> response) {
                 if (response.isSuccessful()) {
-                    RestaurantPlacesPage placesPage = response.body();
+                    MapsPlacesPage placesPage = response.body();
                     if (placesPage != null) {
                         if (handlePageTokenInvalidRequest(pageToken, placesPage.getStatus(), allowRetry)) return;
-                        List<RestaurantPlace> combinedList = new ArrayList<>();
+                        List<MapsPlace> combinedList = new ArrayList<>();
                         combinedList.addAll(Objects.requireNonNull(mRestaurantPlacesMutableLiveData.getValue()));
                         combinedList.addAll(placesPage.getResults());
                         mRestaurantPlacesMutableLiveData.setValue(combinedList);
@@ -92,7 +92,7 @@ public class RestaurantRepository {
             }
 
             @Override
-            public void onFailure(@NonNull Call<RestaurantPlacesPage> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<MapsPlacesPage> call, @NonNull Throwable t) {
                 Log.d("RestaurantRepository", "getRestaurantsPage failure" + t);
             }
         });

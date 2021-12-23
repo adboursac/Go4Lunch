@@ -8,9 +8,9 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.alexdb.go4lunch.data.model.maps.RestaurantPlace;
+import com.alexdb.go4lunch.data.model.maps.MapsPlace;
 import com.alexdb.go4lunch.data.repository.LocationRepository;
-import com.alexdb.go4lunch.data.repository.RestaurantRepository;
+import com.alexdb.go4lunch.data.repository.RestaurantPlacesRepository;
 import com.alexdb.go4lunch.data.service.PermissionHelper;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -29,26 +29,26 @@ public class MapViewModel extends ViewModel {
     @NonNull
     private final LocationRepository mLocationRepository;
     @NonNull
-    private final RestaurantRepository mRestaurantRepository;
+    private final RestaurantPlacesRepository mMapsPlacesRepository;
 
     private GoogleMap mMap;
 
     public MapViewModel(
             @NonNull PermissionHelper permissionHelper,
             @NonNull LocationRepository locationRepository,
-            @NonNull RestaurantRepository restaurantRepository
+            @NonNull RestaurantPlacesRepository mapsPlacesRepository
     ) {
         mPermissionHelper = permissionHelper;
         mLocationRepository = locationRepository;
-        mRestaurantRepository = restaurantRepository;
+        mMapsPlacesRepository = mapsPlacesRepository;
     }
 
     public LiveData<Location> getLocationLiveData() {
         return mLocationRepository.getLocationLiveData();
     }
 
-    public LiveData<List<RestaurantPlace>> getRestaurantsLiveData() {
-        return mRestaurantRepository.getRestaurantPlacesLiveData();
+    public LiveData<List<MapsPlace>> getRestaurantsLiveData() {
+        return mMapsPlacesRepository.getRestaurantPlacesLiveData();
     }
 
 
@@ -63,7 +63,7 @@ public class MapViewModel extends ViewModel {
     }
 
     public void fetchRestaurants(Location location) {
-        mRestaurantRepository.fetchRestaurantPlaces(location);
+        mMapsPlacesRepository.fetchRestaurantPlaces(location);
     }
 
     public void initMap(GoogleMap map, Activity activity) {
@@ -91,7 +91,7 @@ public class MapViewModel extends ViewModel {
     }
 
     public void addEveryRestaurantsMarkers() {
-        for (RestaurantPlace restaurant : Objects.requireNonNull(getRestaurantsLiveData().getValue())) {
+        for (MapsPlace restaurant : Objects.requireNonNull(getRestaurantsLiveData().getValue())) {
             createRestaurantMarker(
                     restaurant.getLocation(),
                     restaurant.getName(),

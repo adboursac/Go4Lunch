@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class RestaurantPlacesPage {
+public class MapsPlacesPage {
 
     @SerializedName("status")
     @Expose
@@ -13,13 +13,13 @@ public class RestaurantPlacesPage {
 
     @SerializedName("results")
     @Expose
-    private final List<RestaurantPlace> results;
+    private final List<MapsPlace> results;
 
     @SerializedName("next_page_token")
     @Expose
     private final String next_page_token;
 
-    public RestaurantPlacesPage(String status, List<RestaurantPlace> results, String next_page_token) {
+    public MapsPlacesPage(String status, List<MapsPlace> results, String next_page_token) {
         this.status = status;
         this.results = results;
         this.next_page_token = next_page_token;
@@ -29,7 +29,7 @@ public class RestaurantPlacesPage {
         return status;
     }
 
-    public List<RestaurantPlace> getResults() {
+    public List<MapsPlace> getResults() {
         return results;
     }
 

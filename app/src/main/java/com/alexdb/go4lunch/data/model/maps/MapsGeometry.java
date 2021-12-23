@@ -5,15 +5,15 @@ import com.google.gson.annotations.SerializedName;
 
 public class MapsGeometry {
 
-        @SerializedName("location")
-        @Expose
-        private final MapsLocation location;
+    @SerializedName("location")
+    @Expose
+    private final MapsLocation location;
 
-        public MapsGeometry(MapsLocation location) {
-                this.location = location;
-        }
+    public MapsGeometry(MapsLocation location) {
+        this.location = location;
+    }
 
-        public MapsLocation getLocation() {
-            return location;
-        }
+    public MapsLocation getLocation() {
+        return location;
+    }
 }

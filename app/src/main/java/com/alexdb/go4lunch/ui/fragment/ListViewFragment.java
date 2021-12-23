@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.alexdb.go4lunch.data.model.maps.RestaurantPlace;
+import com.alexdb.go4lunch.data.model.maps.MapsPlace;
 import com.alexdb.go4lunch.data.viewmodel.ListViewModel;
 import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
 import com.alexdb.go4lunch.databinding.FragmentListViewBinding;
@@ -24,7 +24,7 @@ import java.util.Objects;
 
 public class ListViewFragment extends Fragment {
 
-    private List<RestaurantPlace> mRestaurants = new ArrayList<>();
+    private List<MapsPlace> mRestaurants = new ArrayList<>();
     private ListViewModel mListViewModel;
 
     FragmentListViewBinding mBinding;
