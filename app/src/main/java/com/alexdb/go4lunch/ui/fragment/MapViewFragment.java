@@ -1,8 +1,10 @@
 package com.alexdb.go4lunch.ui.fragment;
 
 import android.annotation.SuppressLint;
+import android.content.res.Resources;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +27,7 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.jetbrains.annotations.NotNull;
@@ -60,6 +63,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
      */
     @Override
     public void onMapReady(@NotNull GoogleMap googleMap) {
+        initMapStyle(googleMap);
         mMapViewModel.initMap(googleMap, requireActivity());
         mBinding.floatingActionButton.setOnClickListener( view -> mMapViewModel.refreshLocation());
     }
@@ -67,5 +71,10 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     private void initViewModel() {
         mMapViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(MapViewModel.class);
         mMapViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), mMapViewModel::moveCamera);
+    }
+
+    private void initMapStyle(GoogleMap googleMap) {
+        googleMap.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.google_map_style));
     }
 }
