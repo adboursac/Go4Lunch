@@ -1,9 +1,7 @@
 package com.alexdb.go4lunch.ui.fragment;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
@@ -11,8 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alexdb.go4lunch.R;
-import com.alexdb.go4lunch.data.model.maps.MapsPlace;
-import com.alexdb.go4lunch.data.service.GoogleMapsApiClient;
+import com.alexdb.go4lunch.data.model.RestaurantStateItem;
 import com.alexdb.go4lunch.databinding.FragmentListViewItemBinding;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -21,10 +18,10 @@ import java.util.List;
 
 public class ListViewRecyclerViewAdapter extends RecyclerView.Adapter<ListViewRecyclerViewAdapter.ViewHolder> {
 
-    private final List<MapsPlace> mRestaurants;
+    private final List<RestaurantStateItem> mRestaurants;
     private Context mContext;
 
-    public ListViewRecyclerViewAdapter(List<MapsPlace> restaurants) {
+    public ListViewRecyclerViewAdapter(List<RestaurantStateItem> restaurants) {
         mRestaurants = restaurants;
     }
 
@@ -47,11 +44,13 @@ public class ListViewRecyclerViewAdapter extends RecyclerView.Adapter<ListViewRe
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        MapsPlace restaurant = mRestaurants.get(position);
+        RestaurantStateItem restaurant = mRestaurants.get(position);
 
         holder.mBinding.name.setText(restaurant.getName());
-        holder.mBinding.address.setText(restaurant.getVicinity());
-        setPicture(GoogleMapsApiClient.getPictureUrl(restaurant.getFirstPhotoReference()), holder.mBinding.picture);
+        holder.mBinding.address.setText(restaurant.getAddress());
+        holder.mBinding.openingStatus.setText(restaurant.getOpenStatus());
+        holder.mBinding.distance.setText(restaurant.getDistance());
+        setPicture(restaurant.getPhotoUrl(), holder.mBinding.picture);
     }
 
     @Override
@@ -67,6 +66,7 @@ public class ListViewRecyclerViewAdapter extends RecyclerView.Adapter<ListViewRe
         Glide.with(mContext)
                 .load(pictureUrl)
                 .apply(new RequestOptions().centerCrop())
+                .error(R.drawable.ic_sharp_no_photography_24)
                 .into(imageView);
     }
 }

@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.alexdb.go4lunch.data.model.RestaurantStateItem;
 import com.alexdb.go4lunch.data.model.maps.MapsPlace;
 import com.alexdb.go4lunch.data.viewmodel.ListViewModel;
 import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
@@ -24,7 +25,7 @@ import java.util.Objects;
 
 public class ListViewFragment extends Fragment {
 
-    private List<MapsPlace> mRestaurants = new ArrayList<>();
+    private List<RestaurantStateItem> mRestaurants = new ArrayList<>();
     private ListViewModel mListViewModel;
 
     FragmentListViewBinding mBinding;
@@ -37,7 +38,7 @@ public class ListViewFragment extends Fragment {
         mBinding = FragmentListViewBinding.inflate(inflater, container, false);
         initRecyclerView(mBinding.getRoot());
         initData();
-        mListViewModel.fetchRestaurants();
+        mListViewModel.fetchRestaurantPlaces();
         return mBinding.getRoot();
     }
 
@@ -52,9 +53,9 @@ public class ListViewFragment extends Fragment {
 
     private void initData() {
         mListViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(ListViewModel.class);
-        mListViewModel.getRestaurantsLiveData().observe(getViewLifecycleOwner(), restaurant -> {
+        mListViewModel.getRestaurantsLiveData().observe(getViewLifecycleOwner(), restaurants -> {
             mRestaurants.clear();
-            mRestaurants.addAll(restaurant);
+            mRestaurants.addAll(restaurants);
             if (mRestaurants.size() == 0) {
                 Log.d("ListVewFragment", "restaurant list is empty");
             }

@@ -33,7 +33,11 @@
         android:textSize="@dimen/default_text_size"
         android:textColor="@color/grey"
         android:text="@string/restaurant_address"
+        android:layout_marginEnd="@dimen/default_margin"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constrainedWidth="true"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/workmatesIcon"
         app:layout_constraintTop_toBottomOf="@id/name"
         app:layout_constraintBottom_toTopOf="@id/openingStatus"/>
 
@@ -42,6 +46,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/default_text_size"
+        android:textStyle="italic"
         android:textColor="@color/grey"
         android:text="@string/restaurant_open_until"
         app:layout_constraintStart_toStartOf="parent"
@@ -53,6 +58,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/default_margin"
         android:textSize="@dimen/default_text_size"
+        android:textColor="@color/grey"
         android:text="@string/restaurant_distance"
         app:layout_constraintEnd_toStartOf="@id/picture"
         app:layout_constraintTop_toTopOf="@id/picture"/>
@@ -63,12 +69,14 @@
         android:layout_height="wrap_content"
         android:paddingBottom="2dp"
         android:layout_marginEnd="@dimen/default_margin"
-        android:textSize="@dimen/default_text_size"
+        android:textSize="14sp"
+        android:textColor="@color/black"
         android:text="@string/restaurant_workmates_number"
         app:layout_constraintEnd_toStartOf="@id/picture"
         app:layout_constraintBottom_toBottomOf="@id/address" />
 
     <ImageView
+        android:id="@+id/workmatesIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toStartOf="@id/workmatesNumber"

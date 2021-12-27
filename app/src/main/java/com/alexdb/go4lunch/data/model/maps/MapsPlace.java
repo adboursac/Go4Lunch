@@ -65,4 +65,8 @@ public class MapsPlace {
         if (photos == null) return null;
         return photos.get(0).getPhotoReference();
     }
+
+    public MapsOpeningHours getOpening_hours() {
+        return opening_hours;
+    }
 }

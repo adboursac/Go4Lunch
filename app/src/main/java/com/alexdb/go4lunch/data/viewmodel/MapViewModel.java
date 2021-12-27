@@ -81,12 +81,13 @@ public class MapViewModel extends ViewModel {
     }
 
     private void createRestaurantMarker(Location location, String title, boolean selected, String placeId) {
+        if (location == null || mMap == null) return;
         LatLng cord = new LatLng(location.getLatitude(), location.getLongitude());
         float hue = selected ? BitmapDescriptorFactory.HUE_GREEN : BitmapDescriptorFactory.HUE_ORANGE;
-        Objects.requireNonNull(mMap.addMarker(new MarkerOptions()
+        mMap.addMarker(new MarkerOptions()
                 .position(cord)
                 .title(title)
-                .icon(BitmapDescriptorFactory.defaultMarker(hue))))
+                .icon(BitmapDescriptorFactory.defaultMarker(hue)))
                 .setTag(placeId);
     }
 

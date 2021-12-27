@@ -48,10 +48,12 @@ public class RestaurantPlacesRepository {
                     if (placesPage != null) {
                         mRestaurantPlacesMutableLiveData.setValue(placesPage.getResults());
 
+                        /*
                         //request for more results if possible
                         if (placesPage.getNext_page_token() != null) {
                             fetchRestaurantPlacesPage(placesPage.getNext_page_token(), true);
                         }
+                         */
                     }
                 }
             }
@@ -67,7 +69,7 @@ public class RestaurantPlacesRepository {
      * Fetch places page from given page token.
      * If allowRetry is set to true, the request will be retried in a background thread if request receives INVALID_REQUEST status.
      * @param pageToken page token
-     * @param allowRetry tells if the call is a retry. if the
+     * @param allowRetry true if retry is allowed, false instead
      */
     private void fetchRestaurantPlacesPage(String pageToken, boolean allowRetry) {
 

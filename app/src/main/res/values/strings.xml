@@ -40,6 +40,6 @@
     <string name="restaurant_closed">Closed</string>
     <string name="restaurant_closing_soon">Closing soon</string>
     <string name="restaurant_open_until">Open until </string>
-    <string name="restaurant_no_hours">Schedule not available</string>
+    <string name="restaurant_no_schedule">Schedule not available</string>
 
 </resources>
