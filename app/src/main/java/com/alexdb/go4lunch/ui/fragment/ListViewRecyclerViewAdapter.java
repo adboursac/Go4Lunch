@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alexdb.go4lunch.R;
@@ -51,6 +52,11 @@ public class ListViewRecyclerViewAdapter extends RecyclerView.Adapter<ListViewRe
         holder.mBinding.openingStatus.setText(restaurant.getOpenStatus());
         holder.mBinding.distance.setText(restaurant.getDistance());
         setPicture(restaurant.getPhotoUrl(), holder.mBinding.picture);
+        holder.itemView.setOnClickListener(v ->
+                Navigation.findNavController(v).navigate(
+                        ListViewFragmentDirections.navigateToDetails().setPlaceId(restaurant.getPlaceId())
+                )
+        );
     }
 
     @Override

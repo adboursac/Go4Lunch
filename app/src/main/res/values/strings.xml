@@ -41,5 +41,10 @@
     <string name="restaurant_closing_soon">Closing soon</string>
     <string name="restaurant_open_until">Open until </string>
     <string name="restaurant_no_schedule">Schedule not available</string>
+    <string name="restaurant_no_phone">This restaurant has no phone number</string>
+    <string name="restaurant_no_website">This restaurant has no website</string>
+    <string name="restaurant_call">CALL</string>
+    <string name="restaurant_like">LIKE</string>
+    <string name="restaurant_website">WEBSITE</string>
 
 </resources>

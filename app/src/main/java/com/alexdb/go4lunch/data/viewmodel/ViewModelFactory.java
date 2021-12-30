@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alexdb.go4lunch.data.repository.LocationRepository;
+import com.alexdb.go4lunch.data.repository.RestaurantDetailsRepository;
 import com.alexdb.go4lunch.data.repository.RestaurantPlacesRepository;
 import com.alexdb.go4lunch.data.repository.UserRepository;
 import com.alexdb.go4lunch.data.service.PermissionHelper;
@@ -29,6 +30,8 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     private final LocationRepository mLocationRepository;
     @NonNull
     private final RestaurantPlacesRepository mMapsPlacesRepository;
+    @NonNull
+    private final RestaurantDetailsRepository mRestaurantDetailsRepository;
 
     private ViewModelFactory() {
         Application application = MainApplication.getApplication();
@@ -38,6 +41,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
         mLocationRepository = new LocationRepository(
                 LocationServices.getFusedLocationProviderClient(application));
         mMapsPlacesRepository = new RestaurantPlacesRepository(Executors.newSingleThreadExecutor());
+        mRestaurantDetailsRepository = new RestaurantDetailsRepository();
     }
 
     public static ViewModelFactory getInstance() {
@@ -63,6 +67,9 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
         }
         else if (modelClass.isAssignableFrom(ListViewModel.class)) {
             return (T) new ListViewModel(mMapsPlacesRepository, mLocationRepository);
+        }
+        else if (modelClass.isAssignableFrom(DetailsViewModel.class)) {
+            return (T) new DetailsViewModel(mRestaurantDetailsRepository);
         }
         throw new IllegalArgumentException("Unknown ViewModel class");
     }

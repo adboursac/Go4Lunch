@@ -47,4 +47,10 @@ public class GoogleMapsApiClient {
                 + mapsPhotoReference
                 + "&key=" + BuildConfig.google_maps_api_key;
     }
+
+    public static Call<MapsPlaceDetailsPage> getPlaceDetails(String placeId) {
+        return getApi().getPlaceDetails(placeId,
+                "place_id,name,opening_hours,website,international_phone_number,formatted_address,photos",
+                BuildConfig.google_maps_api_key);
+    }
 }

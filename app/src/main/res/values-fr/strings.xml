@@ -42,5 +42,10 @@
     <string name="restaurant_closing_soon">Ferme bientôt</string>
     <string name="restaurant_open_until">Ouvert jusqu\'à </string>
     <string name="restaurant_no_schedule">Horaires non disponible.</string>
+    <string name="restaurant_no_phone">Pas de Numéro de téléphone</string>
+    <string name="restaurant_no_website">Pas de site internet</string>
+    <string name="restaurant_call">APPELER</string>
+    <string name="restaurant_like">LIKER</string>
+    <string name="restaurant_website">SITE</string>
 
 </resources>

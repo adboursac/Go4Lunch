@@ -8,6 +8,12 @@
     <dimen name="logo_size">172sp</dimen>
     <dimen name="default_title_size">20sp</dimen>
     <dimen name="default_text_size">16sp</dimen>
-    <dimen name="default_text_size_mini">8sp</dimen>
+    <dimen name="text_size_medium">18sp</dimen>
+    <dimen name="text_size_small">14sp</dimen>
+    <dimen name="text_size_mini">8sp</dimen>
     <dimen name="nav_header_height">224dp</dimen>
+
+    <!-- Restaurant Details -->
+    <dimen name="button_medium_size">32dp</dimen>
+
 </resources>

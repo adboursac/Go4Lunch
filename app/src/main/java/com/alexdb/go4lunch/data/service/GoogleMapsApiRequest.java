@@ -20,4 +20,11 @@ public interface GoogleMapsApiRequest {
             @Query("pagetoken") String pagetoken,
             @Query("key") String key
     );
+
+    @GET("place/details/json")
+    Call<MapsPlaceDetailsPage> getPlaceDetails(
+            @Query("place_id") String place_id,
+            @Query("fields") String fields,
+            @Query("key") String key
+    );
 }
