@@ -52,6 +52,11 @@ public class ListViewRecyclerViewAdapter extends RecyclerView.Adapter<ListViewRe
         holder.mBinding.openingStatus.setText(restaurant.getOpenStatus());
         holder.mBinding.distance.setText(restaurant.getDistance());
         setPicture(restaurant.getPhotoUrl(), holder.mBinding.picture);
+        RatingHelper.displayStarsScheme(
+                restaurant.getRating(),
+                holder.mBinding.star1,
+                holder.mBinding.star2,
+                holder.mBinding.star3);
         holder.itemView.setOnClickListener(v ->
                 Navigation.findNavController(v).navigate(
                         ListViewFragmentDirections.navigateToDetails().setPlaceId(restaurant.getPlaceId())

@@ -67,11 +67,17 @@ public class RestaurantDetailsFragment extends Fragment {
         mDetailsViewModel.fetchRestaurantDetails(placeId);
     }
 
-    private void populateDetails( RestaurantDetailsStateItem details) {
+    private void populateDetails(RestaurantDetailsStateItem details) {
         mCurrentDetails = details;
         mBinding.name.setText(details.getName());
         mBinding.address.setText(details.getAddress());
         setPicture(details.getPhotoUrl(), mBinding.picture);
+        RatingHelper.displayStarsScheme(
+                details.getRating(),
+                mBinding.star1,
+                mBinding.star2,
+                mBinding.star3);
+
     }
 
     private void initCallButton() {
@@ -110,9 +116,10 @@ public class RestaurantDetailsFragment extends Fragment {
 
     /**
      * Show Snack Bar with a message
+     *
      * @param message message to display
      */
-    private void showSnackBar( String message){
+    private void showSnackBar(String message) {
         Snackbar.make(mBinding.mainLayout, message, Snackbar.LENGTH_SHORT).show();
     }
 }

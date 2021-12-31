@@ -29,16 +29,20 @@ public class MapsPlace {
     @Expose
     private final MapsOpeningHours opening_hours;
 
+    @SerializedName("rating")
+    private Float rating;
+
     @SerializedName("photos")
     @Expose
     private final List<MapsPhoto> photos;
 
-    public MapsPlace(String placeId, String name, String vicinity, MapsGeometry geometry, MapsOpeningHours opening_hours, List<MapsPhoto> photos) {
+    public MapsPlace(String placeId, String name, String vicinity, MapsGeometry geometry, MapsOpeningHours opening_hours, Float rating, List<MapsPhoto> photos) {
         this.placeId = placeId;
         this.name = name;
         this.vicinity = vicinity;
         this.geometry = geometry;
         this.opening_hours = opening_hours;
+        this.rating = rating;
         this.photos = photos;
     }
 
@@ -59,6 +63,10 @@ public class MapsPlace {
         location.setLatitude(geometry.getLocation().getLat());
         location.setLongitude(geometry.getLocation().getLng());
         return location;
+    }
+
+    public Float getRating() {
+        return rating;
     }
 
     public String getFirstPhotoReference() {

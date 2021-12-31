@@ -31,17 +31,21 @@ public class MapsPlaceDetails {
     @Expose
     private final String formatted_address;
 
+    @SerializedName("rating")
+    private Float rating;
+
     @SerializedName("photos")
     @Expose
     private final List<MapsPhoto> photos;
 
-    public MapsPlaceDetails(String place_id, String name, MapsOpeningHours opening_hours, String website, String international_phone_number, String formatted_address, List<MapsPhoto> photos) {
+    public MapsPlaceDetails(String place_id, String name, MapsOpeningHours opening_hours, String website, String international_phone_number, String formatted_address, Float rating, List<MapsPhoto> photos) {
         this.place_id = place_id;
         this.name = name;
         this.opening_hours = opening_hours;
         this.website = website;
         this.international_phone_number = international_phone_number;
         this.formatted_address = formatted_address;
+        this.rating = rating;
         this.photos = photos;
     }
 
@@ -67,6 +71,10 @@ public class MapsPlaceDetails {
 
     public String getFormatted_address() {
         return formatted_address;
+    }
+
+    public Float getRating() {
+        return rating;
     }
 
     public String getFirstPhotoReference() {

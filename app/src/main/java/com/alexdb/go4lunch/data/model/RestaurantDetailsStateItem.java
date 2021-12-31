@@ -8,15 +8,17 @@ public class RestaurantDetailsStateItem {
     private String website;
     private String phoneNumber;
     private String address;
+    private Float rating;
     private String photoUrl;
 
-    public RestaurantDetailsStateItem(String placeId, String name, String openStatus, String website, String phoneNumber, String address, String photoUrl) {
+    public RestaurantDetailsStateItem(String placeId, String name, String openStatus, String website, String phoneNumber, String address, Float rating, String photoUrl) {
         this.placeId = placeId;
         this.name = name;
         this.openStatus = openStatus;
         this.website = website;
         this.phoneNumber = phoneNumber;
         this.address = address;
+        this.rating = rating;
         this.photoUrl = photoUrl;
     }
 
@@ -42,6 +44,10 @@ public class RestaurantDetailsStateItem {
 
     public String getAddress() {
         return address;
+    }
+
+    public Float getRating() {
+        return rating;
     }
 
     public String getPhotoUrl() {

@@ -39,6 +39,7 @@ public class DetailsViewModel extends ViewModel {
                 placeDetails.getWebsite(),
                 placeDetails.getInternational_phone_number(),
                 placeDetails.getFormatted_address(),
+                placeDetails.getRating(),
                 GoogleMapsApiClient.getPictureUrl(placeDetails.getFirstPhotoReference())));
     }
 

@@ -19,6 +19,7 @@ import com.alexdb.go4lunch.ui.MainApplication;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ListViewModel extends ViewModel {
 
@@ -52,6 +53,7 @@ public class ListViewModel extends ViewModel {
                         p.getVicinity(),
                         p.getLocation(),
                         generateDistance(p.getLocation()),
+                        p.getRating(),
                         GoogleMapsApiClient.getPictureUrl(p.getFirstPhotoReference()))
                 );
             }
@@ -70,7 +72,7 @@ public class ListViewModel extends ViewModel {
 
     private String generateDistance(Location location) {
         Location userLocation = mLocationRepository.getLocationLiveData().getValue();
-        int distance = Math.round(userLocation.distanceTo(location));
-        return distance+"m";
+        int distance = Math.round(Objects.requireNonNull(userLocation).distanceTo(location));
+        return distance + "m";
     }
 }

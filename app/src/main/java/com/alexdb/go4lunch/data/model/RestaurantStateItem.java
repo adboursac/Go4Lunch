@@ -9,15 +9,17 @@ public class RestaurantStateItem {
     private String address;
     private Location location;
     private String distance;
+    private Float rating;
     private String photoUrl;
 
-    public RestaurantStateItem(String placeId, String name, String openStatus, String address, Location location, String distance, String photoUrl) {
+    public RestaurantStateItem(String placeId, String name, String openStatus, String address, Location location, String distance, Float rating, String photoUrl) {
         this.placeId = placeId;
         this.name = name;
         this.openStatus = openStatus;
         this.address = address;
         this.location = location;
         this.distance = distance;
+        this.rating = rating;
         this.photoUrl = photoUrl;
     }
 
@@ -67,6 +69,14 @@ public class RestaurantStateItem {
 
     public void setDistance(String distance) {
         this.distance = distance;
+    }
+
+    public Float getRating() {
+        return rating;
+    }
+
+    public void setRating(Float rating) {
+        this.rating = rating;
     }
 
     public String getPhotoUrl() {
