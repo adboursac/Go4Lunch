@@ -99,8 +99,7 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
     private void onSignInResult(FirebaseAuthUIAuthenticationResult result) {
         IdpResponse response = result.getIdpResponse();
         if (result.getResultCode() == RESULT_OK) {
-            User user = mUserViewModel.getCurrentUser();
-            mUserViewModel.createUser(user);
+            mUserViewModel.notifyUserAuthentication();
             showSnackBar(getString(R.string.connection_succeed));
         } else {
             // Sign in failed

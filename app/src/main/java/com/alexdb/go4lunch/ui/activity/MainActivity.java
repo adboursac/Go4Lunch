@@ -30,6 +30,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     private UserViewModel mUserViewModel;
     private NavController mNavController;
+    private MenuItem drawerSignOutButton;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -37,8 +38,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         initViewModel();
         initNavigationComponents();
         ConfigureNavigationComponentsDisplayRules();
-        updateDrawerHeaderData();
-        setupListeners();
+
+        Menu menu = mBinding.drawerContent.getMenu();
+        drawerSignOutButton = menu.findItem(R.id.menu_drawer_logout);
+
+        initSignOutButton();
     }
 
     @Override
@@ -46,17 +50,13 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         return ActivityMainBinding.inflate(getLayoutInflater());
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        //mNavController.navigate(R.id.nav_map_view_fragment);
-    }
-
     /**
      * Get required View Model for Main Activity
      */
     private void initViewModel() {
         mUserViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(UserViewModel.class);
+        mUserViewModel.getCurrentUserLiveData().observe(this, this::updateDrawerHeaderData);
+        mUserViewModel.fetchCurrentUser();
     }
 
     /**
@@ -105,14 +105,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         mBinding.activityMainContent.bottomNavigation.setVisibility(visibility);
     }
 
-    /** Set specific listeners for Main Activity
-     * - listener on Sign Out button for navigation drawer
+    /** init Sign Out button for navigation drawer
+     * -
      */
-    private void setupListeners(){
-        // Logout Button
-        Menu menu = mBinding.drawerContent.getMenu();
-        MenuItem item = menu.findItem(R.id.menu_drawer_logout);
-        item.setOnMenuItemClickListener(i -> {
+    private void initSignOutButton(){
+        drawerSignOutButton.setOnMenuItemClickListener(i -> {
             mBinding.drawerLayout.closeDrawer(GravityCompat.START);
             mUserViewModel.signOut(this).addOnSuccessListener(aVoid -> finish());
             return true;
@@ -122,9 +119,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     /**
      * update drawer header with user data
      */
-    private void updateDrawerHeaderData(){
-        if(mUserViewModel.isCurrentUserLogged()){
-            User currentUser = mUserViewModel.getCurrentUser();
+    private void updateDrawerHeaderData(User currentUser){
+        if(mUserViewModel.isCurrentUserLogged()) {
             View drawerHeaderView = mBinding.drawerContent.getHeaderView(0);
 
             if(currentUser.getProfilePictureUrl() != null){
