@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import com.alexdb.go4lunch.R;
 import com.alexdb.go4lunch.data.viewmodel.MapViewModel;
@@ -18,8 +19,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 public class MapViewFragment extends Fragment implements OnMapReadyCallback {
 
@@ -53,7 +57,14 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(@NotNull GoogleMap googleMap) {
         initMapStyle(googleMap);
         mMapViewModel.initMap(googleMap, requireActivity());
+        //Click on target button refresh location and moves camera on it
         mBinding.floatingActionButton.setOnClickListener(view -> mMapViewModel.refreshLocation());
+        //Click on markers navigate to details activity
+        googleMap.setOnInfoWindowClickListener(marker ->
+                Navigation.findNavController(mBinding.getRoot()).navigate(
+                        MapViewFragmentDirections.navigateToDetails()
+                                .setPlaceId((String) Objects.requireNonNull(marker.getTag()))
+                ));
     }
 
     private void initViewModels() {

@@ -25,7 +25,11 @@
         android:id="@+id/nav_map_view_fragment"
         android:name="com.alexdb.go4lunch.ui.fragment.MapViewFragment"
         android:label="@string/toolbar_default"
-        tools:layout="@layout/fragment_map_view" />
+        tools:layout="@layout/fragment_map_view" >
+        <action
+            android:id="@+id/navigateToDetails"
+            app:destination="@id/nav_restaurant_details_fragment" />
+    </fragment>
     <fragment
         android:id="@+id/nav_list_view_fragment"
         android:name="com.alexdb.go4lunch.ui.fragment.ListViewFragment"
