@@ -7,15 +7,18 @@ import android.location.Location;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
+import androidx.navigation.Navigation;
 
 import com.alexdb.go4lunch.data.model.maps.MapsPlace;
 import com.alexdb.go4lunch.data.repository.LocationRepository;
 import com.alexdb.go4lunch.data.repository.RestaurantPlacesRepository;
 import com.alexdb.go4lunch.data.service.PermissionHelper;
+import com.alexdb.go4lunch.ui.fragment.ListViewFragmentDirections;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.List;
@@ -57,6 +60,7 @@ public class MapViewModel extends ViewModel {
         if (mPermissionHelper.hasLocationPermission()) {
             mLocationRepository.startLocationUpdatesLoop();
             mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setMyLocationButtonEnabled(false);
         } else {
             mLocationRepository.stopLocationUpdatesLoop();
         }
