@@ -1,13 +1,20 @@
 package com.alexdb.go4lunch.data.repository;
 
 import android.content.Context;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.alexdb.go4lunch.data.model.User;
 import com.alexdb.go4lunch.data.service.UserApiFirebase;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
+
+import java.util.Date;
 
 public class UserRepository {
 
@@ -46,6 +53,8 @@ public class UserRepository {
 
     /**
      * Add authenticated User in our database if not already in.
+     *
+     * @return resulting task containing user instance created in database
      */
     public Task<User> notifyUserAuthentication() {
         //Get User instance from Firebase Authentication SDK
@@ -74,6 +83,26 @@ public class UserRepository {
      */
     public Task<Void> signOut(Context context) {
         return mUserApiService.signOut(context);
+    }
+
+    /**
+     * Updates current user booking attributes bookedPlacedId and bookedDate
+     * on both remote database and local LiveData
+     *
+     * @param placeId id of the booked place
+     */
+    public void updateCurrentUserBooking(String placeId) {
+        User currentUser = mCurrentUserLiveData.getValue();
+        Date now = new Date(System.currentTimeMillis());
+        mUserApiService.updateBookedPlace(
+                currentUser.getUid(),
+                placeId,
+                now
+        ).addOnSuccessListener(aVoid -> {
+            currentUser.setBookedPlaceId(placeId);
+            currentUser.setBookedDate(now);
+            mCurrentUserLiveData.setValue(currentUser);
+        }).addOnFailureListener(e -> Log.w("User Api", "updateCurrentUserBooking Error", e));
     }
 
     /**

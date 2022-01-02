@@ -25,7 +25,7 @@
         app:layout_constraintGuide_percent="0.38" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/detail_choice_fab"
+        android:id="@+id/bookingButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
@@ -34,10 +34,10 @@
         android:contentDescription="@null"
         android:focusable="true"
         android:src="@drawable/ic_baseline_person_add_alt_1_24"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:maxImageSize="32dp"
         app:layout_constraintBottom_toBottomOf="@id/guideline1"
-        app:layout_constraintTop_toTopOf="@id/guideline1"
-        app:tint="@color/orange_500" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/guideline1" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline2"

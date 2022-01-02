@@ -7,11 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,9 +23,6 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.Objects;
 
 
 public class RestaurantDetailsFragment extends Fragment {
@@ -47,6 +42,7 @@ public class RestaurantDetailsFragment extends Fragment {
         initData();
         initCallButton();
         initWebsiteButton();
+        initBookingButton();
         return mBinding.getRoot();
     }
 
@@ -77,7 +73,21 @@ public class RestaurantDetailsFragment extends Fragment {
                 mBinding.star1,
                 mBinding.star2,
                 mBinding.star3);
+        renderBookingButton(details.isBooked());
+    }
 
+    private void renderBookingButton(boolean booked) {
+        if (booked) {
+            mBinding.bookingButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_check_circle_24));
+            mBinding.bookingButton.getDrawable().setTint(getResources().getColor(R.color.green));
+        } else {
+            mBinding.bookingButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_person_add_alt_1_24));
+            mBinding.bookingButton.getDrawable().setTint(getResources().getColor(R.color.orange_500));
+        }
+    }
+
+    private void initBookingButton() {
+        mBinding.bookingButton.setOnClickListener(v -> mDetailsViewModel.toggleRestaurantBookingStatus());
     }
 
     private void initCallButton() {

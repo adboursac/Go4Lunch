@@ -5,12 +5,13 @@ import android.content.Context;
 import com.alexdb.go4lunch.data.model.User;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Date;
 import java.util.Objects;
 
 public class UserApiFirebase {
@@ -43,6 +44,20 @@ public class UserApiFirebase {
     public Task<User> getUser(String uid) {
         return getUsersCollection().document(uid).get()
                 .continueWith(task -> Objects.requireNonNull(task.getResult().toObject(User.class)));
+    }
+
+    /**
+     * Update user's booked place
+     * @param uid user's uid
+     * @param placeId place id
+     * @param date booking date
+     * @return resulting task
+     */
+    public Task<Void> updateBookedPlace(String uid, String placeId, Date date) {
+        return getUsersCollection().document(uid).update(
+                "bookedPlaceId", placeId,
+                "bookedDate", new Timestamp(date)
+        );
     }
 
     /**

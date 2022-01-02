@@ -1,5 +1,7 @@
 package com.alexdb.go4lunch.data.model;
 
+import android.text.format.DateUtils;
+
 import com.google.firebase.firestore.ServerTimestamp;
 
 import java.util.Date;
@@ -9,18 +11,18 @@ public class User {
     private String name;
     private String email;
     private String profilePictureUrl;
-    private Date bookingDate;
-    private String bookingPlaceId;
+    private Date bookedDate;
+    private String bookedPlaceId;
 
     public User() {}
 
-    public User(String uid, String name, String email, String profilePictureUrl, Date bookingDate, String bookingPlaceId) {
+    public User(String uid, String name, String email, String profilePictureUrl, Date bookedDate, String bookedPlaceId) {
         this.uid = uid;
         this.name = name;
         this.email = email;
         this.profilePictureUrl = profilePictureUrl;
-        this.bookingDate = bookingDate;
-        this.bookingPlaceId = bookingPlaceId;
+        this.bookedDate = bookedDate;
+        this.bookedPlaceId = bookedPlaceId;
     }
 
     public String getUid() {
@@ -56,19 +58,29 @@ public class User {
     }
 
     @ServerTimestamp
-    public Date getBookingDate() {
-        return bookingDate;
+    public Date getBookedDate() {
+        return bookedDate;
     }
 
-    public void setBookingDate(Date bookingDate) {
-        this.bookingDate = bookingDate;
+    public void setBookedDate(Date bookedDate) {
+        this.bookedDate = bookedDate;
     }
 
-    public String getBookingPlaceId() {
-        return bookingPlaceId;
+    public String getBookedPlaceId() {
+        return bookedPlaceId;
     }
 
-    public void setBookingPlaceId(String bookingPlaceId) {
-        this.bookingPlaceId = bookingPlaceId;
+    public void setBookedPlaceId(String bookedPlaceId) {
+        this.bookedPlaceId = bookedPlaceId;
+    }
+
+    public boolean hasValidBookingDate() {
+        if (bookedDate == null) return false;
+        return DateUtils.isToday(bookedDate.getTime());
+    }
+
+    public boolean hasBookedPlace(String placeId) {
+        if (bookedPlaceId == null) return false;
+        return ( hasValidBookingDate() && bookedPlaceId.contentEquals(placeId));
     }
 }
