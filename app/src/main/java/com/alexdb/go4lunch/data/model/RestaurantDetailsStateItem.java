@@ -11,8 +11,9 @@ public class RestaurantDetailsStateItem {
     private Float rating;
     private String photoUrl;
     private boolean booked;
+    private boolean liked;
 
-    public RestaurantDetailsStateItem(String placeId, String name, String openStatus, String website, String phoneNumber, String address, Float rating, String photoUrl, boolean booked) {
+    public RestaurantDetailsStateItem(String placeId, String name, String openStatus, String website, String phoneNumber, String address, Float rating, String photoUrl, boolean booked, boolean liked) {
         this.placeId = placeId;
         this.name = name;
         this.openStatus = openStatus;
@@ -22,6 +23,7 @@ public class RestaurantDetailsStateItem {
         this.rating = rating;
         this.photoUrl = photoUrl;
         this.booked = booked;
+        this.liked = liked;
     }
 
     public String getPlaceId() {
@@ -59,5 +61,9 @@ public class RestaurantDetailsStateItem {
     public boolean isBooked() { return booked; }
 
     public void setBooked(boolean booked) { this.booked = booked; }
+
+    public boolean isLiked() { return liked; }
+
+    public void setLiked(boolean liked) { this.liked = liked; }
 }
 

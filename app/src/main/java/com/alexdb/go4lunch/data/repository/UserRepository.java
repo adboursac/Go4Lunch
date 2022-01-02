@@ -104,6 +104,31 @@ public class UserRepository {
     }
 
     /**
+     * Updates the current user's like status of the given place by removing it from liked places list or adding it
+     * on both remote database and local LiveData
+     *
+     * @param placeId id of the liked place
+     */
+    public void toggleCurrentUserLikedPlace(String placeId) {
+        User currentUser = mCurrentUserLiveData.getValue();
+        if (currentUser.getLikedPlaces().contains(placeId)) {
+            mUserApiService.removeLikedPlace(currentUser.getUid(), placeId)
+                    .addOnSuccessListener(aVoid -> {
+                        currentUser.removeLikedPlace(placeId);
+                        mCurrentUserLiveData.setValue(currentUser);
+                    })
+                    .addOnFailureListener(e -> Log.w("User Repository", "removeCurrentUserLikedPlace Error", e));
+        } else {
+            mUserApiService.addLikedPlace(currentUser.getUid(), placeId)
+                    .addOnSuccessListener(aVoid -> {
+                        currentUser.addLikedPlace(placeId);
+                        mCurrentUserLiveData.setValue(currentUser);
+                    })
+                    .addOnFailureListener(e -> Log.w("User Repository", "addCurrentUserLikedPlace Error", e));
+        }
+    }
+
+    /**
      * Delete current user account.
      *
      * @param context context

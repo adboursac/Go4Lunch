@@ -5,6 +5,7 @@ import android.text.format.DateUtils;
 import com.google.firebase.firestore.ServerTimestamp;
 
 import java.util.Date;
+import java.util.List;
 
 public class User {
     private String uid;
@@ -13,16 +14,18 @@ public class User {
     private String profilePictureUrl;
     private Date bookedDate;
     private String bookedPlaceId;
+    private List<String> likedPlaces;
 
     public User() {}
 
-    public User(String uid, String name, String email, String profilePictureUrl, Date bookedDate, String bookedPlaceId) {
+    public User(String uid, String name, String email, String profilePictureUrl, Date bookedDate, String bookedPlaceId, List<String> likedPlaces) {
         this.uid = uid;
         this.name = name;
         this.email = email;
         this.profilePictureUrl = profilePictureUrl;
         this.bookedDate = bookedDate;
         this.bookedPlaceId = bookedPlaceId;
+        this.likedPlaces = likedPlaces;
     }
 
     public String getUid() {
@@ -82,5 +85,17 @@ public class User {
     public boolean hasBookedPlace(String placeId) {
         if (bookedPlaceId == null) return false;
         return ( hasValidBookingDate() && bookedPlaceId.contentEquals(placeId));
+    }
+
+    public List<String> getLikedPlaces() {
+        return likedPlaces;
+    }
+
+    public void addLikedPlace(String placeId) {
+        likedPlaces.add(placeId);
+    }
+
+    public void removeLikedPlace(String placeId) {
+        likedPlaces.remove(placeId);
     }
 }

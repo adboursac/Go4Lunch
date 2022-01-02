@@ -76,7 +76,8 @@ public class DetailsViewModel extends ViewModel {
                 placeDetails.getFormatted_address(),
                 placeDetails.getRating(),
                 GoogleMapsApiClient.getPictureUrl(placeDetails.getFirstPhotoReference()),
-                currentUser.hasBookedPlace(placeDetails.getPlace_id()));
+                currentUser.hasBookedPlace(placeDetails.getPlace_id()),
+                currentUser.getLikedPlaces().contains(placeDetails.getPlace_id()));
 
         mRestaurantDetailsLiveData.setValue(restaurantDetailsStateItem);
     }
@@ -94,5 +95,10 @@ public class DetailsViewModel extends ViewModel {
         RestaurantDetailsStateItem restaurant = mRestaurantDetailsLiveData.getValue();
         String newBookingPlaceId = restaurant.isBooked() ? null : restaurant.getPlaceId();
         mUserRepository.updateCurrentUserBooking(newBookingPlaceId);
+    }
+
+    public void toggleCurrentUserLikedPlace() {
+        RestaurantDetailsStateItem restaurant = mRestaurantDetailsLiveData.getValue();
+        mUserRepository.toggleCurrentUserLikedPlace(restaurant.getPlaceId());
     }
 }

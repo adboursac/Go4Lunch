@@ -9,8 +9,10 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
 
@@ -48,9 +50,10 @@ public class UserApiFirebase {
 
     /**
      * Update user's booked place
-     * @param uid user's uid
+     *
+     * @param uid     user's uid
      * @param placeId place id
-     * @param date booking date
+     * @param date    booking date
      * @return resulting task
      */
     public Task<Void> updateBookedPlace(String uid, String placeId, Date date) {
@@ -58,6 +61,28 @@ public class UserApiFirebase {
                 "bookedPlaceId", placeId,
                 "bookedDate", new Timestamp(date)
         );
+    }
+
+    /**
+     * Add place into liked places list
+     *
+     * @param uid     user's uid
+     * @param placeId liked place id
+     * @return resulting task
+     */
+    public Task<Void> addLikedPlace(String uid, String placeId) {
+        return getUsersCollection().document(uid).update("likedPlaces", FieldValue.arrayUnion(placeId));
+    }
+
+    /**
+     * Remove place from liked places list
+     *
+     * @param uid     user's uid
+     * @param placeId place id to remove
+     * @return resulting task
+     */
+    public Task<Void> removeLikedPlace(String uid, String placeId) {
+        return getUsersCollection().document(uid).update("likedPlaces", FieldValue.arrayRemove(placeId));
     }
 
     /**
@@ -71,9 +96,10 @@ public class UserApiFirebase {
                 fUser.getUid(),
                 fUser.getDisplayName(),
                 fUser.getEmail(),
-                fUser.getPhotoUrl() != null ? fUser.getPhotoUrl().toString() : "",
+                fUser.getPhotoUrl() != null ? fUser.getPhotoUrl().toString() : null,
                 null,
-                null);
+                null,
+                new ArrayList<>());
         else return null;
     }
 
@@ -83,7 +109,7 @@ public class UserApiFirebase {
      * @return current logged user
      */
     public Task<User> getCurrentUser() {
-        FirebaseUser currentUser =  FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser == null) return null;
         return getUser(currentUser.getUid());
     }

@@ -41,6 +41,7 @@ public class RestaurantDetailsFragment extends Fragment {
         //initRecyclerView();
         initData();
         initCallButton();
+        initLikeButton();
         initWebsiteButton();
         initBookingButton();
         return mBinding.getRoot();
@@ -100,6 +101,10 @@ public class RestaurantDetailsFragment extends Fragment {
                 showSnackBar(getResources().getString(R.string.restaurant_no_phone));
             }
         });
+    }
+
+    private void initLikeButton() {
+        mBinding.likeButton.setOnClickListener(v -> mDetailsViewModel.toggleCurrentUserLikedPlace());
     }
 
     private void initWebsiteButton() {
