@@ -33,10 +33,10 @@ public class UserRepository {
      * Create user from given user instance
      *
      * @param user user to store in database
-     * @return resulting task
      */
-    public Task<Void> createUser(User user) {
-        return mUserApiService.createUser(user);
+    public void createUser(User user) {
+        mUserApiService.createUser(user)
+                .addOnFailureListener(e -> Log.w("User Repository", "createUser Error", e));
     }
 
     /**
@@ -53,16 +53,14 @@ public class UserRepository {
 
     /**
      * Add authenticated User in our database if not already in.
-     *
-     * @return resulting task containing user instance created in database
      */
-    public Task<User> notifyUserAuthentication() {
+    public void notifyUserAuthentication() {
         //Get User instance from Firebase Authentication SDK
         User authenticatedUser = mUserApiService.getFirebaseAuthCurrentUser();
         //Add authenticated User in our database if not already in.
-        return mUserApiService.getUser(authenticatedUser.getUid()).continueWith(task -> {
-            if (task.getResult() == null) createUser(authenticatedUser);
-            return task.getResult();
+        mUserApiService.getUser(authenticatedUser.getUid()).continueWith(task -> {
+            if (!task.isSuccessful()) createUser(authenticatedUser);
+            return null;
         });
     }
 
@@ -102,7 +100,7 @@ public class UserRepository {
             currentUser.setBookedPlaceId(placeId);
             currentUser.setBookedDate(now);
             mCurrentUserLiveData.setValue(currentUser);
-        }).addOnFailureListener(e -> Log.w("User Api", "updateCurrentUserBooking Error", e));
+        }).addOnFailureListener(e -> Log.w("User Repository", "updateCurrentUserBooking Error", e));
     }
 
     /**

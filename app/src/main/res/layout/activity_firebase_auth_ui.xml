@@ -75,7 +75,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/large_margin"
         android:layout_marginRight="@dimen/large_margin"
-        android:layout_marginBottom="@dimen/large_margin"
+        android:layout_marginBottom="@dimen/default_margin"
         android:padding="@dimen/default_button_padding"
         android:backgroundTint="@color/facebook"
         android:textColor="@color/white"
@@ -84,5 +84,38 @@
         android:text="@string/sign_in_with_facebook"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btn_twitter_login"/>
+
+    <Button
+        android:id="@+id/btn_twitter_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/large_margin"
+        android:layout_marginRight="@dimen/large_margin"
+        android:layout_marginBottom="@dimen/default_margin"
+        android:padding="@dimen/default_button_padding"
+        android:backgroundTint="@color/fui_bgTwitter"
+        android:textColor="@color/white"
+        tools:ignore="RtlHardcoded"
+        android:drawableLeft="@drawable/fui_ic_twitter_bird_white_24dp"
+        android:text="@string/sign_in_with_twitter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btn_email_login"/>
+
+    <Button
+        android:id="@+id/btn_email_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/large_margin"
+        android:layout_marginRight="@dimen/large_margin"
+        android:layout_marginBottom="@dimen/large_margin"
+        android:padding="@dimen/default_button_padding"
+        tools:ignore="RtlHardcoded"
+        android:drawableLeft="@drawable/fui_ic_mail_white_24dp"
+        android:text="@string/sign_in_with_mail"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

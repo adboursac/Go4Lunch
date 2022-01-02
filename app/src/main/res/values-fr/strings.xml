@@ -13,6 +13,8 @@
     <string name="connection_succeed">Authentification réussie !</string>
     <string name="sign_in_with_google">Connexion avec Google</string>
     <string name="sign_in_with_facebook">Connexion avec Facebook</string>
+    <string name="sign_in_with_twitter">Connexion avec Twitter</string>
+    <string name="sign_in_with_mail">Connexion avec votre Mail</string>
 
     <!-- Toolbar -->
     <string name="toolbar_default">J\'ai faim</string>

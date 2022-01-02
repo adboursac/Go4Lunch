@@ -12,6 +12,8 @@
     <string name="connection_succeed">Authentication successful!</string>
     <string name="sign_in_with_google">Sign in with Google</string>
     <string name="sign_in_with_facebook">Sign in with Facebook</string>
+    <string name="sign_in_with_twitter">Sign in with Twitter</string>
+    <string name="sign_in_with_mail">Sign in with your Mail</string>
 
     <!-- Toolbar -->
     <string name="toolbar_default">I\'m hungry</string>
