@@ -11,6 +11,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,11 +42,20 @@ public class UserApiFirebase {
      * Get the user from database and cast it to a User model Object
      *
      * @param uid the id of the required user
-     * @return User model Object
+     * @return resulting task with User model Object
      */
     public Task<User> getUser(String uid) {
         return getUsersCollection().document(uid).get()
                 .continueWith(task -> Objects.requireNonNull(task.getResult().toObject(User.class)));
+    }
+
+    /**
+     * Get every user from database
+     *
+     * @return resulting task containing a list with all users as DocumentSnapshot
+     */
+    public Task<QuerySnapshot> getAllUsers() {
+        return getUsersCollection().get();
     }
 
     /**

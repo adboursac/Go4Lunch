@@ -49,4 +49,7 @@
     <string name="restaurant_like">LIKE</string>
     <string name="restaurant_website">WEBSITE</string>
 
+    <!-- Workmates -->
+    <string name="workmate_joining">is joining!</string>
+
 </resources>

@@ -3,23 +3,23 @@ package com.alexdb.go4lunch.data.repository;
 import android.content.Context;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.alexdb.go4lunch.data.model.User;
 import com.alexdb.go4lunch.data.service.UserApiFirebase;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.Timestamp;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class UserRepository {
 
     private final UserApiFirebase mUserApiService;
     private MutableLiveData<User> mCurrentUserLiveData = new MutableLiveData<>();
+    private MutableLiveData<List<User>> mWorkmatesLiveData = new MutableLiveData<>();
 
     public UserRepository(UserApiFirebase userApiService) {
         mUserApiService = userApiService;
@@ -27,6 +27,10 @@ public class UserRepository {
 
     public LiveData<User> getCurrentUserLiveData() {
         return mCurrentUserLiveData;
+    }
+
+    public LiveData<List<User>> getWorkmatesLiveData() {
+        return mWorkmatesLiveData;
     }
 
     /**
@@ -52,16 +56,31 @@ public class UserRepository {
     }
 
     /**
+     * Fetch all users in database except current user, cast them as User model Object
+     * and update workmates Live Data
+     */
+    public void fetchWorkmates() {
+        String currentUserId = mUserApiService.getFirebaseAuthCurrentUser().getUid();
+        mUserApiService.getAllUsers()
+                .addOnSuccessListener(task -> {
+                    List<User> workmates = task.getDocuments().stream()
+                            .map(documentSnapshot -> documentSnapshot.toObject(User.class))
+                            .filter(user -> user != null && !(currentUserId.contentEquals(user.getUid())))
+                            .collect(Collectors.toList());
+                    mWorkmatesLiveData.setValue(workmates);
+                })
+                .addOnFailureListener(e -> Log.w("User Repository", "fetchWorkmates Error", e));
+    }
+
+    /**
      * Add authenticated User in our database if not already in.
      */
     public void notifyUserAuthentication() {
         //Get User instance from Firebase Authentication SDK
         User authenticatedUser = mUserApiService.getFirebaseAuthCurrentUser();
         //Add authenticated User in our database if not already in.
-        mUserApiService.getUser(authenticatedUser.getUid()).continueWith(task -> {
-            if (!task.isSuccessful()) createUser(authenticatedUser);
-            return null;
-        });
+        mUserApiService.getUser(authenticatedUser.getUid())
+                .addOnSuccessListener(task -> createUser(authenticatedUser));
     }
 
     /**
@@ -93,7 +112,7 @@ public class UserRepository {
         User currentUser = mCurrentUserLiveData.getValue();
         Date now = new Date(System.currentTimeMillis());
         mUserApiService.updateBookedPlace(
-                currentUser.getUid(),
+                Objects.requireNonNull(currentUser).getUid(),
                 placeId,
                 now
         ).addOnSuccessListener(aVoid -> {
@@ -111,7 +130,7 @@ public class UserRepository {
      */
     public void toggleCurrentUserLikedPlace(String placeId) {
         User currentUser = mCurrentUserLiveData.getValue();
-        if (currentUser.getLikedPlaces().contains(placeId)) {
+        if (Objects.requireNonNull(currentUser).getLikedPlaces().contains(placeId)) {
             mUserApiService.removeLikedPlace(currentUser.getUid(), placeId)
                     .addOnSuccessListener(aVoid -> {
                         currentUser.removeLikedPlace(placeId);

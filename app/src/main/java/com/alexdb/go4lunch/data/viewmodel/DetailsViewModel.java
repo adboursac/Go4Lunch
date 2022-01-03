@@ -17,6 +17,10 @@ import com.alexdb.go4lunch.data.repository.UserRepository;
 import com.alexdb.go4lunch.data.service.GoogleMapsApiClient;
 import com.alexdb.go4lunch.ui.MainApplication;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class DetailsViewModel extends ViewModel {
 
     private final RestaurantDetailsRepository mRestaurantDetailsRepository;
@@ -35,6 +39,7 @@ public class DetailsViewModel extends ViewModel {
 
     public void fetchRestaurantDetails(String placeId) {
         mRestaurantDetailsRepository.fetchRestaurantDetails(placeId);
+        mUserRepository.fetchWorkmates();
     }
 
     /**
@@ -44,17 +49,28 @@ public class DetailsViewModel extends ViewModel {
         mRestaurantDetailsLiveData = new MediatorLiveData<>();
         LiveData<MapsPlaceDetails> placeDetailsLiveData = mRestaurantDetailsRepository.getRestaurantDetailsLiveData();
         LiveData<User> currentUserLiveData = mUserRepository.getCurrentUserLiveData();
+        LiveData<List<User>> workmatesLiveData = mUserRepository.getWorkmatesLiveData();
 
-        mRestaurantDetailsLiveData.addSource(placeDetailsLiveData, (Observer<MapsPlaceDetails>) restaurantDetails ->
+
+        mRestaurantDetailsLiveData.addSource(placeDetailsLiveData, restaurantDetails ->
                 mapDataToViewState(
                         restaurantDetails,
-                        currentUserLiveData.getValue())
+                        currentUserLiveData.getValue(),
+                        workmatesLiveData.getValue())
         );
 
-        mRestaurantDetailsLiveData.addSource(currentUserLiveData, (Observer<User>) user ->
+        mRestaurantDetailsLiveData.addSource(currentUserLiveData, user ->
                 mapDataToViewState(
                         placeDetailsLiveData.getValue(),
-                        user)
+                        user,
+                        workmatesLiveData.getValue())
+        );
+
+        mRestaurantDetailsLiveData.addSource(workmatesLiveData, workmates ->
+                mapDataToViewState(
+                        placeDetailsLiveData.getValue(),
+                        currentUserLiveData.getValue(),
+                        workmates)
         );
     }
 
@@ -64,7 +80,7 @@ public class DetailsViewModel extends ViewModel {
      * @param placeDetails data from restaurant detail repository
      * @param currentUser current user data from user repository
      */
-    private void mapDataToViewState(MapsPlaceDetails placeDetails, User currentUser) {
+    private void mapDataToViewState(MapsPlaceDetails placeDetails, User currentUser, List<User> workmates) {
             if ((placeDetails == null)||(currentUser == null)) return;
 
         RestaurantDetailsStateItem restaurantDetailsStateItem = new RestaurantDetailsStateItem(
@@ -77,7 +93,8 @@ public class DetailsViewModel extends ViewModel {
                 placeDetails.getRating(),
                 GoogleMapsApiClient.getPictureUrl(placeDetails.getFirstPhotoReference()),
                 currentUser.hasBookedPlace(placeDetails.getPlace_id()),
-                currentUser.getLikedPlaces().contains(placeDetails.getPlace_id()));
+                currentUser.getLikedPlaces().contains(placeDetails.getPlace_id()),
+                getBookedWorkmates(workmates,placeDetails.getPlace_id()));
 
         mRestaurantDetailsLiveData.setValue(restaurantDetailsStateItem);
     }
@@ -93,12 +110,27 @@ public class DetailsViewModel extends ViewModel {
 
     public void toggleRestaurantBookingStatus() {
         RestaurantDetailsStateItem restaurant = mRestaurantDetailsLiveData.getValue();
+        if (restaurant == null) return;
         String newBookingPlaceId = restaurant.isBooked() ? null : restaurant.getPlaceId();
         mUserRepository.updateCurrentUserBooking(newBookingPlaceId);
     }
 
     public void toggleCurrentUserLikedPlace() {
         RestaurantDetailsStateItem restaurant = mRestaurantDetailsLiveData.getValue();
+        if (restaurant == null) return;
         mUserRepository.toggleCurrentUserLikedPlace(restaurant.getPlaceId());
+    }
+
+    /**
+     * Return workmates who booked the restaurant given as parameter
+     * @param allWorkmates list to filter
+     * @param placeId place id of restaurant
+     * @return filtered list of workmates
+     */
+    public List<User> getBookedWorkmates(List<User> allWorkmates, String placeId) {
+        if (allWorkmates == null) return new ArrayList<>();
+        return allWorkmates.stream()
+                .filter(user -> user.hasBookedPlace(placeId))
+                .collect(Collectors.toList());
     }
 }

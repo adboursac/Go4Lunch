@@ -50,4 +50,6 @@
     <string name="restaurant_like">LIKER</string>
     <string name="restaurant_website">SITE</string>
 
+    <!-- Workmates -->
+    <string name="workmate_joining">nous rejoint !</string>
 </resources>

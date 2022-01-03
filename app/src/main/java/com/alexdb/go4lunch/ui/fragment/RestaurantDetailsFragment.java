@@ -3,6 +3,7 @@ package com.alexdb.go4lunch.ui.fragment;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.alexdb.go4lunch.R;
 import com.alexdb.go4lunch.data.model.RestaurantDetailsStateItem;
+import com.alexdb.go4lunch.data.model.User;
 import com.alexdb.go4lunch.data.viewmodel.DetailsViewModel;
 import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
 import com.alexdb.go4lunch.databinding.FragmentRestaurantDetailsBinding;
@@ -24,6 +26,10 @@ import com.google.android.material.snackbar.Snackbar;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 
 public class RestaurantDetailsFragment extends Fragment {
 
@@ -32,13 +38,14 @@ public class RestaurantDetailsFragment extends Fragment {
     private DetailsViewModel mDetailsViewModel;
     private RecyclerView mRecyclerView;
     private RestaurantDetailsStateItem mCurrentDetails;
+    private List<User> mBookedUsers = new ArrayList<>();
 
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentRestaurantDetailsBinding.inflate(inflater, container, false);
-        //initRecyclerView();
+        initRecyclerView();
         initData();
         initCallButton();
         initLikeButton();
@@ -52,13 +59,21 @@ public class RestaurantDetailsFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(layoutManager);
 
-        //ListViewRecyclerViewAdapter mAdapter = new ListViewRecyclerViewAdapter();
-        //mRecyclerView.setAdapter(mAdapter);
+        RestaurantDetailsRecyclerViewAdapter mAdapter = new RestaurantDetailsRecyclerViewAdapter(mBookedUsers);
+        mRecyclerView.setAdapter(mAdapter);
     }
 
     private void initData() {
         mDetailsViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(DetailsViewModel.class);
-        mDetailsViewModel.getRestaurantsDetailsLiveData().observe(getViewLifecycleOwner(), this::populateDetails);
+        mDetailsViewModel.getRestaurantsDetailsLiveData().observe(getViewLifecycleOwner(), restaurant -> {
+            populateDetails(restaurant);
+            mBookedUsers.clear();
+            mBookedUsers.addAll(restaurant.getBookedWorkmates());
+            Objects.requireNonNull(mRecyclerView.getAdapter()).notifyDataSetChanged();
+            if (mBookedUsers.size() == 0) {
+                Log.d("DetailsViewFragment", "No one else booked this restaurant");
+            }
+        });
 
         String placeId = RestaurantDetailsFragmentArgs.fromBundle(requireArguments()).getPlaceId();
         mDetailsViewModel.fetchRestaurantDetails(placeId);
