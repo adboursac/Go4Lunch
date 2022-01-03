@@ -24,6 +24,7 @@ import com.alexdb.go4lunch.data.viewmodel.UserViewModel;
 import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
 import com.alexdb.go4lunch.databinding.ActivityMainBinding;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
@@ -139,6 +140,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         Glide.with(this)
                 .load(profilePictureUrl)
                 .apply(RequestOptions.circleCropTransform())
+                .timeout(10000)
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .into((ImageView) drawerHeaderView.findViewById(R.id.drawer_profile_picture));
     }
 

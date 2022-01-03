@@ -13,6 +13,7 @@ import com.alexdb.go4lunch.R;
 import com.alexdb.go4lunch.data.model.RestaurantStateItem;
 import com.alexdb.go4lunch.databinding.FragmentListViewItemBinding;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
@@ -77,6 +78,8 @@ public class ListViewRecyclerViewAdapter extends RecyclerView.Adapter<ListViewRe
         Glide.with(mContext)
                 .load(pictureUrl)
                 .apply(new RequestOptions().centerCrop())
+                .timeout(10000)
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .error(R.drawable.ic_sharp_no_photography_24)
                 .into(imageView);
     }

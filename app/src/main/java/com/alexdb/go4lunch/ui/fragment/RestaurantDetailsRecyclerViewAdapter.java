@@ -12,6 +12,7 @@ import com.alexdb.go4lunch.R;
 import com.alexdb.go4lunch.data.model.User;
 import com.alexdb.go4lunch.databinding.FragmentRestaurantDetailsWorkmateItemBinding;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
@@ -63,6 +64,8 @@ public class RestaurantDetailsRecyclerViewAdapter extends RecyclerView.Adapter<R
         Glide.with(mContext)
                 .load(pictureUrl)
                 .apply(RequestOptions.circleCropTransform())
+                .timeout(10000)
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .error(R.drawable.ic_sharp_no_photography_24)
                 .into(imageView);
     }

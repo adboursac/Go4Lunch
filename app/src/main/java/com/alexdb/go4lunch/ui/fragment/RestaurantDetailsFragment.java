@@ -21,6 +21,7 @@ import com.alexdb.go4lunch.data.viewmodel.DetailsViewModel;
 import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
 import com.alexdb.go4lunch.databinding.FragmentRestaurantDetailsBinding;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -140,6 +141,8 @@ public class RestaurantDetailsFragment extends Fragment {
         Glide.with(this)
                 .load(pictureUrl)
                 .apply(new RequestOptions().centerCrop())
+                .timeout(10000)
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .error(R.drawable.ic_sharp_no_photography_24)
                 .into(imageView);
     }
