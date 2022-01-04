@@ -14,17 +14,19 @@ public class User {
     private String profilePictureUrl;
     private Date bookedDate;
     private String bookedPlaceId;
+    private String bookedPlaceName;
     private List<String> likedPlaces;
 
     public User() {}
 
-    public User(String uid, String name, String email, String profilePictureUrl, Date bookedDate, String bookedPlaceId, List<String> likedPlaces) {
+    public User(String uid, String name, String email, String profilePictureUrl, Date bookedDate, String bookedPlaceId, String bookedPlaceName, List<String> likedPlaces) {
         this.uid = uid;
         this.name = name;
         this.email = email;
         this.profilePictureUrl = profilePictureUrl;
         this.bookedDate = bookedDate;
         this.bookedPlaceId = bookedPlaceId;
+        this.bookedPlaceName = bookedPlaceName;
         this.likedPlaces = likedPlaces;
     }
 
@@ -76,6 +78,10 @@ public class User {
     public void setBookedPlaceId(String bookedPlaceId) {
         this.bookedPlaceId = bookedPlaceId;
     }
+
+    public String getBookedPlaceName() { return bookedPlaceName; }
+
+    public void setBookedPlaceName(String bookedPlaceName) { this.bookedPlaceName = bookedPlaceName; }
 
     public boolean hasValidBookingDate() {
         if (bookedDate == null) return false;

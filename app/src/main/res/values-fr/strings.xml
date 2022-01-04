@@ -51,5 +51,7 @@
     <string name="restaurant_website">SITE</string>
 
     <!-- Workmates -->
-    <string name="workmate_joining">nous rejoint !</string>
+    <string name="workmate_joining">vient aussi !</string>
+    <string name="workmate_eating">a choisi:</string>
+    <string name="workmate_not_yet">n\'a pas encore choisi</string>
 </resources>

@@ -108,15 +108,17 @@ public class UserRepository {
      *
      * @param placeId id of the booked place
      */
-    public void updateCurrentUserBooking(String placeId) {
+    public void updateCurrentUserBooking(String placeId, String placeName) {
         User currentUser = mCurrentUserLiveData.getValue();
         Date now = new Date(System.currentTimeMillis());
         mUserApiService.updateBookedPlace(
                 Objects.requireNonNull(currentUser).getUid(),
                 placeId,
+                placeName,
                 now
         ).addOnSuccessListener(aVoid -> {
             currentUser.setBookedPlaceId(placeId);
+            currentUser.setBookedPlaceName(placeName);
             currentUser.setBookedDate(now);
             mCurrentUserLiveData.setValue(currentUser);
         }).addOnFailureListener(e -> Log.w("User Repository", "updateCurrentUserBooking Error", e));

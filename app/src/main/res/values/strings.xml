@@ -51,5 +51,6 @@
 
     <!-- Workmates -->
     <string name="workmate_joining">is joining!</string>
-
+    <string name="workmate_eating">is eating at:</string>
+    <string name="workmate_not_yet">hasn\'t decided yet</string>
 </resources>

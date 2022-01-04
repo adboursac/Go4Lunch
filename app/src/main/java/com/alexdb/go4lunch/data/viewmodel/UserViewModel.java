@@ -11,6 +11,8 @@ import com.alexdb.go4lunch.data.repository.UserRepository;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.List;
+
 public class UserViewModel extends ViewModel {
 
     @NonNull
@@ -24,11 +26,22 @@ public class UserViewModel extends ViewModel {
         return mUserRepository.getCurrentUserLiveData();
     }
 
+    public LiveData<List<User>> getWorkmatesLiveData() {
+        return mUserRepository.getWorkmatesLiveData();
+    }
+
     /**
      * refresh current user data
      */
     public void fetchCurrentUser() {
         mUserRepository.fetchCurrentUser();
+    }
+
+    /**
+     * refresh workmates live data
+     */
+    public void fetchWorkmates() {
+        mUserRepository.fetchWorkmates();
     }
 
     /**

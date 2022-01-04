@@ -111,8 +111,8 @@ public class DetailsViewModel extends ViewModel {
     public void toggleRestaurantBookingStatus() {
         RestaurantDetailsStateItem restaurant = mRestaurantDetailsLiveData.getValue();
         if (restaurant == null) return;
-        String newBookingPlaceId = restaurant.isBooked() ? null : restaurant.getPlaceId();
-        mUserRepository.updateCurrentUserBooking(newBookingPlaceId);
+        if (restaurant.isBooked()) mUserRepository.updateCurrentUserBooking(null, null);
+        else mUserRepository.updateCurrentUserBooking(restaurant.getPlaceId(), restaurant.getName());
     }
 
     public void toggleCurrentUserLikedPlace() {

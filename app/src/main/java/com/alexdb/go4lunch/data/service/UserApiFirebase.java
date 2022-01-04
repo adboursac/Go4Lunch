@@ -63,12 +63,14 @@ public class UserApiFirebase {
      *
      * @param uid     user's uid
      * @param placeId place id
+     * @param placeName place's name
      * @param date    booking date
      * @return resulting task
      */
-    public Task<Void> updateBookedPlace(String uid, String placeId, Date date) {
+    public Task<Void> updateBookedPlace(String uid, String placeId, String placeName, Date date) {
         return getUsersCollection().document(uid).update(
                 "bookedPlaceId", placeId,
+                "bookedPlaceName", placeName,
                 "bookedDate", new Timestamp(date)
         );
     }
@@ -107,6 +109,7 @@ public class UserApiFirebase {
                 fUser.getDisplayName(),
                 fUser.getEmail(),
                 fUser.getPhotoUrl() != null ? fUser.getPhotoUrl().toString() : null,
+                null,
                 null,
                 null,
                 new ArrayList<>());
