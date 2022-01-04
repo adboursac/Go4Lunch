@@ -23,15 +23,18 @@ import com.alexdb.go4lunch.data.model.User;
 import com.alexdb.go4lunch.data.viewmodel.UserViewModel;
 import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
 import com.alexdb.go4lunch.databinding.ActivityMainBinding;
+import com.alexdb.go4lunch.ui.fragment.MapViewFragmentDirections;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.material.snackbar.Snackbar;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     private UserViewModel mUserViewModel;
     private NavController mNavController;
     private MenuItem drawerSignOutButton;
+    private MenuItem drawerBookedPlaceButton;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,6 +45,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
         Menu menu = mBinding.drawerContent.getMenu();
         drawerSignOutButton = menu.findItem(R.id.menu_drawer_logout);
+        drawerBookedPlaceButton = menu.findItem(R.id.menu_drawer_booked_place);
 
         initSignOutButton();
     }
@@ -56,7 +60,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
      */
     private void initViewModel() {
         mUserViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(UserViewModel.class);
-        mUserViewModel.getCurrentUserLiveData().observe(this, this::updateDrawerHeaderData);
+        mUserViewModel.getCurrentUserLiveData().observe(this, currentUser -> {
+            updateDrawerHeaderData(currentUser);
+            updateBookedPlaceButton(currentUser);
+        });
         mUserViewModel.fetchCurrentUser();
     }
 
@@ -117,6 +124,28 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         });
     }
 
+    /** init booked place details button for navigation drawer
+     * -
+     */
+    private void updateBookedPlaceButton(User currentUser){
+        if (currentUser.hasValidBookingDate()) {
+            drawerBookedPlaceButton.setOnMenuItemClickListener(i -> {
+                mBinding.drawerLayout.closeDrawer(GravityCompat.START);
+                mNavController.getCurrentDestination();
+                mNavController.navigate(
+                        MapViewFragmentDirections.navigateToDetails().setPlaceId(currentUser.getBookedPlaceId())
+                );
+                return true;
+            });
+        }
+        else {
+            drawerBookedPlaceButton.setOnMenuItemClickListener(i -> {
+                showSnackBar(getResources().getString(R.string.navigation_drawer_no_booking_yet));
+                return true;
+            });
+        }
+    }
+
     /**
      * update drawer header with user data
      */
@@ -158,5 +187,13 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         String name = TextUtils.isEmpty(user.getName()) ? getString(R.string.noName) : user.getName();
         nameView.setText(name);
         emailView.setText(email);
+    }
+
+    /**
+     * Show Snack Bar with a message
+     * @param message message to display
+     */
+    private void showSnackBar( String message){
+        Snackbar.make(mBinding.drawerLayout, message, Snackbar.LENGTH_SHORT).show();
     }
 }

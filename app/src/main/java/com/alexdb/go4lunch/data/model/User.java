@@ -84,7 +84,7 @@ public class User {
     public void setBookedPlaceName(String bookedPlaceName) { this.bookedPlaceName = bookedPlaceName; }
 
     public boolean hasValidBookingDate() {
-        if (bookedDate == null) return false;
+        if (bookedDate == null || bookedPlaceId == null) return false;
         return DateUtils.isToday(bookedDate.getTime());
     }
 

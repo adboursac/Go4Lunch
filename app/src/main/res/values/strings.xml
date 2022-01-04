@@ -26,6 +26,7 @@
     <string name="navigation_drawer_your_lunch">YOUR LUNCH</string>
     <string name="navigation_drawer_settings">SETTINGS</string>
     <string name="navigation_drawer_logout">LOGOUT</string>
+    <string name="navigation_drawer_no_booking_yet">You haven\'t chosen a restaurant yet!</string>
 
     <!-- Bottom navigation view -->
     <string name="bottom_navigation_mapview">Map View</string>

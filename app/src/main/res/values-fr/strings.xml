@@ -27,6 +27,7 @@
     <string name="navigation_drawer_your_lunch">MON RESTO</string>
     <string name="navigation_drawer_settings">PARAMETRES</string>
     <string name="navigation_drawer_logout">DECONNEXION</string>
+    <string name="navigation_drawer_no_booking_yet">Vous n\'avez pas encore choisi de restaurant !</string>
 
     <!-- Bottom navigation view -->
     <string name="bottom_navigation_mapview">Carte</string>
