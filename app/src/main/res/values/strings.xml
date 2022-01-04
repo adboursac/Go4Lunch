@@ -2,6 +2,8 @@
     <!-- Global -->
     <string name="app_name">Go4Lunch</string>
     <string name="app_logo_description">Find a nice restaurant and invite your co-workers for lunch!</string>
+    <string name="placeholder_distance">%dm</string>
+    <string name="placeholder_amount">(%d)</string>
 
     <!-- Login Activity authentication-->
     <string name="facebook_application_id">3092308644376950</string>

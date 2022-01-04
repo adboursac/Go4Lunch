@@ -8,11 +8,12 @@ public class RestaurantStateItem {
     private String openStatus;
     private String address;
     private Location location;
-    private String distance;
+    private int distance;
     private Float rating;
     private String photoUrl;
+    private int workmatesAmount;
 
-    public RestaurantStateItem(String placeId, String name, String openStatus, String address, Location location, String distance, Float rating, String photoUrl) {
+    public RestaurantStateItem(String placeId, String name, String openStatus, String address, Location location, int distance, Float rating, String photoUrl, int workmatesAmount) {
         this.placeId = placeId;
         this.name = name;
         this.openStatus = openStatus;
@@ -21,6 +22,7 @@ public class RestaurantStateItem {
         this.distance = distance;
         this.rating = rating;
         this.photoUrl = photoUrl;
+        this.workmatesAmount = workmatesAmount;
     }
 
     public String getPlaceId() {
@@ -63,11 +65,9 @@ public class RestaurantStateItem {
         this.location = location;
     }
 
-    public String getDistance() {
-        return distance;
-    }
+    public int getDistance() { return distance; }
 
-    public void setDistance(String distance) {
+    public void setDistance(int distance) {
         this.distance = distance;
     }
 
@@ -86,4 +86,8 @@ public class RestaurantStateItem {
     public void setPhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
     }
+
+    public int getWorkmatesAmount() { return workmatesAmount; }
+
+    public void setWorkmatesAmount(int workmatesAmount) { this.workmatesAmount = workmatesAmount; }
 }

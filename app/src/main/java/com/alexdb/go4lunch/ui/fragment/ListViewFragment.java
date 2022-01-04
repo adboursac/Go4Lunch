@@ -36,13 +36,13 @@ public class ListViewFragment extends Fragment {
                              ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentListViewBinding.inflate(inflater, container, false);
-        initRecyclerView(mBinding.getRoot());
+        initRecyclerView();
         initData();
-        mListViewModel.fetchRestaurantPlaces();
+        mListViewModel.fetchRestaurants();
         return mBinding.getRoot();
     }
 
-    private void initRecyclerView(View root) {
+    private void initRecyclerView() {
         mRecyclerView = mBinding.recyclerView;
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(layoutManager);

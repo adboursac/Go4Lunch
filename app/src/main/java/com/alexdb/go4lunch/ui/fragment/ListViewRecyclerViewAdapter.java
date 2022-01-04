@@ -51,13 +51,17 @@ public class ListViewRecyclerViewAdapter extends RecyclerView.Adapter<ListViewRe
         holder.mBinding.name.setText(restaurant.getName());
         holder.mBinding.address.setText(restaurant.getAddress());
         holder.mBinding.openingStatus.setText(restaurant.getOpenStatus());
-        holder.mBinding.distance.setText(restaurant.getDistance());
+        holder.mBinding.distance.setText(distanceToString(restaurant.getDistance()));
+        holder.mBinding.workmatesAmount.setText(workmatesAmountToString(restaurant.getWorkmatesAmount()));
+
         setPicture(restaurant.getPhotoUrl(), holder.mBinding.picture);
+
         RatingHelper.displayStarsScheme(
                 restaurant.getRating(),
                 holder.mBinding.star1,
                 holder.mBinding.star2,
                 holder.mBinding.star3);
+
         holder.itemView.setOnClickListener(v ->
                 Navigation.findNavController(v).navigate(
                         ListViewFragmentDirections.navigateToDetails().setPlaceId(restaurant.getPlaceId())
@@ -82,6 +86,14 @@ public class ListViewRecyclerViewAdapter extends RecyclerView.Adapter<ListViewRe
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .error(R.drawable.ic_sharp_no_photography_24)
                 .into(imageView);
+    }
+
+    private String distanceToString(int distance) {
+        return distance > -1 ? String.format(mContext.getResources().getString(R.string.placeholder_distance), distance) : "";
+    }
+
+    private String workmatesAmountToString(int workmatesAmount) {
+        return String.format(mContext.getResources().getString(R.string.placeholder_amount), workmatesAmount);
     }
 }
 

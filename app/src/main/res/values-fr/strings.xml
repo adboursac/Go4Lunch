@@ -3,6 +3,8 @@
     <!-- Global -->
     <string name="app_name">Go4Lunch</string>
     <string name="app_logo_description">Trouvez un bon restaurant et invitez vos collègues à déjeuner !</string>
+    <string name="placeholder_distance">%dm</string>
+    <string name="placeholder_amount">(%d)</string>
 
     <!-- Login Activity authentication-->
     <string name="facebook_application_id">3092308644376950</string>

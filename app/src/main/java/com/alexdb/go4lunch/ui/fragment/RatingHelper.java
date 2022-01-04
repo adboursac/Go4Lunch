@@ -18,14 +18,14 @@ public class RatingHelper {
                 star3.setVisibility(View.GONE);
                 break;
             case 3:
-                star1.setVisibility(View.GONE);
+                star1.setVisibility(View.VISIBLE);
                 star2.setVisibility(View.GONE);
-                star3.setVisibility(View.VISIBLE);
+                star3.setVisibility(View.GONE);
                 break;
             case 4:
-                star1.setVisibility(View.GONE);
+                star1.setVisibility(View.VISIBLE);
                 star2.setVisibility(View.VISIBLE);
-                star3.setVisibility(View.VISIBLE);
+                star3.setVisibility(View.GONE);
                 break;
             case 5:
                 star1.setVisibility(View.VISIBLE);

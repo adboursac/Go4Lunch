@@ -64,12 +64,12 @@
         app:layout_constraintTop_toTopOf="@id/picture"/>
 
     <TextView
-        android:id="@+id/workmatesNumber"
+        android:id="@+id/workmates_amount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingBottom="2dp"
         android:layout_marginEnd="@dimen/default_margin"
-        android:textSize="14sp"
+        android:textSize="16sp"
         android:textColor="@color/black"
         android:text="@string/restaurant_workmates_number"
         app:layout_constraintEnd_toStartOf="@id/picture"
@@ -79,7 +79,7 @@
         android:id="@+id/workmatesIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@id/workmatesNumber"
+        app:layout_constraintEnd_toStartOf="@id/workmates_amount"
         app:layout_constraintBottom_toBottomOf="@id/address"
         android:src="@drawable/ic_outline_person_24"
         android:contentDescription="@null" />
