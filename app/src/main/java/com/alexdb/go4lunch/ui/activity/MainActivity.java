@@ -29,6 +29,8 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.Objects;
+
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     private UserViewModel mUserViewModel;
@@ -74,12 +76,15 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     private void initNavigationComponents() {
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment);
-        assert navHostFragment != null;
+        if (navHostFragment == null) return;
         mNavController = navHostFragment.getNavController();
         AppBarConfiguration mAppBarConfiguration = new AppBarConfiguration
-                .Builder(mNavController.getGraph())
+                //We define multiple top-level destinations instead of graph's start destination
+                //Thus, the drawer button will remain in the toolbar on all destinations
+                .Builder(R.id.drawer_layout, R.id.nav_map_view_fragment, R.id.nav_list_view_fragment, R.id.nav_workmates_view_fragment)
                 .setOpenableLayout(mBinding.drawerLayout)
                 .build();
+
         NavigationUI.setupWithNavController(mBinding.drawerContent, mNavController);
         NavigationUI.setupWithNavController(mBinding.activityMainContent.toolbar, mNavController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(mBinding.activityMainContent.bottomNavigation, mNavController);
@@ -105,18 +110,20 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     /**
      * Set visibility to both toolbar and bottom navigation
+     *
      * @param visible true show both toolbar and bottom navigation
      */
-    private void ShowToolbarAndBottomNavigation( boolean visible) {
+    private void ShowToolbarAndBottomNavigation(boolean visible) {
         int visibility = visible ? View.VISIBLE : View.GONE;
         mBinding.activityMainContent.toolbar.setVisibility(visibility);
         mBinding.activityMainContent.bottomNavigation.setVisibility(visibility);
     }
 
-    /** init Sign Out button for navigation drawer
+    /**
+     * init Sign Out button for navigation drawer
      * -
      */
-    private void initSignOutButton(){
+    private void initSignOutButton() {
         drawerSignOutButton.setOnMenuItemClickListener(i -> {
             mBinding.drawerLayout.closeDrawer(GravityCompat.START);
             mUserViewModel.signOut(this).addOnSuccessListener(aVoid -> finish());
@@ -124,10 +131,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         });
     }
 
-    /** init booked place details button for navigation drawer
+    /**
+     * init booked place details button for navigation drawer
      * -
      */
-    private void updateBookedPlaceButton(User currentUser){
+    private void updateBookedPlaceButton(User currentUser) {
         if (currentUser.hasValidBookingDate()) {
             drawerBookedPlaceButton.setOnMenuItemClickListener(i -> {
                 mBinding.drawerLayout.closeDrawer(GravityCompat.START);
@@ -137,8 +145,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
                 );
                 return true;
             });
-        }
-        else {
+        } else {
             drawerBookedPlaceButton.setOnMenuItemClickListener(i -> {
                 showSnackBar(getResources().getString(R.string.navigation_drawer_no_booking_yet));
                 return true;
@@ -146,14 +153,24 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        //Close Drawer if it's open
+        if (mBinding.drawerLayout.isDrawerOpen(GravityCompat.START))
+            mBinding.drawerLayout.closeDrawer(GravityCompat.START);
+            //Navigate back except if we already are on start destination : Map view fragment
+        else if (Objects.requireNonNull(mNavController.getCurrentDestination()).getId() != R.id.nav_map_view_fragment)
+            super.onBackPressed();
+    }
+
     /**
      * update drawer header with user data
      */
-    private void updateDrawerHeaderData(User currentUser){
-        if(mUserViewModel.isCurrentUserLogged()) {
+    private void updateDrawerHeaderData(User currentUser) {
+        if (mUserViewModel.isCurrentUserLogged()) {
             View drawerHeaderView = mBinding.drawerContent.getHeaderView(0);
 
-            if(currentUser.getProfilePictureUrl() != null){
+            if (currentUser.getProfilePictureUrl() != null) {
                 setDrawerHeaderProfilePicture(currentUser.getProfilePictureUrl(), drawerHeaderView);
             }
             setDrawerHeaderTexts(currentUser, drawerHeaderView);
@@ -162,10 +179,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     /**
      * Set drawer header profile picture with given url.
+     *
      * @param profilePictureUrl profile string url
-     * @param drawerHeaderView main activity drawer header view
+     * @param drawerHeaderView  main activity drawer header view
      */
-    private void setDrawerHeaderProfilePicture(String profilePictureUrl, View drawerHeaderView){
+    private void setDrawerHeaderProfilePicture(String profilePictureUrl, View drawerHeaderView) {
         Glide.with(this)
                 .load(profilePictureUrl)
                 .apply(RequestOptions.circleCropTransform())
@@ -176,10 +194,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     /**
      * Fill drawer header texts with current user data.
-     * @param user current user
+     *
+     * @param user             current user
      * @param drawerHeaderView main activity drawer header view
      */
-    private void setDrawerHeaderTexts(User user, View drawerHeaderView){
+    private void setDrawerHeaderTexts(User user, View drawerHeaderView) {
         TextView nameView = drawerHeaderView.findViewById(R.id.drawer_name);
         TextView emailView = drawerHeaderView.findViewById(R.id.drawer_email);
         //Get email & username from User and set it to views
@@ -191,9 +210,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     /**
      * Show Snack Bar with a message
+     *
      * @param message message to display
      */
-    private void showSnackBar( String message){
+    private void showSnackBar(String message) {
         Snackbar.make(mBinding.drawerLayout, message, Snackbar.LENGTH_SHORT).show();
     }
 }
