@@ -19,7 +19,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.MapStyleOptions;
-import com.google.android.gms.maps.model.Marker;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -38,7 +37,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                              ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentMapViewBinding.inflate(inflater, container, false);
-        initViewModels();
+        initData();
         return mBinding.getRoot();
     }
 
@@ -67,7 +66,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                 ));
     }
 
-    private void initViewModels() {
+    private void initData() {
         mMapViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(MapViewModel.class);
 
         mMapViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), location -> {
@@ -76,8 +75,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                 }
         );
 
-        mMapViewModel.getRestaurantsLiveData().observe(getViewLifecycleOwner(), restaurants -> mMapViewModel.addEveryRestaurantsMarkers()
-        );
+        mMapViewModel.getRestaurantsLiveData().observe(getViewLifecycleOwner(), mMapViewModel::updateEveryRestaurantsMarkers );
     }
 
     private void initMapStyle(GoogleMap googleMap) {

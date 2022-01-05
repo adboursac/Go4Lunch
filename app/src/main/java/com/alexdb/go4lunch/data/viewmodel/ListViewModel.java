@@ -47,7 +47,7 @@ public class ListViewModel extends ViewModel {
     }
 
     /**
-     * Merge restaurant Details and current user live data from repositories into a single observable live data
+     * Merge restaurant places, location and workmates live data from repositories into a single observable live data
      */
     public void initRestaurantsLiveData() {
         mRestaurantsLiveData = new MediatorLiveData<>();
@@ -78,7 +78,7 @@ public class ListViewModel extends ViewModel {
     }
 
     /**
-     * Map restaurant places and workmates data from repositories to view data as a RestaurantStateItem instance,
+     * Map restaurant places, location, and workmates data from repositories to view data as a RestaurantStateItem instance,
      * and store it in the Mediator Live Data mRestaurantsLiveData
      *
      * @param places data from restaurant places repository
