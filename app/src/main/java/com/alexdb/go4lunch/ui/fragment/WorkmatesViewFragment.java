@@ -3,14 +3,19 @@ package com.alexdb.go4lunch.ui.fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.alexdb.go4lunch.R;
 import com.alexdb.go4lunch.data.model.User;
 import com.alexdb.go4lunch.data.viewmodel.UserViewModel;
 import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
@@ -22,9 +27,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class WorkmatesViewFragment extends Fragment {
+public class WorkmatesViewFragment extends Fragment implements SearchView.OnQueryTextListener {
 
     FragmentWorkmatesViewBinding mBinding;
+    private SearchView mSearchView;
+
     private RecyclerView mRecyclerView;
     private List<User> mWorkmates = new ArrayList<>();
     private UserViewModel mUserViewModel;
@@ -36,6 +43,7 @@ public class WorkmatesViewFragment extends Fragment {
         mBinding = FragmentWorkmatesViewBinding.inflate(inflater, container, false);
         initRecyclerView(mBinding.getRoot());
         initData();
+        setHasOptionsMenu(true);
         return mBinding.getRoot();
     }
 
@@ -58,5 +66,25 @@ public class WorkmatesViewFragment extends Fragment {
             }
             Objects.requireNonNull(mRecyclerView.getAdapter()).notifyDataSetChanged();
         });
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.toolbar_menu, menu);
+        mSearchView = (SearchView) menu.findItem(R.id.toolbar_search).getActionView();
+        mSearchView.setSubmitButtonEnabled(true);
+        mSearchView.setOnQueryTextListener(this);
+        mSearchView.setQueryHint(getString(R.string.toolbar_search_workmates));
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        mSearchView.onActionViewCollapsed();
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        return false;
     }
 }

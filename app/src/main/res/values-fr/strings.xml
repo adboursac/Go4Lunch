@@ -22,6 +22,8 @@
     <string name="toolbar_default">J\'ai faim</string>
     <string name="toolbar_settings">Paramètres</string>
     <string name="toolbar_workmates">Collègues</string>
+    <string name="toolbar_search_restaurants">chercher un restaurant</string>
+    <string name="toolbar_search_workmates">chercher un collègue</string>
 
     <!-- Navigation Drawer-->
     <string name="noEmail">Email : _</string>

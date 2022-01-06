@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.view.GravityCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -52,6 +53,15 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         initSignOutButton();
     }
 
+    /**
+     * Set toolbar_default label instead of app name as toolbar title when MainActivity starts
+     */
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mBinding.activityMainContent.toolbar.setTitle(R.string.toolbar_default);
+    }
+
     @Override
     ActivityMainBinding getViewBinding() {
         return ActivityMainBinding.inflate(getLayoutInflater());
@@ -77,6 +87,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment);
         if (navHostFragment == null) return;
+
         mNavController = navHostFragment.getNavController();
         AppBarConfiguration mAppBarConfiguration = new AppBarConfiguration
                 //We define multiple top-level destinations instead of graph's start destination
@@ -84,6 +95,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
                 .Builder(R.id.drawer_layout, R.id.nav_map_view_fragment, R.id.nav_list_view_fragment, R.id.nav_workmates_view_fragment)
                 .setOpenableLayout(mBinding.drawerLayout)
                 .build();
+
+        setSupportActionBar(mBinding.activityMainContent.toolbar);
 
         NavigationUI.setupWithNavController(mBinding.drawerContent, mNavController);
         NavigationUI.setupWithNavController(mBinding.activityMainContent.toolbar, mNavController, mAppBarConfiguration);

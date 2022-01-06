@@ -2,11 +2,14 @@ package com.alexdb.go4lunch.ui.fragment;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -24,10 +27,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public class MapViewFragment extends Fragment implements OnMapReadyCallback {
+public class MapViewFragment extends Fragment implements OnMapReadyCallback, SearchView.OnQueryTextListener {
 
     private FragmentMapViewBinding mBinding;
     private MapViewModel mMapViewModel;
+    private SearchView mSearchView;
 
     public MapViewFragment() {
     }
@@ -38,12 +42,14 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                              Bundle savedInstanceState) {
         mBinding = FragmentMapViewBinding.inflate(inflater, container, false);
         initData();
+        setHasOptionsMenu(true);
         return mBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        //setHasOptionsMenu(true);
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
@@ -81,5 +87,25 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     private void initMapStyle(GoogleMap googleMap) {
         googleMap.setMapStyle(
                 MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.google_map_style));
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.toolbar_menu, menu);
+        mSearchView = (SearchView) menu.findItem(R.id.toolbar_search).getActionView();
+        mSearchView.setSubmitButtonEnabled(true);
+        mSearchView.setOnQueryTextListener(this);
+        mSearchView.setQueryHint(getString(R.string.toolbar_search_restaurants));
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        mSearchView.onActionViewCollapsed();
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        return false;
     }
 }
