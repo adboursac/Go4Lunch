@@ -56,6 +56,7 @@ public class RestaurantDetailsStateItem {
     }
 
     public Float getRating() {
+        if (rating == null) return 0F;
         return rating;
     }
 

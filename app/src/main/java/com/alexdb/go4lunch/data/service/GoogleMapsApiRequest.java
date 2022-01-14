@@ -1,7 +1,7 @@
 package com.alexdb.go4lunch.data.service;
 
 import com.alexdb.go4lunch.data.model.maps.MapsPlaceDetailsPage;
-import com.alexdb.go4lunch.data.model.maps.MapsPlacePredictionsList;
+import com.alexdb.go4lunch.data.model.maps.MapsPlacePredictionsPage;
 import com.alexdb.go4lunch.data.model.maps.MapsPlacesPage;
 
 import retrofit2.Call;
@@ -30,11 +30,12 @@ public interface GoogleMapsApiRequest {
     );
 
     @GET("place/autocomplete/json")
-    Call<MapsPlacePredictionsList> getPlacesPredictions(
+    Call<MapsPlacePredictionsPage> getPlacesPredictions(
             @Query("location") String location,
             @Query("radius") Integer radius,
             @Query("input") String input,
             @Query("types") String types,
+            @Query("strictbounds") String strictbounds,
             @Query("key") String key
     );
 }

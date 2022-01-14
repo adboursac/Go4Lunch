@@ -24,12 +24,18 @@
 
     <!-- Toolbar -->
     <style name="AppTheme.Toolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="autoCompleteTextViewStyle">@style/AppTheme.AutoComplete</item>
     </style>
 
     <!-- Drawer Theme -->
     <style name="AppTheme.Drawer" parent="AppTheme">
         <item name="android:backgroundTint">@color/orange_400</item>
         <item name="android:textColor">@color/white</item>
+    </style>
+
+    <!-- Search View -->
+    <style name="AppTheme.AutoComplete" parent="Widget.AppCompat.Light.AutoCompleteTextView">
+        <item name="android:popupBackground">@color/orange_transparent</item>
     </style>
 
 </resources>

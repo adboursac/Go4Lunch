@@ -8,6 +8,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.alexdb.go4lunch.data.model.maps.MapsPlace;
+import com.alexdb.go4lunch.data.model.maps.MapsPlaceDetails;
+import com.alexdb.go4lunch.data.model.maps.MapsPlaceDetailsPage;
 import com.alexdb.go4lunch.data.model.maps.MapsPlacesPage;
 import com.alexdb.go4lunch.data.service.GoogleMapsApiClient;
 
@@ -35,6 +37,7 @@ public class RestaurantPlacesRepository {
 
     /**
      * Fetch restaurants places for given location.
+     *
      * @param location last location of the device.
      */
     public void fetchRestaurantPlaces(Location location) {
@@ -68,7 +71,8 @@ public class RestaurantPlacesRepository {
     /**
      * Fetch places page from given page token.
      * If allowRetry is set to true, the request will be retried in a background thread if request receives INVALID_REQUEST status.
-     * @param pageToken page token
+     *
+     * @param pageToken  page token
      * @param allowRetry true if retry is allowed, false instead
      */
     private void fetchRestaurantPlacesPage(String pageToken, boolean allowRetry) {
@@ -79,7 +83,8 @@ public class RestaurantPlacesRepository {
                 if (response.isSuccessful()) {
                     MapsPlacesPage placesPage = response.body();
                     if (placesPage != null) {
-                        if (handlePageTokenInvalidRequest(pageToken, placesPage.getStatus(), allowRetry)) return;
+                        if (handlePageTokenInvalidRequest(pageToken, placesPage.getStatus(), allowRetry))
+                            return;
                         List<MapsPlace> combinedList = new ArrayList<>();
                         combinedList.addAll(Objects.requireNonNull(mRestaurantPlacesMutableLiveData.getValue()));
                         combinedList.addAll(placesPage.getResults());
@@ -103,8 +108,9 @@ public class RestaurantPlacesRepository {
     /**
      * Check page request status. If status is INVALID_REQUEST and allowRetry set to true,
      * it retries the request in a background thread after waiting for 2 seconds.
-     * @param pageToken requested page token
-     * @param status the status of the request
+     *
+     * @param pageToken  requested page token
+     * @param status     the status of the request
      * @param allowRetry true if retry in background is allowed.
      * @return true if status is INVALID_REQUEST
      */
@@ -123,5 +129,41 @@ public class RestaurantPlacesRepository {
             return true;
         }
         return false;
+    }
+
+    /**
+     * get restaurant by its place id.
+     *
+     * @param placeId place id of the restaurant
+     */
+    public void requestRestaurant(String placeId) {
+        if (placeId == null) return;
+
+        GoogleMapsApiClient.getPlaceDetails(placeId).enqueue(new Callback<MapsPlaceDetailsPage>() {
+            @Override
+            public void onResponse(@NonNull Call<MapsPlaceDetailsPage> call, @NonNull Response<MapsPlaceDetailsPage> response) {
+                if (response.isSuccessful()) {
+                    MapsPlaceDetailsPage detailsPage = response.body();
+                    if (detailsPage != null) {
+                        MapsPlaceDetails p = detailsPage.getResult();
+                        List<MapsPlace> placeList = new ArrayList<>();
+                        placeList.add(new MapsPlace(p.getPlace_id(),
+                                p.getName(),
+                                p.getFormatted_address(),
+                                p.getGeometry(),
+                                p.getOpening_hours(),
+                                p.getRating(),
+                                p.getPhotos()
+                        ));
+                        mRestaurantPlacesMutableLiveData.setValue(placeList);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<MapsPlaceDetailsPage> call, @NonNull Throwable t) {
+                Log.d("RestaurantDetailsRepo--", "requestRestaurant failure" + t);
+            }
+        });
     }
 }

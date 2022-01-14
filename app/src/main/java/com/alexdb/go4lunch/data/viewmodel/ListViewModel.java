@@ -3,16 +3,21 @@ package com.alexdb.go4lunch.data.viewmodel;
 import android.content.res.Resources;
 import android.location.Location;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import com.alexdb.go4lunch.R;
+import com.alexdb.go4lunch.data.model.PredictionStateItem;
 import com.alexdb.go4lunch.data.model.RestaurantStateItem;
 import com.alexdb.go4lunch.data.model.User;
 import com.alexdb.go4lunch.data.model.maps.MapsOpeningHours;
 import com.alexdb.go4lunch.data.model.maps.MapsPlace;
+import com.alexdb.go4lunch.data.model.maps.MapsPlacePrediction;
 import com.alexdb.go4lunch.data.repository.LocationRepository;
+import com.alexdb.go4lunch.data.repository.PlacePredictionRepository;
 import com.alexdb.go4lunch.data.repository.RestaurantPlacesRepository;
 import com.alexdb.go4lunch.data.repository.UserRepository;
 import com.alexdb.go4lunch.data.service.GoogleMapsApiClient;
@@ -26,14 +31,17 @@ public class ListViewModel extends ViewModel {
     private final RestaurantPlacesRepository mMapsPlacesRepository;
     private final LocationRepository mLocationRepository;
     private final UserRepository mUserRepository;
+    private final PlacePredictionRepository mPlacePredictionRepository;
     private MediatorLiveData<List<RestaurantStateItem>> mRestaurantsLiveData;
 
     ListViewModel(RestaurantPlacesRepository mapsPlacesRepository,
                   LocationRepository locationRepository,
-                  UserRepository userRepository) {
+                  UserRepository userRepository,
+                  PlacePredictionRepository placePredictionRepository) {
         mMapsPlacesRepository = mapsPlacesRepository;
         mLocationRepository = locationRepository;
         mUserRepository = userRepository;
+        mPlacePredictionRepository = placePredictionRepository;
         initRestaurantsLiveData();
     }
 
@@ -45,6 +53,8 @@ public class ListViewModel extends ViewModel {
         mMapsPlacesRepository.fetchRestaurantPlaces(mLocationRepository.getLocationLiveData().getValue());
         mUserRepository.fetchWorkmates();
     }
+
+    public String getCurrentSearchQuery() { return mPlacePredictionRepository.getCurrentSearchQuery(); }
 
     /**
      * Merge restaurant places, location and workmates live data from repositories into a single observable live data
@@ -125,5 +135,44 @@ public class ListViewModel extends ViewModel {
             if (workmate.hasBookedPlace(placeId)) amount++;
         }
         return amount;
+    }
+
+    public void requestRestaurantPredictions(String textInput) {
+        mPlacePredictionRepository.requestRestaurantPredictions(mLocationRepository.getLocationLiveData().getValue(),
+                200, textInput);
+    }
+
+    public LiveData<List<PredictionStateItem>> getRestaurantPredictionsLivaData() {
+        return Transformations.map(mPlacePredictionRepository.getRestaurantPredictionsLiveData(), predictions -> {
+            List<PredictionStateItem> predictionsItems = new ArrayList<>();
+            for (MapsPlacePrediction p : predictions) {
+                if (p.getPlace_id() != null) {
+                    predictionsItems.add(new PredictionStateItem(
+                            p.getPlace_id(),
+                            p.getStructured_formatting().getMain_text(),
+                            p.getStructured_formatting().getSecondary_text()
+                    ));
+                }
+            }
+            return predictionsItems;
+        });
+    }
+
+    public void applySearch(String query) {
+        mPlacePredictionRepository.setCurrentSearchQuery(query);
+        List<MapsPlacePrediction> currentPredictions = mPlacePredictionRepository.getRestaurantPredictionsLiveData().getValue();
+        if (currentPredictions == null) return;
+        for (MapsPlacePrediction p : currentPredictions) {
+            if (query.contentEquals(p.getStructured_formatting().getMain_text())) {
+                mMapsPlacesRepository.requestRestaurant(p.getPlace_id());
+            }
+        }
+    }
+
+    public void clearSearch() {
+        mPlacePredictionRepository.setCurrentSearchQuery(null);
+        Location location = mLocationRepository.getLocationLiveData().getValue();
+        if (location == null) return;
+        mMapsPlacesRepository.fetchRestaurantPlaces(location);
     }
 }

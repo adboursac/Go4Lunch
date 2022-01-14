@@ -17,11 +17,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alexdb.go4lunch.R;
+import com.alexdb.go4lunch.data.model.PredictionStateItem;
 import com.alexdb.go4lunch.data.model.RestaurantStateItem;
 import com.alexdb.go4lunch.data.model.maps.MapsPlace;
 import com.alexdb.go4lunch.data.viewmodel.ListViewModel;
 import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
 import com.alexdb.go4lunch.databinding.FragmentListViewBinding;
+import com.alexdb.go4lunch.ui.helper.ArrayAdapterSearchView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -29,13 +31,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ListViewFragment extends Fragment implements SearchView.OnQueryTextListener {
+public class ListViewFragment extends Fragment implements ArrayAdapterSearchView.OnQueryTextListener {
 
     private List<RestaurantStateItem> mRestaurants = new ArrayList<>();
     private ListViewModel mListViewModel;
 
     FragmentListViewBinding mBinding;
-    private SearchView mSearchView;
+    private ArrayAdapterSearchView mSearchView;
     private RecyclerView mRecyclerView;
 
     @Override
@@ -45,7 +47,6 @@ public class ListViewFragment extends Fragment implements SearchView.OnQueryText
         mBinding = FragmentListViewBinding.inflate(inflater, container, false);
         initRecyclerView();
         initData();
-        mListViewModel.fetchRestaurants();
         setHasOptionsMenu(true);
         return mBinding.getRoot();
     }
@@ -69,25 +70,61 @@ public class ListViewFragment extends Fragment implements SearchView.OnQueryText
             }
             Objects.requireNonNull(mRecyclerView.getAdapter()).notifyDataSetChanged();
         });
+        
+        mListViewModel.getRestaurantPredictionsLivaData().observe(getViewLifecycleOwner(), predictionList -> {
+            if (mSearchView != null && predictionList != null) mSearchView.setSuggestionsList(mapPredictionsForSearchView(predictionList));
+        });
+    }
+
+    private List<String> mapPredictionsForSearchView (List<PredictionStateItem> predictions) {
+        List<String> predictionsStrings = new ArrayList<>();
+        for (PredictionStateItem p : predictions) {
+            predictionsStrings.add(p.getMainText());
+        }
+        return predictionsStrings;
     }
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.toolbar_menu, menu);
-        mSearchView = (SearchView) menu.findItem(R.id.toolbar_search).getActionView();
-        mSearchView.setSubmitButtonEnabled(true);
-        mSearchView.setOnQueryTextListener(this);
-        mSearchView.setQueryHint(getString(R.string.toolbar_search_restaurants));
+        mSearchView = (ArrayAdapterSearchView) menu.findItem(R.id.toolbar_search).getActionView();
+        configureSearchView();
     }
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        mSearchView.onActionViewCollapsed();
         return false;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
+        if (newText.length() > 2) {
+            mListViewModel.requestRestaurantPredictions(newText);
+        }
         return false;
+    }
+
+    private void configureSearchView() {
+        mSearchView.setOnQueryTextListener(this);
+        mSearchView.setQueryHint(getString(R.string.toolbar_search_restaurants));
+        mSearchView.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedString = mSearchView.applyItemSelection(position);
+            mListViewModel.applySearch(selectedString);
+            mSearchView.setQuery(selectedString, true);
+        });
+
+        mSearchView.getClearButton().setOnClickListener(view -> {
+            if(mSearchView.getQuery().length() == 0) {
+                mSearchView.setIconified(true);
+            } else {
+                mSearchView.setQuery("", false);
+                mListViewModel.clearSearch();
+            }
+        });
+
+        if (mListViewModel.getCurrentSearchQuery() != null) {
+            mSearchView.setIconified(false);
+            mSearchView.setQuery(mListViewModel.getCurrentSearchQuery(), true);
+        }
     }
 }

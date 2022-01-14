@@ -1,11 +1,11 @@
-package com.alexdb.go4lunch.ui.fragment;
+package com.alexdb.go4lunch.ui.helper;
 
 import android.view.View;
 import android.widget.ImageView;
 
 public class RatingHelper {
 
-    //[0,2.5[ No star, [2.5, 3.5[ = 1 stars, [3.5,4.5[ = 2 stars, [4.5,5] = 3 stars
+    //[0,2.5[ No star, [2.5, 3.5[ = 1 star, [3.5,4.5[ = 2 stars, [4.5,5] = 3 stars
     public static void displayStarsScheme(double rate, ImageView star1, ImageView star2, ImageView star3) {
         int rate_int = (int) Math.round(rate);
 

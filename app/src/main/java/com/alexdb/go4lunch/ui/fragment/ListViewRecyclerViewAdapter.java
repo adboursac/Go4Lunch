@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.alexdb.go4lunch.R;
 import com.alexdb.go4lunch.data.model.RestaurantStateItem;
 import com.alexdb.go4lunch.databinding.FragmentListViewItemBinding;
+import com.alexdb.go4lunch.ui.helper.RatingHelper;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;

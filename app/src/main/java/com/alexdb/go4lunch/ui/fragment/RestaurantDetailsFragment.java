@@ -20,6 +20,7 @@ import com.alexdb.go4lunch.data.model.User;
 import com.alexdb.go4lunch.data.viewmodel.DetailsViewModel;
 import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
 import com.alexdb.go4lunch.databinding.FragmentRestaurantDetailsBinding;
+import com.alexdb.go4lunch.ui.helper.RatingHelper;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;

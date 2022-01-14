@@ -30,6 +30,7 @@ public class MapsPlace {
     private final MapsOpeningHours opening_hours;
 
     @SerializedName("rating")
+    @Expose
     private Float rating;
 
     @SerializedName("photos")

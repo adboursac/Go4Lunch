@@ -4,7 +4,7 @@ import android.location.Location;
 
 import com.alexdb.go4lunch.BuildConfig;
 import com.alexdb.go4lunch.data.model.maps.MapsPlaceDetailsPage;
-import com.alexdb.go4lunch.data.model.maps.MapsPlacePredictionsList;
+import com.alexdb.go4lunch.data.model.maps.MapsPlacePredictionsPage;
 import com.alexdb.go4lunch.data.model.maps.MapsPlacesPage;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -30,8 +30,7 @@ public class GoogleMapsApiClient {
     }
 
     public static Call<MapsPlacesPage> getRestaurantPlaces(Location location) {
-        String locationString = location.getLatitude() + "," + location.getLongitude();
-        return getApi().getPlaces(locationString,
+        return getApi().getPlaces(locationToString(location),
                 "restaurant",
                 BuildConfig.google_maps_api_key);
     }
@@ -51,15 +50,20 @@ public class GoogleMapsApiClient {
 
     public static Call<MapsPlaceDetailsPage> getPlaceDetails(String placeId) {
         return getApi().getPlaceDetails(placeId,
-                "place_id,name,opening_hours,website,international_phone_number,formatted_address,rating,photos",
+                "place_id,geometry,name,opening_hours,website,international_phone_number,formatted_address,rating,photos",
                 BuildConfig.google_maps_api_key);
     }
 
-    public static Call<MapsPlacePredictionsList> getPlacesPredictions(String location, int radius, String input) {
-        return getApi().getPlacesPredictions(location,
+    public static Call<MapsPlacePredictionsPage> getPlacesPredictions(Location location, int radius, String input) {
+        return getApi().getPlacesPredictions(locationToString(location),
                 radius,
                 input,
-                "restaurant",
+                "establishment",
+                "true",
                 BuildConfig.google_maps_api_key);
+    }
+
+    private static String locationToString(Location location) {
+        return location.getLatitude() + "," + location.getLongitude();
     }
 }

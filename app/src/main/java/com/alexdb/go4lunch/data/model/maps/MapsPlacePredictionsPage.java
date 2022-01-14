@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class MapsPlacePredictionsList {
+public class MapsPlacePredictionsPage {
 
     @SerializedName("status")
     @Expose
@@ -15,7 +15,7 @@ public class MapsPlacePredictionsList {
     @Expose
     private final List<MapsPlacePrediction> predictions;
 
-    public MapsPlacePredictionsList(String status, List<MapsPlacePrediction> predictions) {
+    public MapsPlacePredictionsPage(String status, List<MapsPlacePrediction> predictions) {
         this.status = status;
         this.predictions = predictions;
     }

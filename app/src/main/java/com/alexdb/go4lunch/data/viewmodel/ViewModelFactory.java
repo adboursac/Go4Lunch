@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alexdb.go4lunch.data.repository.LocationRepository;
+import com.alexdb.go4lunch.data.repository.PlacePredictionRepository;
 import com.alexdb.go4lunch.data.repository.RestaurantDetailsRepository;
 import com.alexdb.go4lunch.data.repository.RestaurantPlacesRepository;
 import com.alexdb.go4lunch.data.repository.UserRepository;
@@ -32,6 +33,8 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     private final RestaurantPlacesRepository mMapsPlacesRepository;
     @NonNull
     private final RestaurantDetailsRepository mRestaurantDetailsRepository;
+    @NonNull
+    private final PlacePredictionRepository mPlacePredictionRepository;
 
     private ViewModelFactory() {
         Application application = MainApplication.getApplication();
@@ -42,6 +45,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
                 LocationServices.getFusedLocationProviderClient(application));
         mMapsPlacesRepository = new RestaurantPlacesRepository(Executors.newSingleThreadExecutor());
         mRestaurantDetailsRepository = new RestaurantDetailsRepository();
+        mPlacePredictionRepository = new PlacePredictionRepository();
     }
 
     public static ViewModelFactory getInstance() {
@@ -63,10 +67,10 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
             return (T) new UserViewModel(mUserRepository);
         }
         else if (modelClass.isAssignableFrom(MapViewModel.class)) {
-            return (T) new MapViewModel(mPermissionHelper, mLocationRepository, mMapsPlacesRepository, mUserRepository);
+            return (T) new MapViewModel(mPermissionHelper, mLocationRepository, mMapsPlacesRepository, mUserRepository, mPlacePredictionRepository);
         }
         else if (modelClass.isAssignableFrom(ListViewModel.class)) {
-            return (T) new ListViewModel(mMapsPlacesRepository, mLocationRepository, mUserRepository);
+            return (T) new ListViewModel(mMapsPlacesRepository, mLocationRepository, mUserRepository, mPlacePredictionRepository);
         }
         else if (modelClass.isAssignableFrom(DetailsViewModel.class)) {
             return (T) new DetailsViewModel(mRestaurantDetailsRepository, mUserRepository);

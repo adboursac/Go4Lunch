@@ -1,5 +1,7 @@
 package com.alexdb.go4lunch.data.model.maps;
 
+import android.location.Location;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -10,6 +12,10 @@ public class MapsPlaceDetails {
     @SerializedName("place_id")
     @Expose
     private final String place_id;
+
+    @SerializedName("geometry")
+    @Expose
+    private final MapsGeometry geometry;
 
     @SerializedName("name")
     @Expose
@@ -32,14 +38,16 @@ public class MapsPlaceDetails {
     private final String formatted_address;
 
     @SerializedName("rating")
+    @Expose
     private Float rating;
 
     @SerializedName("photos")
     @Expose
     private final List<MapsPhoto> photos;
 
-    public MapsPlaceDetails(String place_id, String name, MapsOpeningHours opening_hours, String website, String international_phone_number, String formatted_address, Float rating, List<MapsPhoto> photos) {
+    public MapsPlaceDetails(String place_id, MapsGeometry geometry, String name, MapsOpeningHours opening_hours, String website, String international_phone_number, String formatted_address, Float rating, List<MapsPhoto> photos) {
         this.place_id = place_id;
+        this.geometry = geometry;
         this.name = name;
         this.opening_hours = opening_hours;
         this.website = website;
@@ -51,6 +59,15 @@ public class MapsPlaceDetails {
 
     public String getPlace_id() {
         return place_id;
+    }
+
+    public MapsGeometry getGeometry() { return geometry; }
+
+    public Location getLocation() {
+        Location location = new Location("");
+        location.setLatitude(geometry.getLocation().getLat());
+        location.setLongitude(geometry.getLocation().getLng());
+        return location;
     }
 
     public String getName() {
@@ -76,6 +93,8 @@ public class MapsPlaceDetails {
     public Float getRating() {
         return rating;
     }
+
+    public List<MapsPhoto> getPhotos() { return photos; }
 
     public String getFirstPhotoReference() {
         if (photos == null) return null;
