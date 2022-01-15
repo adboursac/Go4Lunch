@@ -1,5 +1,7 @@
 package com.alexdb.go4lunch.ui.fragment;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,6 +12,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresPermission;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -21,10 +24,15 @@ import com.alexdb.go4lunch.data.viewmodel.MapViewModel;
 import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
 import com.alexdb.go4lunch.databinding.FragmentMapViewBinding;
 import com.alexdb.go4lunch.ui.helper.ArrayAdapterSearchView;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -34,11 +42,17 @@ import java.util.Objects;
 
 public class MapViewFragment extends Fragment implements OnMapReadyCallback, ArrayAdapterSearchView.OnQueryTextListener {
 
+    private int mDefaultZoom = 18;
+    private GoogleMap mMap;
     private FragmentMapViewBinding mBinding;
     private MapViewModel mMapViewModel;
     private ArrayAdapterSearchView mSearchView;
 
     public MapViewFragment() {
+    }
+
+    public void setDefaultZoom(int defaultZoom) {
+        mDefaultZoom = defaultZoom;
     }
 
     @Override
@@ -64,22 +78,67 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Arr
      */
     @Override
     public void onMapReady(@NotNull GoogleMap googleMap) {
-        initMapStyle(googleMap);
-        mMapViewModel.initMap(googleMap, requireActivity());
+        mMap = googleMap;
+        configureMapObjects();
         mMapViewModel.refreshLocation();
+    }
+
+    /**
+     * Configure all google map related objects and listeners
+     */
+    public void configureMapObjects() {
+        mMap.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.google_map_style));
 
         //Click on target button moves camera on current location
         mBinding.floatingActionButton.setOnClickListener(view -> {
             Location currentLocation = mMapViewModel.getLocationLiveData().getValue();
-            if (currentLocation != null) mMapViewModel.moveCamera(currentLocation);
+            if (currentLocation != null) moveCamera(currentLocation);
         });
 
         //Click on markers info navigate to details activity
-        googleMap.setOnInfoWindowClickListener(marker ->
+        mMap.setOnInfoWindowClickListener(marker ->
                 Navigation.findNavController(mBinding.getRoot()).navigate(
                         MapViewFragmentDirections.navigateToDetails()
                                 .setPlaceId((String) Objects.requireNonNull(marker.getTag()))
                 ));
+    }
+
+    @SuppressLint("MissingPermission")
+    public void configureLocationRelatedOptions() {
+        if (mMapViewModel.hasLocationPermission()) {
+            mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        }
+    }
+
+    public void moveCamera(Location location) {
+        if (location == null || mMap == null) return;
+        LatLng cord = new LatLng(location.getLatitude(), location.getLongitude());
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cord, mDefaultZoom));
+    }
+
+    private void createRestaurantMarker(Location location, String title, boolean selected, String placeId) {
+        if (location == null || mMap == null) return;
+        LatLng cord = new LatLng(location.getLatitude(), location.getLongitude());
+        float hue = selected ? BitmapDescriptorFactory.HUE_GREEN : BitmapDescriptorFactory.HUE_ORANGE;
+        Marker marker = mMap.addMarker(new MarkerOptions()
+                .position(cord)
+                .title(title)
+                .icon(BitmapDescriptorFactory.defaultMarker(hue)));
+        if (marker != null) marker.setTag(placeId);
+    }
+
+    public void updateEveryRestaurantsMarkers(List<RestaurantStateItem> restaurants) {
+        if (mMap == null) return;
+        mMap.clear();
+        for (RestaurantStateItem restaurant : restaurants) {
+            createRestaurantMarker(
+                    restaurant.getLocation(),
+                    restaurant.getName(),
+                    restaurant.getWorkmatesAmount() > 0,
+                    restaurant.getPlaceId());
+        }
     }
 
     /**
@@ -93,11 +152,11 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Arr
 
         //New restaurants data triggers markers update and optional camera move
         mMapViewModel.getRestaurantsLiveData().observe(getViewLifecycleOwner(), restaurants -> {
-            mMapViewModel.updateEveryRestaurantsMarkers(restaurants);
+            updateEveryRestaurantsMarkers(restaurants);
             //Move camera if we are displaying a search result
             if (mMapViewModel.getCurrentSearchQuery().length() > 0) {
                 Location searchResultLocation = restaurants.get(0).getLocation();
-                mMapViewModel.moveCamera(searchResultLocation);
+                moveCamera(searchResultLocation);
             }
         });
 
@@ -107,6 +166,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Arr
                 mSearchView.setSuggestionsList(predictionsToStrings(predictionList), true);
             }
         });
+
+        mMapViewModel.requestLocationPermission(getActivity());
     }
 
     private void handleNewLocation(Location location) {
@@ -114,12 +175,12 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Arr
         if (mMapViewModel.getCurrentSearchQuery().length() > 0) {
             List<RestaurantStateItem> currentRestaurants = mMapViewModel.getRestaurantsLiveData().getValue();
             if (currentRestaurants == null) return;
-            mMapViewModel.moveCamera(currentRestaurants.get(0).getLocation());
+            moveCamera(currentRestaurants.get(0).getLocation());
         }
         // If we don't, we fetch restaurants and move camera on currentLocation
         else {
             mMapViewModel.fetchRestaurants(location);
-            mMapViewModel.moveCamera(location);
+            moveCamera(location);
         }
     }
 
@@ -129,11 +190,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Arr
             predictionsStrings.add(p.getMainText());
         }
         return predictionsStrings;
-    }
-
-    private void initMapStyle(GoogleMap googleMap) {
-        googleMap.setMapStyle(
-                MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.google_map_style));
     }
 
     @Override

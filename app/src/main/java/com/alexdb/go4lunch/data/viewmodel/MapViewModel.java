@@ -37,7 +37,6 @@ import java.util.List;
 
 public class MapViewModel extends ViewModel {
 
-    private int mDefaultZoom = 18;
     @NonNull
     private final PermissionHelper mPermissionHelper;
     @NonNull
@@ -50,8 +49,6 @@ public class MapViewModel extends ViewModel {
     private final PlacePredictionRepository mPlacePredictionRepository;
 
     private MediatorLiveData<List<RestaurantStateItem>> mRestaurantsLiveData;
-
-    private GoogleMap mMap;
 
     public MapViewModel(
             @NonNull PermissionHelper permissionHelper,
@@ -77,8 +74,6 @@ public class MapViewModel extends ViewModel {
     }
 
     public String getCurrentSearchQuery() { return mPlacePredictionRepository.getCurrentSearchQuery(); }
-
-    public void setDefaultZoom(int defaultZoom) { mDefaultZoom = defaultZoom; }
 
     /**
      * Merge restaurant places, location and workmates live data from repositories into a single observable live data
@@ -138,17 +133,6 @@ public class MapViewModel extends ViewModel {
         mRestaurantsLiveData.setValue(stateItems);
     }
 
-    @SuppressLint("MissingPermission")
-    public void refreshLocation() {
-        if (mPermissionHelper.hasLocationPermission()) {
-            mLocationRepository.startLocationUpdatesLoop();
-            mMap.setMyLocationEnabled(true);
-            mMap.getUiSettings().setMyLocationButtonEnabled(false);
-        } else {
-            mLocationRepository.stopLocationUpdatesLoop();
-        }
-    }
-
     public void fetchRestaurants(Location location) {
         if (location == null) {
             refreshLocation();
@@ -158,39 +142,22 @@ public class MapViewModel extends ViewModel {
         mUserRepository.fetchWorkmates();
     }
 
-    public void initMap(GoogleMap map, Activity activity) {
-        mMap = map;
+    @SuppressLint("MissingPermission")
+    public void refreshLocation() {
+        if (mPermissionHelper.hasLocationPermission()) {
+            mLocationRepository.startLocationUpdatesLoop();
+        } else {
+            mLocationRepository.stopLocationUpdatesLoop();
+        }
+    }
+
+    public boolean hasLocationPermission() {
+        return mPermissionHelper.hasLocationPermission();
+    }
+
+    public void requestLocationPermission(Activity activity) {
         if (!mPermissionHelper.hasLocationPermission())
             mPermissionHelper.requestLocationPermission(activity);
-    }
-
-    public void moveCamera(Location location) {
-        if (location == null || mMap == null) return;
-        LatLng cord = new LatLng(location.getLatitude(), location.getLongitude());
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cord, mDefaultZoom));
-    }
-
-    private void createRestaurantMarker(Location location, String title, boolean selected, String placeId) {
-        if (location == null || mMap == null) return;
-        LatLng cord = new LatLng(location.getLatitude(), location.getLongitude());
-        float hue = selected ? BitmapDescriptorFactory.HUE_GREEN : BitmapDescriptorFactory.HUE_ORANGE;
-        Marker marker = mMap.addMarker(new MarkerOptions()
-                .position(cord)
-                .title(title)
-                .icon(BitmapDescriptorFactory.defaultMarker(hue)));
-        if (marker != null) marker.setTag(placeId);
-    }
-
-    public void updateEveryRestaurantsMarkers(List<RestaurantStateItem> restaurants) {
-        if (mMap == null) return;
-        mMap.clear();
-        for (RestaurantStateItem restaurant : restaurants) {
-            createRestaurantMarker(
-                    restaurant.getLocation(),
-                    restaurant.getName(),
-                    restaurant.getWorkmatesAmount() > 0,
-                    restaurant.getPlaceId());
-        }
     }
 
     private String mapOpeningStatus(MapsOpeningHours openingHours) {
