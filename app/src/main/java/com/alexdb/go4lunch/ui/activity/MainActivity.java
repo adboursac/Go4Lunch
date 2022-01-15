@@ -2,6 +2,7 @@ package com.alexdb.go4lunch.ui.activity;
 
 
 import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -10,8 +11,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SearchView;
 import androidx.core.view.GravityCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -21,6 +22,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.alexdb.go4lunch.R;
 import com.alexdb.go4lunch.data.model.User;
+import com.alexdb.go4lunch.data.viewmodel.MapViewModel;
 import com.alexdb.go4lunch.data.viewmodel.UserViewModel;
 import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
 import com.alexdb.go4lunch.databinding.ActivityMainBinding;
@@ -35,9 +37,12 @@ import java.util.Objects;
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     private UserViewModel mUserViewModel;
+    private MapViewModel mMapViewModel;
     private NavController mNavController;
     private MenuItem drawerSignOutButton;
     private MenuItem drawerBookedPlaceButton;
+
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 767967;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -55,11 +60,13 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     /**
      * Set toolbar_default label instead of app name as toolbar title when MainActivity starts
+     * and request location permission
      */
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         mBinding.activityMainContent.toolbar.setTitle(R.string.toolbar_default);
+        mMapViewModel.requestLocationPermission(this);
     }
 
     @Override
@@ -72,6 +79,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
      */
     private void initViewModel() {
         mUserViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(UserViewModel.class);
+        mMapViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(MapViewModel.class);
+
         mUserViewModel.getCurrentUserLiveData().observe(this, currentUser -> {
             updateDrawerHeaderData(currentUser);
             updateBookedPlaceButton(currentUser);
@@ -134,7 +143,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     /**
      * init Sign Out button for navigation drawer
-     * -
      */
     private void initSignOutButton() {
         drawerSignOutButton.setOnMenuItemClickListener(i -> {
@@ -146,7 +154,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     /**
      * init booked place details button for navigation drawer
-     * -
      */
     private void updateBookedPlaceButton(User currentUser) {
         if (currentUser.hasValidBookingDate()) {
@@ -228,5 +235,21 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
      */
     private void showSnackBar(String message) {
         Snackbar.make(mBinding.drawerLayout, message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE && grantResults.length > 0) {
+            for (int grantResult : grantResults) {
+                if (grantResult == PackageManager.PERMISSION_GRANTED) {
+                    mMapViewModel.grantLocationPermission();
+                    //Any type of location suits us we can leave
+                    return;
+                }
+                //We didn't find any location permission
+                mMapViewModel.denyLocationPermission();
+            }
+        }
     }
 }

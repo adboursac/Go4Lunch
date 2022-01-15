@@ -42,7 +42,8 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
         mPermissionHelper = new PermissionHelper(application);
         mUserRepository = new UserRepository(new UserApiFirebase());
         mLocationRepository = new LocationRepository(
-                LocationServices.getFusedLocationProviderClient(application));
+                LocationServices.getFusedLocationProviderClient(application),
+                mPermissionHelper);
         mMapsPlacesRepository = new RestaurantPlacesRepository(Executors.newSingleThreadExecutor());
         mRestaurantDetailsRepository = new RestaurantDetailsRepository();
         mPlacePredictionRepository = new PlacePredictionRepository();
@@ -67,7 +68,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
             return (T) new UserViewModel(mUserRepository);
         }
         else if (modelClass.isAssignableFrom(MapViewModel.class)) {
-            return (T) new MapViewModel(mPermissionHelper, mLocationRepository, mMapsPlacesRepository, mUserRepository, mPlacePredictionRepository);
+            return (T) new MapViewModel(mLocationRepository, mMapsPlacesRepository, mUserRepository, mPlacePredictionRepository);
         }
         else if (modelClass.isAssignableFrom(ListViewModel.class)) {
             return (T) new ListViewModel(mMapsPlacesRepository, mLocationRepository, mUserRepository, mPlacePredictionRepository);

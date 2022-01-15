@@ -38,8 +38,6 @@ import java.util.List;
 public class MapViewModel extends ViewModel {
 
     @NonNull
-    private final PermissionHelper mPermissionHelper;
-    @NonNull
     private final LocationRepository mLocationRepository;
     @NonNull
     private final RestaurantPlacesRepository mMapsPlacesRepository;
@@ -51,13 +49,11 @@ public class MapViewModel extends ViewModel {
     private MediatorLiveData<List<RestaurantStateItem>> mRestaurantsLiveData;
 
     public MapViewModel(
-            @NonNull PermissionHelper permissionHelper,
             @NonNull LocationRepository locationRepository,
             @NonNull RestaurantPlacesRepository mapsPlacesRepository,
             @NonNull UserRepository userRepository,
             @NonNull PlacePredictionRepository placePredictionRepository
     ) {
-        mPermissionHelper = permissionHelper;
         mLocationRepository = locationRepository;
         mMapsPlacesRepository = mapsPlacesRepository;
         mUserRepository = userRepository;
@@ -67,6 +63,10 @@ public class MapViewModel extends ViewModel {
 
     public LiveData<Location> getLocationLiveData() {
         return mLocationRepository.getLocationLiveData();
+    }
+
+    public LiveData<Boolean> getLocationPermissionLiveData() {
+        return mLocationRepository.getLocationPermissionLiveData();
     }
 
     public LiveData<List<RestaurantStateItem>> getRestaurantsLiveData() {
@@ -135,29 +135,32 @@ public class MapViewModel extends ViewModel {
 
     public void fetchRestaurants(Location location) {
         if (location == null) {
-            refreshLocation();
+            mLocationRepository.refreshLocation();
             return;
         }
         mMapsPlacesRepository.fetchRestaurantPlaces(location);
         mUserRepository.fetchWorkmates();
     }
 
-    @SuppressLint("MissingPermission")
-    public void refreshLocation() {
-        if (mPermissionHelper.hasLocationPermission()) {
-            mLocationRepository.startLocationUpdatesLoop();
-        } else {
-            mLocationRepository.stopLocationUpdatesLoop();
-        }
-    }
-
     public boolean hasLocationPermission() {
-        return mPermissionHelper.hasLocationPermission();
+        return mLocationRepository.hasLocationPermission();
     }
 
     public void requestLocationPermission(Activity activity) {
-        if (!mPermissionHelper.hasLocationPermission())
-            mPermissionHelper.requestLocationPermission(activity);
+        if (!mLocationRepository.hasLocationPermission())
+            mLocationRepository.requestLocationPermission(activity);
+    }
+
+    public void denyLocationPermission() {
+        mLocationRepository.denyLocationPermission();
+    }
+
+    public void grantLocationPermission() {
+        mLocationRepository.grantLocationPermission();
+    }
+
+    public void refreshLocation() {
+        mLocationRepository.refreshLocation();
     }
 
     private String mapOpeningStatus(MapsOpeningHours openingHours) {

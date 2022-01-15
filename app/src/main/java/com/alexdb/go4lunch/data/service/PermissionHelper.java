@@ -15,6 +15,8 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
  */
 public class PermissionHelper {
 
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 767967;
+
     @NonNull
     private final Application mApplication;
 
@@ -36,6 +38,6 @@ public class PermissionHelper {
      */
     public void requestLocationPermission(Activity activity) {
         ActivityCompat.requestPermissions(activity,
-                new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+                new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
     }
 }
