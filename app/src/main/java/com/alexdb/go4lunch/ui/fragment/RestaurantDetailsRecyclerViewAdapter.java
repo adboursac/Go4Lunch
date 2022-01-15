@@ -9,6 +9,7 @@ public class RestaurantDetailsRecyclerViewAdapter extends WorkmatesRecyclerViewA
 
     public RestaurantDetailsRecyclerViewAdapter(List<User> workmates) {
         super(workmates);
+        setDefaultWorkmatesList(workmates);
     }
 
     @Override

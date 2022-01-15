@@ -66,7 +66,7 @@ public class RestaurantDetailsFragment extends Fragment {
     }
 
     private void initData() {
-        mDetailsViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(DetailsViewModel.class);
+        mDetailsViewModel = new ViewModelProvider(requireActivity(), ViewModelFactory.getInstance()).get(DetailsViewModel.class);
         mDetailsViewModel.getRestaurantsDetailsLiveData().observe(getViewLifecycleOwner(), restaurant -> {
             populateDetails(restaurant);
             mBookedUsers.clear();

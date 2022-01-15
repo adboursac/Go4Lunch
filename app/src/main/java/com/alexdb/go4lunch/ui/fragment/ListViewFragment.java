@@ -9,8 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -19,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.alexdb.go4lunch.R;
 import com.alexdb.go4lunch.data.model.PredictionStateItem;
 import com.alexdb.go4lunch.data.model.RestaurantStateItem;
-import com.alexdb.go4lunch.data.model.maps.MapsPlace;
 import com.alexdb.go4lunch.data.viewmodel.ListViewModel;
 import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
 import com.alexdb.go4lunch.databinding.FragmentListViewBinding;
@@ -61,7 +58,7 @@ public class ListViewFragment extends Fragment implements ArrayAdapterSearchView
     }
 
     private void initData() {
-        mListViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(ListViewModel.class);
+        mListViewModel = new ViewModelProvider(requireActivity(), ViewModelFactory.getInstance()).get(ListViewModel.class);
         mListViewModel.getRestaurantsLiveData().observe(getViewLifecycleOwner(), restaurants -> {
             mRestaurants.clear();
             mRestaurants.addAll(restaurants);
@@ -72,11 +69,11 @@ public class ListViewFragment extends Fragment implements ArrayAdapterSearchView
         });
         
         mListViewModel.getRestaurantPredictionsLivaData().observe(getViewLifecycleOwner(), predictionList -> {
-            if (mSearchView != null && predictionList != null) mSearchView.setSuggestionsList(mapPredictionsForSearchView(predictionList));
+            if (mSearchView != null) mSearchView.setSuggestionsList(predictionsToStrings(predictionList), true);
         });
     }
 
-    private List<String> mapPredictionsForSearchView (List<PredictionStateItem> predictions) {
+    private List<String> predictionsToStrings(List<PredictionStateItem> predictions) {
         List<String> predictionsStrings = new ArrayList<>();
         for (PredictionStateItem p : predictions) {
             predictionsStrings.add(p.getMainText());
@@ -107,12 +104,15 @@ public class ListViewFragment extends Fragment implements ArrayAdapterSearchView
     private void configureSearchView() {
         mSearchView.setOnQueryTextListener(this);
         mSearchView.setQueryHint(getString(R.string.toolbar_search_restaurants));
+
+        //Handle suggestion click
         mSearchView.setOnItemClickListener((parent, view, position, id) -> {
             String selectedString = mSearchView.applyItemSelection(position);
             mListViewModel.applySearch(selectedString);
             mSearchView.setQuery(selectedString, true);
         });
 
+        //Handle clear button
         mSearchView.getClearButton().setOnClickListener(view -> {
             if(mSearchView.getQuery().length() == 0) {
                 mSearchView.setIconified(true);
@@ -122,7 +122,9 @@ public class ListViewFragment extends Fragment implements ArrayAdapterSearchView
             }
         });
 
-        if (mListViewModel.getCurrentSearchQuery() != null) {
+        //Display current search on searchView
+        String currentQuery = mListViewModel.getCurrentSearchQuery();
+        if ( currentQuery.length() > 0) {
             mSearchView.setIconified(false);
             mSearchView.setQuery(mListViewModel.getCurrentSearchQuery(), true);
         }

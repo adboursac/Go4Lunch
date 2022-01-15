@@ -20,7 +20,8 @@ import retrofit2.Response;
 public class PlacePredictionRepository {
 
     private final MutableLiveData<List<MapsPlacePrediction>> mRestaurantPredictions = new MutableLiveData<>();
-    private String mCurrentSearchQuery;
+    private int mDefaultSearchRadius=200;
+    private String mCurrentSearchQuery="";
 
     public LiveData<List<MapsPlacePrediction>> getRestaurantPredictionsLiveData() {
         return mRestaurantPredictions;
@@ -28,18 +29,18 @@ public class PlacePredictionRepository {
 
     public String getCurrentSearchQuery() { return mCurrentSearchQuery; }
     public void setCurrentSearchQuery(String currentSearchQuery) { mCurrentSearchQuery = currentSearchQuery; }
+    public void setDefaultSearchRadius(int defaultSearchRadius) { mDefaultSearchRadius = defaultSearchRadius; }
 
     /**
      * Request restaurant autocomplete predictions.
      * @param location current location
-     * @param radius search radius
      * @param textInput user search input
      */
 
-    public void requestRestaurantPredictions(Location location, int radius, String textInput) {
-        if (textInput == null) return;
+    public void requestRestaurantPredictions(Location location, String textInput) {
+        if (textInput == null || containsPrediction(textInput)) return;
 
-        GoogleMapsApiClient.getPlacesPredictions(location, radius, textInput).enqueue(new Callback<MapsPlacePredictionsPage>() {
+        GoogleMapsApiClient.getPlacesPredictions(location, mDefaultSearchRadius, textInput).enqueue(new Callback<MapsPlacePredictionsPage>() {
             @Override
             public void onResponse(@NonNull Call<MapsPlacePredictionsPage> call, @NonNull Response<MapsPlacePredictionsPage> response) {
                 if (response.isSuccessful()) {
@@ -55,5 +56,20 @@ public class PlacePredictionRepository {
                 Log.d("PlacePredictionRepo--", "requestRestaurantPredictions failure" + t);
             }
         });
+    }
+
+    /**
+     * Tells if given textInput has an exact match with our current predictions list.
+     * In this case, we won't need to request it as it will return only one match that we already have.
+     * @param textInput the request input we want to check
+     * @return true if we have an exact match, false instead
+     */
+    public boolean containsPrediction(String textInput) {
+        List<MapsPlacePrediction> predictions = mRestaurantPredictions.getValue();
+        if (predictions ==  null) return false;
+        for( MapsPlacePrediction p : predictions) {
+            if (p.getStructured_formatting().getMain_text().contentEquals(textInput)) return true;
+        }
+        return false;
     }
 }

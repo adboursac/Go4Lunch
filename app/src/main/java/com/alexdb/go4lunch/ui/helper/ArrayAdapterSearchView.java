@@ -37,7 +37,7 @@ public class ArrayAdapterSearchView extends SearchView {
     }
 
     public void init() {
-        mSearchAutoComplete = (SearchAutoComplete) findViewById(androidx.appcompat.R.id.search_src_text);
+        mSearchAutoComplete = findViewById(androidx.appcompat.R.id.search_src_text);
         mClearButton = findViewById(androidx.appcompat.R.id.search_close_btn);
         mAdapter = new ArrayAdapter<>(getContext(), R.layout.search_autocomplete_item);
 
@@ -57,22 +57,23 @@ public class ArrayAdapterSearchView extends SearchView {
         mSearchAutoComplete.setAdapter(adapter);
     }
 
-    public void setSuggestionsList(List<String> suggestions) {
+    public void setSuggestionsList(List<String> suggestions, boolean displayNow) {
         mAdapter.clear();
         mAdapter.addAll(suggestions);
-    }
-
-    public void setText(String text) {
-        mSearchAutoComplete.setText(text);
-    }
-
-    public String getText() {
-        return mSearchAutoComplete.getText().toString();
+        if (displayNow && suggestions.size() > 0) displaySuggestions();
     }
 
     public String applyItemSelection(int position) {
-        String selectedItem = mAdapter.getItem(position);
-        setText(selectedItem);
-        return selectedItem;
+        String selectedString = mAdapter.getItem(position);
+        setQuery(selectedString, true);
+        return selectedString;
+    }
+
+    public void displaySuggestions() {
+        mSearchAutoComplete.callOnClick();
+    }
+
+    public void hideSuggestions() {
+        mSearchAutoComplete.dismissDropDown();
     }
 }

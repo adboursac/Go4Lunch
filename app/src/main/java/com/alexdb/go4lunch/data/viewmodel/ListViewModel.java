@@ -1,5 +1,6 @@
 package com.alexdb.go4lunch.data.viewmodel;
 
+import android.annotation.SuppressLint;
 import android.content.res.Resources;
 import android.location.Location;
 
@@ -50,7 +51,9 @@ public class ListViewModel extends ViewModel {
     }
 
     public void fetchRestaurants() {
-        mMapsPlacesRepository.fetchRestaurantPlaces(mLocationRepository.getLocationLiveData().getValue());
+        Location currentLocation = mLocationRepository.getLocationLiveData().getValue();
+        if ( currentLocation == null) return;
+        mMapsPlacesRepository.fetchRestaurantPlaces(currentLocation);
         mUserRepository.fetchWorkmates();
     }
 
@@ -116,7 +119,7 @@ public class ListViewModel extends ViewModel {
 
     private String mapOpeningStatus(MapsOpeningHours openingHours) {
         Resources resources = MainApplication.getApplication().getResources();
-        if (openingHours == null) return resources.getString(R.string.restaurant_no_schedule);
+        if (openingHours == null || openingHours.getOpen_now() == null ) return resources.getString(R.string.restaurant_no_schedule);
         else {
             return openingHours.getOpen_now() ? resources.getString(R.string.restaurant_open)
                     : resources.getString(R.string.restaurant_closed);
@@ -138,8 +141,7 @@ public class ListViewModel extends ViewModel {
     }
 
     public void requestRestaurantPredictions(String textInput) {
-        mPlacePredictionRepository.requestRestaurantPredictions(mLocationRepository.getLocationLiveData().getValue(),
-                200, textInput);
+        mPlacePredictionRepository.requestRestaurantPredictions(mLocationRepository.getLocationLiveData().getValue(), textInput);
     }
 
     public LiveData<List<PredictionStateItem>> getRestaurantPredictionsLivaData() {
@@ -170,7 +172,7 @@ public class ListViewModel extends ViewModel {
     }
 
     public void clearSearch() {
-        mPlacePredictionRepository.setCurrentSearchQuery(null);
+        mPlacePredictionRepository.setCurrentSearchQuery("");
         Location location = mLocationRepository.getLocationLiveData().getValue();
         if (location == null) return;
         mMapsPlacesRepository.fetchRestaurantPlaces(location);

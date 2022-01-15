@@ -33,12 +33,11 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
-import java.util.Currency;
 import java.util.List;
 
 public class MapViewModel extends ViewModel {
 
-    private final int DEFAULT_ZOOM = 18;
+    private int mDefaultZoom = 18;
     @NonNull
     private final PermissionHelper mPermissionHelper;
     @NonNull
@@ -78,6 +77,8 @@ public class MapViewModel extends ViewModel {
     }
 
     public String getCurrentSearchQuery() { return mPlacePredictionRepository.getCurrentSearchQuery(); }
+
+    public void setDefaultZoom(int defaultZoom) { mDefaultZoom = defaultZoom; }
 
     /**
      * Merge restaurant places, location and workmates live data from repositories into a single observable live data
@@ -161,13 +162,12 @@ public class MapViewModel extends ViewModel {
         mMap = map;
         if (!mPermissionHelper.hasLocationPermission())
             mPermissionHelper.requestLocationPermission(activity);
-        fetchRestaurants(mLocationRepository.getLocationLiveData().getValue());
     }
 
     public void moveCamera(Location location) {
         if (location == null || mMap == null) return;
         LatLng cord = new LatLng(location.getLatitude(), location.getLongitude());
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cord, DEFAULT_ZOOM));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cord, mDefaultZoom));
     }
 
     private void createRestaurantMarker(Location location, String title, boolean selected, String placeId) {
@@ -195,7 +195,7 @@ public class MapViewModel extends ViewModel {
 
     private String mapOpeningStatus(MapsOpeningHours openingHours) {
         Resources resources = MainApplication.getApplication().getResources();
-        if (openingHours == null) return resources.getString(R.string.restaurant_no_schedule);
+        if ( openingHours == null || openingHours.getOpen_now() == null ) return resources.getString(R.string.restaurant_no_schedule);
         else {
             return openingHours.getOpen_now() ? resources.getString(R.string.restaurant_open)
                     : resources.getString(R.string.restaurant_closed);
@@ -217,8 +217,7 @@ public class MapViewModel extends ViewModel {
     }
 
     public void requestRestaurantPredictions(String textInput) {
-        mPlacePredictionRepository.requestRestaurantPredictions(mLocationRepository.getLocationLiveData().getValue(),
-                200, textInput);
+        mPlacePredictionRepository.requestRestaurantPredictions(mLocationRepository.getLocationLiveData().getValue(), textInput);
     }
 
     public LiveData<List<PredictionStateItem>> getRestaurantPredictionsLivaData() {
@@ -249,7 +248,7 @@ public class MapViewModel extends ViewModel {
     }
 
     public void clearSearch() {
-        mPlacePredictionRepository.setCurrentSearchQuery(null);
+        mPlacePredictionRepository.setCurrentSearchQuery("");
         Location location = mLocationRepository.getLocationLiveData().getValue();
         if (location == null) return;
         mMapsPlacesRepository.fetchRestaurantPlaces(location);

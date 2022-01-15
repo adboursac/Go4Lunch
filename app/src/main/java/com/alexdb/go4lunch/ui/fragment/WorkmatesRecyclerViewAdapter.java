@@ -3,8 +3,11 @@ package com.alexdb.go4lunch.ui.fragment;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,19 +22,26 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class WorkmatesRecyclerViewAdapter extends RecyclerView.Adapter<WorkmatesRecyclerViewAdapter.ViewHolder> {
+public class WorkmatesRecyclerViewAdapter extends RecyclerView.Adapter<WorkmatesRecyclerViewAdapter.ViewHolder> implements Filterable {
 
-    private List<User> mWorkmates;
+    private List<User> mWorkmatesFullList;
+    private List<User> mWorkmatesFilteredList;
     private Context mContext;
 
     public WorkmatesRecyclerViewAdapter(List<User> workmates) {
-        mWorkmates = workmates;
+        mWorkmatesFullList = workmates;
+        mWorkmatesFilteredList = new ArrayList<>(workmates);
     }
 
     public List<User> getWorkmates() {
-        return mWorkmates;
+        return mWorkmatesFilteredList;
+    }
+
+    public void setDefaultWorkmatesList(List<User> workmatesFilteredList) {
+        mWorkmatesFilteredList = workmatesFilteredList;
     }
 
     public Resources getResources() {
@@ -62,7 +72,7 @@ public class WorkmatesRecyclerViewAdapter extends RecyclerView.Adapter<Workmates
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        User workmate = mWorkmates.get(position);
+        User workmate = mWorkmatesFilteredList.get(position);
         setPicture(workmate.getProfilePictureUrl(), holder.mBinding.picture);
         setDescription(workmate, holder.mBinding.description);
 
@@ -77,7 +87,7 @@ public class WorkmatesRecyclerViewAdapter extends RecyclerView.Adapter<Workmates
 
     @Override
     public int getItemCount() {
-        return mWorkmates.size();
+        return mWorkmatesFilteredList.size();
     }
 
     public void setPicture(String pictureUrl, ImageView imageView) {
@@ -108,5 +118,41 @@ public class WorkmatesRecyclerViewAdapter extends RecyclerView.Adapter<Workmates
             textView.setTextColor(getResources().getColor(R.color.grey));
         }
         textView.setText(description);
+    }
+
+    private Filter mWorkmatesFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence charSequence) {
+            List<User> filteredList = new ArrayList<>();
+            if (charSequence == null || charSequence.length() == 0) {
+                filteredList.addAll(mWorkmatesFullList);
+            }
+            else {
+                String filterPattern = charSequence.toString().toLowerCase().trim();
+                for (User workmate : mWorkmatesFullList) {
+                    if (workmate.getName().toLowerCase().contains(filterPattern)) {
+                        filteredList.add(workmate);
+                    }
+                }
+            }
+
+            FilterResults results = new FilterResults();
+            results.values = filteredList;
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+            mWorkmatesFilteredList.clear();
+            //As this adapter is exclusively handling User lists, we won't check this cast.
+            @SuppressWarnings("unchecked") List<User> castedUserList = (List<User>) filterResults.values;
+            mWorkmatesFilteredList.addAll(castedUserList);
+            notifyDataSetChanged();
+        }
+    };
+
+    @Override
+    public Filter getFilter() {
+        return mWorkmatesFilter;
     }
 }
