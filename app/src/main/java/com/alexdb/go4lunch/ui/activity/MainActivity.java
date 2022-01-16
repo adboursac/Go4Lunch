@@ -22,7 +22,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.alexdb.go4lunch.R;
 import com.alexdb.go4lunch.data.model.User;
-import com.alexdb.go4lunch.data.viewmodel.MapViewModel;
+import com.alexdb.go4lunch.data.viewmodel.MainViewModel;
 import com.alexdb.go4lunch.data.viewmodel.UserViewModel;
 import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
 import com.alexdb.go4lunch.databinding.ActivityMainBinding;
@@ -36,8 +36,7 @@ import java.util.Objects;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
-    private UserViewModel mUserViewModel;
-    private MapViewModel mMapViewModel;
+    private MainViewModel mMainViewModel;
     private NavController mNavController;
     private MenuItem drawerSignOutButton;
     private MenuItem drawerBookedPlaceButton;
@@ -66,7 +65,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         mBinding.activityMainContent.toolbar.setTitle(R.string.toolbar_default);
-        mMapViewModel.requestLocationPermission(this);
+        mMainViewModel.requestLocationPermission(this);
     }
 
     @Override
@@ -78,14 +77,13 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
      * Get required View Model for Main Activity
      */
     private void initViewModel() {
-        mUserViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(UserViewModel.class);
-        mMapViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(MapViewModel.class);
+        mMainViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(MainViewModel.class);
 
-        mUserViewModel.getCurrentUserLiveData().observe(this, currentUser -> {
+        mMainViewModel.getCurrentUserLiveData().observe(this, currentUser -> {
             updateDrawerHeaderData(currentUser);
             updateBookedPlaceButton(currentUser);
         });
-        mUserViewModel.fetchCurrentUser();
+        mMainViewModel.fetchCurrentUser();
     }
 
     /**
@@ -147,7 +145,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     private void initSignOutButton() {
         drawerSignOutButton.setOnMenuItemClickListener(i -> {
             mBinding.drawerLayout.closeDrawer(GravityCompat.START);
-            mUserViewModel.signOut(this).addOnSuccessListener(aVoid -> finish());
+            mMainViewModel.signOut(this).addOnSuccessListener(aVoid -> finish());
             return true;
         });
     }
@@ -187,7 +185,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
      * update drawer header with user data
      */
     private void updateDrawerHeaderData(User currentUser) {
-        if (mUserViewModel.isCurrentUserLogged()) {
+        if (mMainViewModel.isCurrentUserLogged()) {
             View drawerHeaderView = mBinding.drawerContent.getHeaderView(0);
 
             if (currentUser.getProfilePictureUrl() != null) {
@@ -243,12 +241,12 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE && grantResults.length > 0) {
             for (int grantResult : grantResults) {
                 if (grantResult == PackageManager.PERMISSION_GRANTED) {
-                    mMapViewModel.grantLocationPermission();
+                    mMainViewModel.grantLocationPermission();
                     //Any type of location suits us we can leave
                     return;
                 }
                 //We didn't find any location permission
-                mMapViewModel.denyLocationPermission();
+                mMainViewModel.denyLocationPermission();
             }
         }
     }

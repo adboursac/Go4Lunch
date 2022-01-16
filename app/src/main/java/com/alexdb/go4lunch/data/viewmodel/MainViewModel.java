@@ -1,7 +1,7 @@
 package com.alexdb.go4lunch.data.viewmodel;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.Resources;
 import android.location.Location;
 
@@ -23,19 +23,13 @@ import com.alexdb.go4lunch.data.repository.PlacePredictionRepository;
 import com.alexdb.go4lunch.data.repository.RestaurantPlacesRepository;
 import com.alexdb.go4lunch.data.repository.UserRepository;
 import com.alexdb.go4lunch.data.service.GoogleMapsApiClient;
-import com.alexdb.go4lunch.data.service.PermissionHelper;
 import com.alexdb.go4lunch.ui.MainApplication;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.Task;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapViewModel extends ViewModel {
+public class MainViewModel extends ViewModel {
 
     @NonNull
     private final LocationRepository mLocationRepository;
@@ -48,7 +42,7 @@ public class MapViewModel extends ViewModel {
 
     private MediatorLiveData<List<RestaurantStateItem>> mRestaurantsLiveData;
 
-    public MapViewModel(
+    public MainViewModel(
             @NonNull LocationRepository locationRepository,
             @NonNull RestaurantPlacesRepository mapsPlacesRepository,
             @NonNull UserRepository userRepository,
@@ -69,11 +63,52 @@ public class MapViewModel extends ViewModel {
         return mLocationRepository.getLocationPermissionLiveData();
     }
 
+    public LiveData<User> getCurrentUserLiveData() {
+        return mUserRepository.getCurrentUserLiveData();
+    }
+
     public LiveData<List<RestaurantStateItem>> getRestaurantsLiveData() {
         return mRestaurantsLiveData;
     }
 
-    public String getCurrentSearchQuery() { return mPlacePredictionRepository.getCurrentSearchQuery(); }
+    public LiveData<List<PredictionStateItem>> getRestaurantPredictionsLivaData() {
+        return Transformations.map(mPlacePredictionRepository.getRestaurantPredictionsLiveData(), predictions -> {
+            List<PredictionStateItem> predictionsItems = new ArrayList<>();
+            for (MapsPlacePrediction p : predictions) {
+                if (p.getPlace_id() != null) {
+                    predictionsItems.add(new PredictionStateItem(
+                            p.getPlace_id(),
+                            p.getStructured_formatting().getMain_text(),
+                            p.getStructured_formatting().getSecondary_text()
+                    ));
+                }
+            }
+            return predictionsItems;
+        });
+    }
+
+    public String getCurrentSearchQuery() {
+        return mPlacePredictionRepository.getCurrentSearchQuery();
+    }
+
+    /**
+     * refresh current user data
+     */
+    public void fetchCurrentUser() {
+        mUserRepository.fetchCurrentUser();
+    }
+
+    /**
+     * refresh Restaurants data
+     */
+    public void fetchRestaurants(Location location) {
+        if (location == null) {
+            mLocationRepository.refreshLocation();
+            return;
+        }
+        mMapsPlacesRepository.fetchRestaurantPlaces(location);
+        mUserRepository.fetchWorkmates();
+    }
 
     /**
      * Merge restaurant places, location and workmates live data from repositories into a single observable live data
@@ -85,21 +120,21 @@ public class MapViewModel extends ViewModel {
         LiveData<List<User>> workmatesLiveData = mUserRepository.getWorkmatesLiveData();
 
         mRestaurantsLiveData.addSource(placesLiveData, places ->
-                mapDataToViewState(
+                mergeDataToViewState(
                         places,
                         locationLiveData.getValue(),
                         workmatesLiveData.getValue())
         );
 
         mRestaurantsLiveData.addSource(locationLiveData, location ->
-                mapDataToViewState(
+                mergeDataToViewState(
                         placesLiveData.getValue(),
                         location,
                         workmatesLiveData.getValue())
         );
 
         mRestaurantsLiveData.addSource(workmatesLiveData, workmates ->
-                mapDataToViewState(
+                mergeDataToViewState(
                         placesLiveData.getValue(),
                         locationLiveData.getValue(),
                         workmates)
@@ -107,39 +142,30 @@ public class MapViewModel extends ViewModel {
     }
 
     /**
-     * Map restaurant places, location, and workmates data from repositories to view data as a RestaurantStateItem instance,
+     * Merge restaurant places, location, and workmates data from repositories to view data as a RestaurantStateItem instance,
      * and store it in the Mediator Live Data mRestaurantsLiveData
      *
      * @param places       data from restaurant places repository
      * @param userLocation current user location
      * @param workmates    workmates data from User repository
      */
-    private void mapDataToViewState(List<MapsPlace> places, Location userLocation, List<User> workmates) {
+    private void mergeDataToViewState(List<MapsPlace> places, Location userLocation, List<User> workmates) {
         if ((places == null) || (userLocation == null) || (workmates == null)) return;
         List<RestaurantStateItem> stateItems = new ArrayList<>();
         for (MapsPlace p : places) {
             stateItems.add(new RestaurantStateItem(
                     p.getPlaceId(),
                     p.getName(),
-                    mapOpeningStatus(p.getOpening_hours()),
+                    openingStatusToString(p.getOpening_hours()),
                     p.getVicinity(),
                     p.getLocation(),
-                    generateDistance(userLocation, p.getLocation()),
+                    calculateDistance(userLocation, p.getLocation()),
                     p.getRating(),
                     GoogleMapsApiClient.getPictureUrl(p.getFirstPhotoReference()),
-                    calculateWorkmateAmount(p.getPlaceId(), workmates)
+                    calculateBookedWorkmatesAmount(p.getPlaceId(), workmates)
             ));
         }
         mRestaurantsLiveData.setValue(stateItems);
-    }
-
-    public void fetchRestaurants(Location location) {
-        if (location == null) {
-            mLocationRepository.refreshLocation();
-            return;
-        }
-        mMapsPlacesRepository.fetchRestaurantPlaces(location);
-        mUserRepository.fetchWorkmates();
     }
 
     public boolean hasLocationPermission() {
@@ -163,21 +189,42 @@ public class MapViewModel extends ViewModel {
         mLocationRepository.refreshLocation();
     }
 
-    private String mapOpeningStatus(MapsOpeningHours openingHours) {
+    /**
+     * Transform maps opening data into String
+     *
+     * @param openingHours map opening data
+     * @return String representation of opening data
+     */
+    private String openingStatusToString(MapsOpeningHours openingHours) {
         Resources resources = MainApplication.getApplication().getResources();
-        if ( openingHours == null || openingHours.getOpen_now() == null ) return resources.getString(R.string.restaurant_no_schedule);
+        if (openingHours == null || openingHours.getOpen_now() == null)
+            return resources.getString(R.string.restaurant_no_schedule);
         else {
             return openingHours.getOpen_now() ? resources.getString(R.string.restaurant_open)
                     : resources.getString(R.string.restaurant_closed);
         }
     }
 
-    private int generateDistance(Location userLocation, Location placeLocation) {
+    /**
+     * Calculate distance between two given locations
+     *
+     * @param userLocation  user location
+     * @param placeLocation place location
+     * @return Distance in meters
+     */
+    private int calculateDistance(Location userLocation, Location placeLocation) {
         if ((userLocation == null) || (placeLocation == null)) return -1;
         return Math.round(userLocation.distanceTo(placeLocation));
     }
 
-    public int calculateWorkmateAmount(String placeId, List<User> workmates) {
+    /**
+     * Calculate workmates amount that booked the given place
+     *
+     * @param placeId   id of the place
+     * @param workmates list of workmates
+     * @return workmates amount
+     */
+    public int calculateBookedWorkmatesAmount(String placeId, List<User> workmates) {
         if (workmates == null) return 0;
         int amount = 0;
         for (User workmate : workmates) {
@@ -186,26 +233,34 @@ public class MapViewModel extends ViewModel {
         return amount;
     }
 
-    public void requestRestaurantPredictions(String textInput) {
+    /**
+     * Request place autocomplete predictions that match given text input
+     *
+     * @param textInput text input for prediction
+     */
+    public void requestPlacesPredictions(String textInput) {
         mPlacePredictionRepository.requestRestaurantPredictions(mLocationRepository.getLocationLiveData().getValue(), textInput);
     }
 
-    public LiveData<List<PredictionStateItem>> getRestaurantPredictionsLivaData() {
-        return Transformations.map(mPlacePredictionRepository.getRestaurantPredictionsLiveData(), predictions -> {
-            List<PredictionStateItem> predictionsItems = new ArrayList<>();
-            for (MapsPlacePrediction p : predictions) {
-                if (p.getPlace_id() != null) {
-                    predictionsItems.add(new PredictionStateItem(
-                            p.getPlace_id(),
-                            p.getStructured_formatting().getMain_text(),
-                            p.getStructured_formatting().getSecondary_text()
-                    ));
-                }
-            }
-            return predictionsItems;
-        });
+    /**
+     * Convert predictions list to place names as strings list
+     *
+     * @param predictions predictions items
+     * @return String list of predicted places
+     */
+    public List<String> predictionsToStrings(List<PredictionStateItem> predictions) {
+        List<String> predictionsStrings = new ArrayList<>();
+        for (PredictionStateItem p : predictions) {
+            predictionsStrings.add(p.getMainText());
+        }
+        return predictionsStrings;
     }
 
+    /**
+     * Apply a query choice obtained from autocomplete and request places list to be updated to match the query
+     *
+     * @param query text query that should come from autocomplete predictions
+     */
     public void applySearch(String query) {
         mPlacePredictionRepository.setCurrentSearchQuery(query);
         List<MapsPlacePrediction> currentPredictions = mPlacePredictionRepository.getRestaurantPredictionsLiveData().getValue();
@@ -217,10 +272,32 @@ public class MapViewModel extends ViewModel {
         }
     }
 
+    /**
+     * Clear search and bring back the list of nearest places
+     */
     public void clearSearch() {
         mPlacePredictionRepository.setCurrentSearchQuery("");
         Location location = mLocationRepository.getLocationLiveData().getValue();
         if (location == null) return;
         mMapsPlacesRepository.fetchRestaurantPlaces(location);
+    }
+
+    /**
+     * Tell if current user is already logged
+     *
+     * @return true if user is logged, false instead
+     */
+    public Boolean isCurrentUserLogged() {
+        return mUserRepository.isCurrentUserLogged();
+    }
+
+    /**
+     * Sign current user out.
+     *
+     * @param context context
+     * @return resulting task
+     */
+    public Task<Void> signOut(Context context) {
+        return mUserRepository.signOut(context);
     }
 }

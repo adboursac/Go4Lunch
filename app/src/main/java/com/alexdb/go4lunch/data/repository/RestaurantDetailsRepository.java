@@ -24,9 +24,9 @@ public class RestaurantDetailsRepository {
 
     /**
      * Fetch restaurant details from its place id.
+     *
      * @param placeId place id of the restaurant
      */
-
     public void fetchRestaurantDetails(String placeId) {
         if (placeId == null) return;
 

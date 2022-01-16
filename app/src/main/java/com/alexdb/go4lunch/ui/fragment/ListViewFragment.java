@@ -15,9 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alexdb.go4lunch.R;
-import com.alexdb.go4lunch.data.model.PredictionStateItem;
 import com.alexdb.go4lunch.data.model.RestaurantStateItem;
-import com.alexdb.go4lunch.data.viewmodel.ListViewModel;
+import com.alexdb.go4lunch.data.viewmodel.MainViewModel;
 import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
 import com.alexdb.go4lunch.databinding.FragmentListViewBinding;
 import com.alexdb.go4lunch.ui.helper.ArrayAdapterSearchView;
@@ -31,7 +30,7 @@ import java.util.Objects;
 public class ListViewFragment extends Fragment implements ArrayAdapterSearchView.OnQueryTextListener {
 
     private List<RestaurantStateItem> mRestaurants = new ArrayList<>();
-    private ListViewModel mListViewModel;
+    private MainViewModel mMainViewModel;
 
     FragmentListViewBinding mBinding;
     private ArrayAdapterSearchView mSearchView;
@@ -57,9 +56,12 @@ public class ListViewFragment extends Fragment implements ArrayAdapterSearchView
         mRecyclerView.setAdapter(mAdapter);
     }
 
+    /**
+     * Init view model and data behaviour of the fragment
+     */
     private void initData() {
-        mListViewModel = new ViewModelProvider(requireActivity(), ViewModelFactory.getInstance()).get(ListViewModel.class);
-        mListViewModel.getRestaurantsLiveData().observe(getViewLifecycleOwner(), restaurants -> {
+        mMainViewModel = new ViewModelProvider(requireActivity(), ViewModelFactory.getInstance()).get(MainViewModel.class);
+        mMainViewModel.getRestaurantsLiveData().observe(getViewLifecycleOwner(), restaurants -> {
             mRestaurants.clear();
             mRestaurants.addAll(restaurants);
             if (mRestaurants.size() == 0) {
@@ -67,18 +69,13 @@ public class ListViewFragment extends Fragment implements ArrayAdapterSearchView
             }
             Objects.requireNonNull(mRecyclerView.getAdapter()).notifyDataSetChanged();
         });
-        
-        mListViewModel.getRestaurantPredictionsLivaData().observe(getViewLifecycleOwner(), predictionList -> {
-            if (mSearchView != null) mSearchView.setSuggestionsList(predictionsToStrings(predictionList), true);
-        });
-    }
 
-    private List<String> predictionsToStrings(List<PredictionStateItem> predictions) {
-        List<String> predictionsStrings = new ArrayList<>();
-        for (PredictionStateItem p : predictions) {
-            predictionsStrings.add(p.getMainText());
-        }
-        return predictionsStrings;
+        mMainViewModel.getRestaurantPredictionsLivaData().observe(getViewLifecycleOwner(), predictionList -> {
+            if (mSearchView != null) {
+                List<String> predictionsStrings = mMainViewModel.predictionsToStrings(predictionList);
+                mSearchView.setSuggestionsList(predictionsStrings, true);
+            }
+        });
     }
 
     @Override
@@ -96,37 +93,40 @@ public class ListViewFragment extends Fragment implements ArrayAdapterSearchView
     @Override
     public boolean onQueryTextChange(String newText) {
         if (newText.length() > 2) {
-            mListViewModel.requestRestaurantPredictions(newText);
+            mMainViewModel.requestPlacesPredictions(newText);
         }
         return false;
     }
 
+    /**
+     * Configure search view
+     */
     private void configureSearchView() {
         mSearchView.setOnQueryTextListener(this);
         mSearchView.setQueryHint(getString(R.string.toolbar_search_restaurants));
 
         //Handle suggestion click
         mSearchView.setOnItemClickListener((parent, view, position, id) -> {
-            String selectedString = mSearchView.applyItemSelection(position);
-            mListViewModel.applySearch(selectedString);
+            String selectedString = mSearchView.applySelection(position);
+            mMainViewModel.applySearch(selectedString);
             mSearchView.setQuery(selectedString, true);
         });
 
         //Handle clear button
         mSearchView.getClearButton().setOnClickListener(view -> {
-            if(mSearchView.getQuery().length() == 0) {
+            if (mSearchView.getQuery().length() == 0) {
                 mSearchView.setIconified(true);
             } else {
                 mSearchView.setQuery("", false);
-                mListViewModel.clearSearch();
+                mMainViewModel.clearSearch();
             }
         });
 
         //Display current search on searchView
-        String currentQuery = mListViewModel.getCurrentSearchQuery();
-        if ( currentQuery.length() > 0) {
+        String currentQuery = mMainViewModel.getCurrentSearchQuery();
+        if (currentQuery.length() > 0) {
             mSearchView.setIconified(false);
-            mSearchView.setQuery(mListViewModel.getCurrentSearchQuery(), true);
+            mSearchView.setQuery(mMainViewModel.getCurrentSearchQuery(), true);
         }
     }
 }

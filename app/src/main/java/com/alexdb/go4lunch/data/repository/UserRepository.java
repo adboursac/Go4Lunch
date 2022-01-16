@@ -15,6 +15,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * Provide all users data with liveData
+ * Provide also a dedicated liveData for current app user
+ */
 public class UserRepository {
 
     private final UserApiFirebase mUserApiService;

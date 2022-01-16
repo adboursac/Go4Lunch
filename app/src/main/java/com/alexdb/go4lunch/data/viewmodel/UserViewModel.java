@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModel;
 import com.alexdb.go4lunch.data.model.User;
 import com.alexdb.go4lunch.data.repository.UserRepository;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 

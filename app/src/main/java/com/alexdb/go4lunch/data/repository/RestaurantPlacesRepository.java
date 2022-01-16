@@ -22,6 +22,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * Provide places list with liveData
+ * List of places is updated according to location criteria as MapsPlace model objects
+ */
 public class RestaurantPlacesRepository {
 
     private final Executor mExecutor;
