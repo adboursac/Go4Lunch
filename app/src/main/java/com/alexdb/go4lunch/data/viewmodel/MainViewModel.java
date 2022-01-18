@@ -21,6 +21,7 @@ import com.alexdb.go4lunch.data.model.PredictionStateItem;
 import com.alexdb.go4lunch.data.repository.LocationRepository;
 import com.alexdb.go4lunch.data.repository.PlacePredictionRepository;
 import com.alexdb.go4lunch.data.repository.RestaurantPlacesRepository;
+import com.alexdb.go4lunch.data.repository.SettingsRepository;
 import com.alexdb.go4lunch.data.repository.UserRepository;
 import com.alexdb.go4lunch.data.service.GoogleMapsApiClient;
 import com.alexdb.go4lunch.ui.MainApplication;
@@ -39,6 +40,8 @@ public class MainViewModel extends ViewModel {
     private final UserRepository mUserRepository;
     @NonNull
     private final PlacePredictionRepository mPlacePredictionRepository;
+    @NonNull
+    private final SettingsRepository mSettingsRepository;
 
     private MediatorLiveData<List<RestaurantStateItem>> mRestaurantsLiveData;
 
@@ -46,12 +49,14 @@ public class MainViewModel extends ViewModel {
             @NonNull LocationRepository locationRepository,
             @NonNull RestaurantPlacesRepository mapsPlacesRepository,
             @NonNull UserRepository userRepository,
-            @NonNull PlacePredictionRepository placePredictionRepository
+            @NonNull PlacePredictionRepository placePredictionRepository,
+            @NonNull SettingsRepository settingsRepository
     ) {
         mLocationRepository = locationRepository;
         mMapsPlacesRepository = mapsPlacesRepository;
         mUserRepository = userRepository;
         mPlacePredictionRepository = placePredictionRepository;
+        mSettingsRepository = settingsRepository;
         initRestaurantsLiveData();
     }
 
@@ -69,6 +74,14 @@ public class MainViewModel extends ViewModel {
 
     public LiveData<List<RestaurantStateItem>> getRestaurantsLiveData() {
         return mRestaurantsLiveData;
+    }
+
+    public LiveData<Integer> getMapZoomLiveData() {
+        return mSettingsRepository.getMapZoomLiveData();
+    }
+
+    public LiveData<Integer> getSearchRadiusLiveData() {
+        return mSettingsRepository.getSearchRadiusLiveData();
     }
 
     public LiveData<List<PredictionStateItem>> getRestaurantPredictionsLivaData() {
@@ -239,7 +252,9 @@ public class MainViewModel extends ViewModel {
      * @param textInput text input for prediction
      */
     public void requestPlacesPredictions(String textInput) {
-        mPlacePredictionRepository.requestRestaurantPredictions(mLocationRepository.getLocationLiveData().getValue(), textInput);
+        mPlacePredictionRepository.requestRestaurantPredictions(mLocationRepository.getLocationLiveData().getValue(),
+                mSettingsRepository.getSearchRadiusLiveData().getValue(),
+                textInput);
     }
 
     /**

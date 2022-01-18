@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.alexdb.go4lunch.data.repository.LocationRepository;
 import com.alexdb.go4lunch.data.repository.PlacePredictionRepository;
+import com.alexdb.go4lunch.data.repository.SettingsRepository;
 import com.alexdb.go4lunch.data.repository.RestaurantDetailsRepository;
 import com.alexdb.go4lunch.data.repository.RestaurantPlacesRepository;
 import com.alexdb.go4lunch.data.repository.UserRepository;
@@ -26,6 +27,8 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     @NonNull
     private final PermissionHelper mPermissionHelper;
     @NonNull
+    private final SettingsRepository mSettingsRepository;
+    @NonNull
     private final UserRepository mUserRepository;
     @NonNull
     private final LocationRepository mLocationRepository;
@@ -40,6 +43,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
         Application application = MainApplication.getApplication();
 
         mPermissionHelper = new PermissionHelper(application);
+        mSettingsRepository = new SettingsRepository(application);
         mUserRepository = new UserRepository(new UserApiFirebase());
         mLocationRepository = new LocationRepository(
                 LocationServices.getFusedLocationProviderClient(application),
@@ -64,11 +68,14 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     @NotNull
     @Override
     public <T extends ViewModel> T create(Class<T> modelClass) {
-        if (modelClass.isAssignableFrom(UserViewModel.class)) {
+        if (modelClass.isAssignableFrom(SettingsViewModel.class)) {
+            return (T) new SettingsViewModel(mSettingsRepository);
+        }
+        else if (modelClass.isAssignableFrom(UserViewModel.class)) {
             return (T) new UserViewModel(mUserRepository);
         }
         else if (modelClass.isAssignableFrom(MainViewModel.class)) {
-            return (T) new MainViewModel(mLocationRepository, mMapsPlacesRepository, mUserRepository, mPlacePredictionRepository);
+            return (T) new MainViewModel(mLocationRepository, mMapsPlacesRepository, mUserRepository, mPlacePredictionRepository, mSettingsRepository);
         }
         else if (modelClass.isAssignableFrom(DetailsViewModel.class)) {
             return (T) new DetailsViewModel(mRestaurantDetailsRepository, mUserRepository);

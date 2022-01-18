@@ -98,8 +98,12 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         mNavController = navHostFragment.getNavController();
         AppBarConfiguration mAppBarConfiguration = new AppBarConfiguration
                 //We define multiple top-level destinations instead of graph's start destination
-                //Thus, the drawer button will remain in the toolbar on all destinations
-                .Builder(R.id.drawer_layout, R.id.nav_map_view_fragment, R.id.nav_list_view_fragment, R.id.nav_workmates_view_fragment)
+                //Thus, the drawer button will remain in the toolbar on all .Builder specified destinations
+                .Builder(
+                    R.id.drawer_layout,
+                    R.id.nav_map_view_fragment,
+                    R.id.nav_list_view_fragment,
+                    R.id.nav_workmates_view_fragment)
                 .setOpenableLayout(mBinding.drawerLayout)
                 .build();
 
@@ -119,7 +123,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         mNavController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             switch (destination.getId()) {
                 case R.id.nav_restaurant_details_fragment:
-                case R.id.nav_settings_fragment:
+                    //case R.id.nav_settings_fragment:
                     ShowToolbarAndBottomNavigation(false);
                     break;
                 default:

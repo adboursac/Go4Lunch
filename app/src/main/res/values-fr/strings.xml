@@ -5,6 +5,7 @@
     <string name="app_logo_description">Trouvez un bon restaurant et invitez vos collègues à déjeuner !</string>
     <string name="placeholder_distance">%dm</string>
     <string name="placeholder_amount">(%d)</string>
+    <string name="placeholder_integer">%d</string>
 
     <!-- Login Activity authentication-->
     <string name="facebook_application_id">3092308644376950</string>
@@ -59,4 +60,9 @@
     <string name="workmate_joining">vient aussi !</string>
     <string name="workmate_eating">a choisi:</string>
     <string name="workmate_not_yet">n\'a pas encore choisi</string>
+
+    <!-- Settings -->
+    <string name="settings_map_zoom">Google map zoom</string>
+    <string name="settings_search_radius">Rayon de recherche</string>
+    <string name="settings_save">Sauver</string>
 </resources>

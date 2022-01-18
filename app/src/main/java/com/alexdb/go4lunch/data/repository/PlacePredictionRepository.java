@@ -20,7 +20,6 @@ import retrofit2.Response;
 public class PlacePredictionRepository {
 
     private final MutableLiveData<List<MapsPlacePrediction>> mRestaurantPredictions = new MutableLiveData<>();
-    private int mDefaultSearchRadius=200;
     private String mCurrentSearchQuery="";
 
     public LiveData<List<MapsPlacePrediction>> getRestaurantPredictionsLiveData() {
@@ -29,7 +28,6 @@ public class PlacePredictionRepository {
 
     public String getCurrentSearchQuery() { return mCurrentSearchQuery; }
     public void setCurrentSearchQuery(String currentSearchQuery) { mCurrentSearchQuery = currentSearchQuery; }
-    public void setDefaultSearchRadius(int defaultSearchRadius) { mDefaultSearchRadius = defaultSearchRadius; }
 
     /**
      * Request restaurant autocomplete predictions.
@@ -37,10 +35,10 @@ public class PlacePredictionRepository {
      * @param textInput user search input
      */
 
-    public void requestRestaurantPredictions(Location location, String textInput) {
-        if (textInput == null || containsPrediction(textInput)) return;
+    public void requestRestaurantPredictions(Location location, int searchRadius, String textInput) {
+        if (location == null || textInput == null || containsPrediction(textInput)) return;
 
-        GoogleMapsApiClient.getPlacesPredictions(location, mDefaultSearchRadius, textInput).enqueue(new Callback<MapsPlacePredictionsPage>() {
+        GoogleMapsApiClient.getPlacesPredictions(location, searchRadius, textInput).enqueue(new Callback<MapsPlacePredictionsPage>() {
             @Override
             public void onResponse(@NonNull Call<MapsPlacePredictionsPage> call, @NonNull Response<MapsPlacePredictionsPage> response) {
                 if (response.isSuccessful()) {
