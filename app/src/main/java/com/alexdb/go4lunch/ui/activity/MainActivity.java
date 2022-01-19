@@ -13,6 +13,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.view.GravityCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -27,6 +29,7 @@ import com.alexdb.go4lunch.data.viewmodel.UserViewModel;
 import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
 import com.alexdb.go4lunch.databinding.ActivityMainBinding;
 import com.alexdb.go4lunch.ui.fragment.MapViewFragmentDirections;
+import com.alexdb.go4lunch.ui.helper.NotificationHelper;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
@@ -55,17 +58,19 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         drawerBookedPlaceButton = menu.findItem(R.id.menu_drawer_booked_place);
 
         initSignOutButton();
+
     }
 
     /**
-     * Set toolbar_default label instead of app name as toolbar title when MainActivity starts
-     * and request location permission
+     * Set toolbar_default label instead of app name as toolbar title when MainActivity starts,
+     * requests location permission, requests lunch notification
      */
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         mBinding.activityMainContent.toolbar.setTitle(R.string.toolbar_default);
         mMainViewModel.requestLocationPermission(this);
+        NotificationHelper.getInstance().requestLunchNotification(getApplicationContext());
     }
 
     @Override

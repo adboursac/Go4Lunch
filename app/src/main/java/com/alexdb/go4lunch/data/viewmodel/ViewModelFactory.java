@@ -15,6 +15,7 @@ import com.alexdb.go4lunch.data.repository.UserRepository;
 import com.alexdb.go4lunch.data.service.PermissionHelper;
 import com.alexdb.go4lunch.data.service.UserApiFirebase;
 import com.alexdb.go4lunch.ui.MainApplication;
+import com.alexdb.go4lunch.ui.helper.NotificationHelper;
 import com.google.android.gms.location.LocationServices;
 
 import org.jetbrains.annotations.NotNull;
@@ -41,16 +42,21 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
 
     private ViewModelFactory() {
         Application application = MainApplication.getApplication();
+        UserApiFirebase userApi = new UserApiFirebase();
 
         mPermissionHelper = new PermissionHelper(application);
         mSettingsRepository = new SettingsRepository(application);
-        mUserRepository = new UserRepository(new UserApiFirebase());
+        mUserRepository = new UserRepository(userApi);
         mLocationRepository = new LocationRepository(
                 LocationServices.getFusedLocationProviderClient(application),
                 mPermissionHelper);
         mMapsPlacesRepository = new RestaurantPlacesRepository(Executors.newSingleThreadExecutor());
         mRestaurantDetailsRepository = new RestaurantDetailsRepository();
         mPlacePredictionRepository = new PlacePredictionRepository();
+
+        NotificationHelper notificationHelper = NotificationHelper.getInstance();
+        notificationHelper.setUserApi(userApi);
+        notificationHelper.setUserRepository(mUserRepository);
     }
 
     public static ViewModelFactory getInstance() {
