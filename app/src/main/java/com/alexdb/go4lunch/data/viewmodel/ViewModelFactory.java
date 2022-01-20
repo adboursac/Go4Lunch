@@ -57,6 +57,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
         NotificationHelper notificationHelper = NotificationHelper.getInstance();
         notificationHelper.setUserApi(userApi);
         notificationHelper.setUserRepository(mUserRepository);
+        notificationHelper.setSettingsRepository(mSettingsRepository);
     }
 
     public static ViewModelFactory getInstance() {

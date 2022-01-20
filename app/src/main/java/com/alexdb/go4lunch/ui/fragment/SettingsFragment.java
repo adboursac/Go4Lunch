@@ -39,16 +39,38 @@ public class SettingsFragment extends Fragment {
     private void initData() {
         mSettingsViewModel = new ViewModelProvider(requireActivity(), ViewModelFactory.getInstance()).get(SettingsViewModel.class);
 
-        mSettingsViewModel.getMapZoomLiveData().observe(getViewLifecycleOwner(), zoom -> mBinding.mapZoom.setText(String.format(getString(R.string.placeholder_integer), zoom.intValue())));
+        mSettingsViewModel.getMapZoomLiveData().observe(getViewLifecycleOwner(), zoom -> mBinding.mapZoom.setText(String.format(getString(R.string.placeholder_integer), zoom)));
 
-        mSettingsViewModel.getSearchRadiusLiveData().observe(getViewLifecycleOwner(), radius -> mBinding.searchRadius.setText(String.format(getString(R.string.placeholder_integer), radius.intValue())));
+        mSettingsViewModel.getSearchRadiusLiveData().observe(getViewLifecycleOwner(), radius -> mBinding.searchRadius.setText(String.format(getString(R.string.placeholder_integer), radius)));
+
+        mSettingsViewModel.getLunchNotificationLiveData().observe(getViewLifecycleOwner(), enabled -> {
+            mBinding.notificationSwitch.setChecked(enabled);
+            setNotificationTimeVisibility(enabled);
+        });
+
+        mSettingsViewModel.getNotificationTimeLiveData().observe(getViewLifecycleOwner(), time -> mBinding.notificationTime.setText(time));
     }
 
     private void initViews() {
         //Save button
-        mBinding.saveButton.setOnClickListener( view -> mSettingsViewModel.saveSettings(
-                mBinding.mapZoom.getText().toString(),
-                mBinding.searchRadius.getText().toString()
+        mBinding.saveButton.setOnClickListener(view -> mSettingsViewModel.saveSettings(
+                Objects.requireNonNull(mBinding.mapZoom.getText()).toString(),
+                Objects.requireNonNull(mBinding.searchRadius.getText()).toString(),
+                mBinding.notificationSwitch.isChecked(),
+                Objects.requireNonNull(mBinding.notificationTime.getText()).toString()
         ));
+
+        mBinding.notificationSwitch.setOnCheckedChangeListener((compoundButton, enabled) -> setNotificationTimeVisibility(enabled));
+    }
+
+    private void setNotificationTimeVisibility(boolean enabled) {
+        if (enabled) {
+            mBinding.notificationTime.setVisibility(View.VISIBLE);
+            mBinding.timeLabel.setVisibility(View.VISIBLE);
+        }
+        else {
+            mBinding.notificationTime.setVisibility(View.GONE);
+            mBinding.timeLabel.setVisibility(View.GONE);
+        }
     }
 }

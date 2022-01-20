@@ -53,6 +53,8 @@ public class LunchNotification extends Worker {
     }
 
     private void fetchLunchNotificationData() {
+        // We can trust user repository for current user's booking placeID
+        // Current user's booking local state is always up to date
         mCurrentUser = mUserRepository.getCurrentUserLiveData().getValue();
         if (mCurrentUser == null) return;
         if (mCurrentUser.hasValidBookingDate()) {
@@ -77,6 +79,7 @@ public class LunchNotification extends Worker {
             @Override
             public void onFailure(@NonNull Call<MapsPlaceDetailsPage> call, @NonNull Throwable t) {
                 Log.d("LunchNotification", "fetchRestaurantDetails failure" + t);
+                //If we failed getting
                 mMessage = getApplicationContext().getString(R.string.notification_lunch);
                 mMessage += " "+mCurrentUser.getBookedPlaceName();
                 fetchWorkmatesList(mCurrentUser.getBookedPlaceId());
@@ -110,16 +113,18 @@ public class LunchNotification extends Worker {
 
     public void generateWorkmatesList (List<DocumentSnapshot> users, String currentUserId, String placeId) {
         int workmatesAmount = 0;
-        String workmatesList = "\n"+getApplicationContext().getString(R.string.notification_with);
+        StringBuilder workmatesList = new StringBuilder("\n");
+        workmatesList.append(getApplicationContext().getString(R.string.notification_with));
         for (DocumentSnapshot u : users) {
             User user = u.toObject(User.class);
             if (user == null) break;
             if (!currentUserId.contentEquals(user.getUid()) && placeId.contentEquals(user.getBookedPlaceId())) {
                 workmatesAmount++;
-                workmatesList += "\n"+user.getName();
+                workmatesList.append("\n");
+                workmatesList.append(user.getName());
             }
         }
-        if (workmatesAmount > 0) mMessage += workmatesList;
+        if (workmatesAmount > 0) mMessage += workmatesList.toString();
     }
 
     private void buildAndSendNotification() {

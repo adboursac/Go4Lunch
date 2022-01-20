@@ -63,6 +63,8 @@
     <!-- Settings -->
     <string name="settings_map_zoom">Google map zoom</string>
     <string name="settings_search_radius">Search radius</string>
+    <string name="settings_lunch_notification">Notify at lunch time</string>
+    <string name="settings_notification_time">Notification time</string>
     <string name="settings_save">Save</string>
 
     <!-- Notifications -->

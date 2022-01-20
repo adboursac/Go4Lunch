@@ -70,7 +70,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         super.onPostCreate(savedInstanceState);
         mBinding.activityMainContent.toolbar.setTitle(R.string.toolbar_default);
         mMainViewModel.requestLocationPermission(this);
-        NotificationHelper.getInstance().requestLunchNotification(getApplicationContext());
+        NotificationHelper.getInstance().initLunchNotifications(this);
     }
 
     @Override
@@ -124,6 +124,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
      * ( Restaurant details fragment and settings fragment )
      */
     @SuppressLint("NonConstantResourceId")
+    @SuppressWarnings("SwitchStatementWithTooFewBranches")
     private void ConfigureNavigationComponentsDisplayRules() {
         mNavController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             switch (destination.getId()) {

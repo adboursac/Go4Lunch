@@ -23,23 +23,19 @@ public class SettingsViewModel extends ViewModel {
         return mSettingsRepository.getSearchRadiusLiveData();
     }
 
-    public void saveSettings(String mapZoomString, String searchRadiusString) {
+    public LiveData<Boolean> getLunchNotificationLiveData() {
+        return mSettingsRepository.getLunchNotificationLiveData();
+    }
+
+    public LiveData<String> getNotificationTimeLiveData() {
+        return mSettingsRepository.getNotificationTimeLiveData();
+    }
+
+    public void saveSettings(String mapZoomString, String searchRadiusString, Boolean lunchNotification, String notificationTime) {
         Integer mapZoom;
-        try {
-            mapZoom = Integer.parseInt(mapZoomString);
-        }
-        catch (Exception e) {
-            mapZoom = mSettingsRepository.getMapZoomLiveData().getValue();
-        }
-
+        try { mapZoom = Integer.parseInt(mapZoomString); } catch (Exception e) { mapZoom = null;}
         Integer searchRadius;
-        try {
-            searchRadius = Integer.parseInt(searchRadiusString);
-        }
-        catch (Exception e) {
-            searchRadius = mSettingsRepository.getSearchRadiusLiveData().getValue();
-        }
-
-        mSettingsRepository.saveSettings(mapZoom, searchRadius);
+        try { searchRadius = Integer.parseInt(searchRadiusString); } catch (Exception e) { searchRadius = null;}
+        mSettingsRepository.saveSettings(mapZoom, searchRadius, lunchNotification, notificationTime);
     }
 }

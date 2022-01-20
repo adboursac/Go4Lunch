@@ -55,12 +55,11 @@ public class RestaurantPlacesRepository {
                     if (placesPage != null) {
                         mRestaurantPlacesMutableLiveData.setValue(placesPage.getResults());
 
-                        /*
-                        //request for more results if possible
+                        /*//request for more results if possible
                         if (placesPage.getNext_page_token() != null) {
-                            fetchRestaurantPlacesPage(placesPage.getNext_page_token(), true);
+                            //fetchRestaurantPlacesPage(placesPage.getNext_page_token(), true);
                         }
-                         */
+                        */
                     }
                 }
             }
@@ -94,10 +93,11 @@ public class RestaurantPlacesRepository {
                         combinedList.addAll(placesPage.getResults());
                         mRestaurantPlacesMutableLiveData.setValue(combinedList);
 
-                        //request for more results if possible
+                        /*//request for more results if possible
                         if (placesPage.getNext_page_token() != null) {
-                            fetchRestaurantPlacesPage(placesPage.getNext_page_token(), true);
+                            //fetchRestaurantPlacesPage(placesPage.getNext_page_token(), true);
                         }
+                        */
                     }
                 }
             }
