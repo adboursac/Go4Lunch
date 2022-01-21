@@ -7,12 +7,15 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.alexdb.go4lunch.data.model.maps.MapsPlaceDetails;
 import com.alexdb.go4lunch.data.model.maps.MapsPlacePrediction;
 import com.alexdb.go4lunch.data.model.maps.MapsPlacePredictionsPage;
 import com.alexdb.go4lunch.data.service.GoogleMapsApi;
 import com.google.android.gms.maps.GoogleMap;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;

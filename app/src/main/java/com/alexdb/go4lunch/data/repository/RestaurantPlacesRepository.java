@@ -15,7 +15,6 @@ import com.alexdb.go4lunch.data.service.GoogleMapsApi;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -31,7 +30,7 @@ public class RestaurantPlacesRepository {
 
     private final GoogleMapsApi mGoogleMapsApi;
     private final Executor mExecutor;
-    private final MutableLiveData<List<MapsPlace>> mRestaurantPlacesMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<List<MapsPlace>> mRestaurantPlacesMutableLiveData = new MutableLiveData<>(new ArrayList<>());
 
     public LiveData<List<MapsPlace>> getRestaurantPlacesLiveData() {
         return mRestaurantPlacesMutableLiveData;
@@ -53,17 +52,15 @@ public class RestaurantPlacesRepository {
         mGoogleMapsApi.getRestaurantPlaces(location).enqueue(new Callback<MapsPlacesPage>() {
             @Override
             public void onResponse(@NonNull Call<MapsPlacesPage> call, @NonNull Response<MapsPlacesPage> response) {
-                if (response.isSuccessful()) {
-                    MapsPlacesPage placesPage = response.body();
-                    if (placesPage != null) {
-                        mRestaurantPlacesMutableLiveData.setValue(placesPage.getResults());
+                MapsPlacesPage placesPage = response.body();
+                if (placesPage != null) {
+                    mRestaurantPlacesMutableLiveData.setValue(placesPage.getResults());
 
                         /*//request for more results if possible
                         if (placesPage.getNext_page_token() != null) {
                             //fetchRestaurantPlacesPage(placesPage.getNext_page_token(), true);
                         }
                         */
-                    }
                 }
             }
 
@@ -74,13 +71,14 @@ public class RestaurantPlacesRepository {
         });
     }
 
-    /**
+    /*
      * Fetch places page from given page token.
      * If allowRetry is set to true, the request will be retried in a background thread if request receives INVALID_REQUEST status.
      *
      * @param pageToken  page token
      * @param allowRetry true if retry is allowed, false instead
      */
+    /*
     private void fetchRestaurantPlacesPage(String pageToken, boolean allowRetry) {
 
         mGoogleMapsApi.getPlacesPage(pageToken).enqueue(new Callback<MapsPlacesPage>() {
@@ -96,11 +94,10 @@ public class RestaurantPlacesRepository {
                         combinedList.addAll(placesPage.getResults());
                         mRestaurantPlacesMutableLiveData.setValue(combinedList);
 
-                        /*//request for more results if possible
+                        //request for more results if possible
                         if (placesPage.getNext_page_token() != null) {
                             //fetchRestaurantPlacesPage(placesPage.getNext_page_token(), true);
                         }
-                        */
                     }
                 }
             }
@@ -111,8 +108,9 @@ public class RestaurantPlacesRepository {
             }
         });
     }
+    */
 
-    /**
+    /*
      * Check page request status. If status is INVALID_REQUEST and allowRetry set to true,
      * it retries the request in a background thread after waiting for 2 seconds.
      *
@@ -121,6 +119,7 @@ public class RestaurantPlacesRepository {
      * @param allowRetry true if retry in background is allowed.
      * @return true if status is INVALID_REQUEST
      */
+    /*
     public boolean handlePageTokenInvalidRequest(String pageToken, String status, boolean allowRetry) {
         if (status.contentEquals("INVALID_REQUEST")) {
             if (!allowRetry) return true;
@@ -137,9 +136,10 @@ public class RestaurantPlacesRepository {
         }
         return false;
     }
+    */
 
     /**
-     * get restaurant by its place id.
+     * get restaurant by its place id and add it to the current list
      *
      * @param placeId place id of the restaurant
      */
@@ -149,20 +149,16 @@ public class RestaurantPlacesRepository {
         mGoogleMapsApi.getPlaceDetails(placeId).enqueue(new Callback<MapsPlaceDetailsPage>() {
             @Override
             public void onResponse(@NonNull Call<MapsPlaceDetailsPage> call, @NonNull Response<MapsPlaceDetailsPage> response) {
-                if (response != null) {
-                    MapsPlaceDetailsPage detailsPage = response.body();
-                    if (detailsPage != null) {
-                        MapsPlaceDetails p = detailsPage.getResult();
+                MapsPlaceDetailsPage detailsPage = response.body();
+                if (detailsPage != null) {
+                    MapsPlaceDetails placeDetails = detailsPage.getResult();
+                    if (placeDetails != null) {
                         List<MapsPlace> placeList = mRestaurantPlacesMutableLiveData.getValue();
-                        placeList.add(0, new MapsPlace(p.getPlace_id(),
-                                p.getName(),
-                                p.getFormatted_address(),
-                                p.getGeometry(),
-                                p.getOpening_hours(),
-                                p.getRating(),
-                                p.getPhotos()
-                        ));
-                        mRestaurantPlacesMutableLiveData.setValue(placeList);
+                        if (placeList != null) {
+                            MapsPlace place = transformPlaceDetailsToMapPlace(placeDetails);
+                            placeList.add(0, place);
+                            mRestaurantPlacesMutableLiveData.setValue(placeList);
+                        }
                     }
                 }
             }
@@ -176,5 +172,15 @@ public class RestaurantPlacesRepository {
 
     public String getPictureUrl(String mapsPhotoReference) {
         return mGoogleMapsApi.getPictureUrl(mapsPhotoReference);
+    }
+
+    public MapsPlace transformPlaceDetailsToMapPlace(MapsPlaceDetails p) {
+        return new MapsPlace(p.getPlace_id(),
+                p.getName(),
+                p.getFormatted_address(),
+                p.getGeometry(),
+                p.getOpening_hours(),
+                p.getRating(),
+                p.getPhotos());
     }
 }

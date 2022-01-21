@@ -46,8 +46,8 @@ public class UserViewModel extends ViewModel {
     /**
      * Add authenticated User in our database if not already in.
      */
-    public void notifyUserAuthentication() {
-        mUserRepository.notifyUserAuthentication();
+    public void addAuthenticatedUserInDatabase() {
+        mUserRepository.addAuthenticatedUserInDatabase();
     }
 
     /**

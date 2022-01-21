@@ -59,6 +59,8 @@ public class MapsPlace {
         return vicinity;
     }
 
+    public MapsGeometry getGeometry() { return geometry; }
+
     public Location getLocation() {
         Location location = new Location("");
         location.setLatitude(geometry.getLocation().getLat());
@@ -69,6 +71,8 @@ public class MapsPlace {
     public Float getRating() {
         return rating;
     }
+
+    public List<MapsPhoto> getPhotos() { return photos; }
 
     public String getFirstPhotoReference() {
         if (photos == null) return null;

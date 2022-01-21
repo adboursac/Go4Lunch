@@ -1,15 +1,21 @@
 package com.alexdb.go4lunch.data.repository;
 
 import android.content.Context;
+import android.text.PrecomputedText;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.alexdb.go4lunch.data.model.User;
 import com.alexdb.go4lunch.data.service.UserApiFirebase;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -23,7 +29,7 @@ public class UserRepository {
 
     private final UserApiFirebase mUserApiService;
     private MutableLiveData<User> mCurrentUserLiveData = new MutableLiveData<>();
-    private MutableLiveData<List<User>> mWorkmatesLiveData = new MutableLiveData<>();
+    private MutableLiveData<List<User>> mWorkmatesLiveData = new MutableLiveData<>(new ArrayList<>());
 
     public UserRepository(UserApiFirebase userApiService) {
         mUserApiService = userApiService;
@@ -42,9 +48,10 @@ public class UserRepository {
      *
      * @param user user to store in database
      */
-    public void createUser(User user) {
-        mUserApiService.createUser(user)
-                .addOnFailureListener(e -> Log.w("User Repository", "createUser Error", e));
+    public Task<Void> createUser(User user) {
+        Task<Void> task = mUserApiService.createUser(user);
+        if (task != null) task.addOnFailureListener(e -> Log.w("User Repository", "createUser Error", e));
+        return task;
     }
 
     /**
@@ -56,35 +63,34 @@ public class UserRepository {
         return mUserApiService.getCurrentUser().continueWith(task -> {
             mCurrentUserLiveData.setValue(task.getResult());
             return task.getResult();
-        });
+        }).addOnFailureListener(e -> Log.w("User Repository", "fetchCurrentUser Error", e));
     }
 
     /**
      * Fetch all users in database except current user, cast them as User model Object
      * and update workmates Live Data
      */
-    public void fetchWorkmates() {
+    public Task<List<User>> fetchWorkmates() {
         String currentUserId = mUserApiService.getFirebaseAuthCurrentUser().getUid();
-        mUserApiService.getAllUsers()
-                .addOnSuccessListener(task -> {
-                    List<User> workmates = task.getDocuments().stream()
-                            .map(documentSnapshot -> documentSnapshot.toObject(User.class))
-                            .filter(user -> user != null && !(currentUserId.contentEquals(user.getUid())))
-                            .collect(Collectors.toList());
-                    mWorkmatesLiveData.setValue(workmates);
-                })
-                .addOnFailureListener(e -> Log.w("User Repository", "fetchWorkmates Error", e));
+        return mUserApiService.getAllUsers().continueWith(task -> {
+            List<User> workmates = task.getResult().getDocuments().stream()
+                    .map(documentSnapshot -> documentSnapshot.toObject(User.class))
+                    .filter(user -> user != null && !(currentUserId.contentEquals(user.getUid())))
+                    .collect(Collectors.toList());
+            mWorkmatesLiveData.setValue(workmates);
+            return workmates;
+        }).addOnFailureListener(e -> Log.w("User Repository", "fetchWorkmates Error", e));
     }
 
     /**
      * Add authenticated User in our database if not already in.
      */
-    public void notifyUserAuthentication() {
+    public void addAuthenticatedUserInDatabase() {
         //Get User instance from Firebase Authentication SDK
         User authenticatedUser = mUserApiService.getFirebaseAuthCurrentUser();
         //Add authenticated User in our database if not already in.
         mUserApiService.getUser(authenticatedUser.getUid())
-                .addOnSuccessListener(task -> createUser(authenticatedUser));
+                .continueWith(task -> createUser(authenticatedUser));
     }
 
     /**
@@ -112,20 +118,21 @@ public class UserRepository {
      *
      * @param placeId id of the booked place
      */
-    public void updateCurrentUserBooking(String placeId, String placeName) {
+    public Task<Void> updateCurrentUserBooking(String placeId, String placeName) {
         User currentUser = mCurrentUserLiveData.getValue();
         Date now = new Date(System.currentTimeMillis());
-        mUserApiService.updateBookedPlace(
+        return mUserApiService.updateBookedPlace(
                 Objects.requireNonNull(currentUser).getUid(),
                 placeId,
                 placeName,
                 now
-        ).addOnSuccessListener(aVoid -> {
+        ).continueWith(task -> {
             currentUser.setBookedPlaceId(placeId);
             currentUser.setBookedPlaceName(placeName);
             currentUser.setBookedDate(now);
-            mCurrentUserLiveData.setValue(currentUser);
-        }).addOnFailureListener(e -> Log.w("User Repository", "updateCurrentUserBooking Error", e));
+            return task.getResult();
+        });
+        //.addOnFailureListener(e -> Log.w("User Repository", "updateCurrentUserBooking Error", e));
     }
 
     /**
@@ -134,32 +141,35 @@ public class UserRepository {
      *
      * @param placeId id of the liked place
      */
-    public void toggleCurrentUserLikedPlace(String placeId) {
+    public Task<Void> toggleCurrentUserLikedPlace(String placeId) {
         User currentUser = mCurrentUserLiveData.getValue();
-        if (Objects.requireNonNull(currentUser).getLikedPlaces().contains(placeId)) {
-            mUserApiService.removeLikedPlace(currentUser.getUid(), placeId)
-                    .addOnSuccessListener(aVoid -> {
-                        currentUser.removeLikedPlace(placeId);
-                        mCurrentUserLiveData.setValue(currentUser);
-                    })
-                    .addOnFailureListener(e -> Log.w("User Repository", "removeCurrentUserLikedPlace Error", e));
-        } else {
-            mUserApiService.addLikedPlace(currentUser.getUid(), placeId)
-                    .addOnSuccessListener(aVoid -> {
-                        currentUser.addLikedPlace(placeId);
-                        mCurrentUserLiveData.setValue(currentUser);
-                    })
-                    .addOnFailureListener(e -> Log.w("User Repository", "addCurrentUserLikedPlace Error", e));
+        if (currentUser == null) return null;
+
+        if (currentUser.getLikedPlaces().contains(placeId)) {
+            return mUserApiService.removeLikedPlace(currentUser.getUid(), placeId).continueWith(task -> {
+                currentUser.removeLikedPlace(placeId);
+                mCurrentUserLiveData.setValue(currentUser);
+                return task.getResult();
+            });
+            //.addOnFailureListener(e -> Log.w("User Repository", "removeCurrentUserLikedPlace Error", e));
         }
+        return mUserApiService.addLikedPlace(currentUser.getUid(), placeId).continueWith(task -> {
+            currentUser.addLikedPlace(placeId);
+            mCurrentUserLiveData.setValue(currentUser);
+            return task.getResult();
+        });
+        //.addOnFailureListener(e -> Log.w("User Repository", "addCurrentUserLikedPlace Error", e));
     }
 
-    /**
+    /*
      * Delete current user account.
      *
      * @param context context
      * @return resulting task
      */
+    /*
     public Task<Void> deleteCurrentUserAccount(Context context) {
         return mUserApiService.deleteCurrentUserAccount(context);
     }
+    */
 }

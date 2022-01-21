@@ -30,6 +30,10 @@ public class User {
         this.likedPlaces = likedPlaces;
     }
 
+    public User(String uid) {
+        this.uid = uid;
+    }
+
     public String getUid() {
         return uid;
     }

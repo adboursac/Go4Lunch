@@ -122,8 +122,11 @@ public class UserApiFirebase {
      * @return current logged user
      */
     public Task<User> getCurrentUser() {
+        // Get currentUser instance from FirebaseAuth
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        // If we don't have any FirebaseUser instance, we won't get anything from database
         if (currentUser == null) return null;
+        // else we get current user data from database
         return getUser(currentUser.getUid());
     }
 

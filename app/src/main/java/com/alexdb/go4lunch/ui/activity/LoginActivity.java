@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.alexdb.go4lunch.R;
-import com.alexdb.go4lunch.data.model.User;
 import com.alexdb.go4lunch.databinding.ActivityLoginBinding;
 import com.alexdb.go4lunch.data.viewmodel.UserViewModel;
 import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
@@ -99,7 +98,7 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
     private void onSignInResult(FirebaseAuthUIAuthenticationResult result) {
         IdpResponse response = result.getIdpResponse();
         if (result.getResultCode() == RESULT_OK) {
-            mUserViewModel.notifyUserAuthentication();
+            mUserViewModel.addAuthenticatedUserInDatabase();
             showSnackBar(getString(R.string.connection_succeed));
         } else {
             // Sign in failed
