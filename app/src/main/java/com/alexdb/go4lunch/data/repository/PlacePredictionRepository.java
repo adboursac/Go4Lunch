@@ -9,7 +9,8 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.alexdb.go4lunch.data.model.maps.MapsPlacePrediction;
 import com.alexdb.go4lunch.data.model.maps.MapsPlacePredictionsPage;
-import com.alexdb.go4lunch.data.service.GoogleMapsApiClient;
+import com.alexdb.go4lunch.data.service.GoogleMapsApi;
+import com.google.android.gms.maps.GoogleMap;
 
 import java.util.List;
 
@@ -19,11 +20,16 @@ import retrofit2.Response;
 
 public class PlacePredictionRepository {
 
+    private final GoogleMapsApi mGoogleMapsApi;
     private final MutableLiveData<List<MapsPlacePrediction>> mRestaurantPredictions = new MutableLiveData<>();
     private String mCurrentSearchQuery="";
 
     public LiveData<List<MapsPlacePrediction>> getRestaurantPredictionsLiveData() {
         return mRestaurantPredictions;
+    }
+
+    public PlacePredictionRepository(GoogleMapsApi googleMapsApi) {
+        mGoogleMapsApi = googleMapsApi;
     }
 
     public String getCurrentSearchQuery() { return mCurrentSearchQuery; }
@@ -38,7 +44,7 @@ public class PlacePredictionRepository {
     public void requestRestaurantPredictions(Location location, int searchRadius, String textInput) {
         if (location == null || textInput == null || containsPrediction(textInput)) return;
 
-        GoogleMapsApiClient.getPlacesPredictions(location, searchRadius, textInput).enqueue(new Callback<MapsPlacePredictionsPage>() {
+        mGoogleMapsApi.getPlacesPredictions(location, searchRadius, textInput).enqueue(new Callback<MapsPlacePredictionsPage>() {
             @Override
             public void onResponse(@NonNull Call<MapsPlacePredictionsPage> call, @NonNull Response<MapsPlacePredictionsPage> response) {
                 if (response.isSuccessful()) {

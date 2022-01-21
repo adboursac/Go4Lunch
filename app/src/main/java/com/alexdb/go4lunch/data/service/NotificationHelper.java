@@ -1,4 +1,4 @@
-package com.alexdb.go4lunch.ui.helper;
+package com.alexdb.go4lunch.data.service;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,9 +10,9 @@ import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
 import com.alexdb.go4lunch.data.repository.SettingsRepository;
-import com.alexdb.go4lunch.data.repository.UserRepository;
-import com.alexdb.go4lunch.data.service.UserApiFirebase;
 import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
+import com.alexdb.go4lunch.ui.helper.LocalTimeHelper;
+import com.alexdb.go4lunch.ui.helper.LunchNotification;
 
 import java.time.LocalTime;
 import java.util.Calendar;
@@ -20,21 +20,10 @@ import java.util.concurrent.TimeUnit;
 
 public class NotificationHelper {
 
-    private static volatile NotificationHelper sNotificationHelper;
-
-    private UserApiFirebase mUserApi;
-    private UserRepository mUserRepository;
     private SettingsRepository mSettingsRepository;
 
-    public static NotificationHelper getInstance() {
-        if (sNotificationHelper == null) {
-            synchronized (ViewModelFactory.class) {
-                if (sNotificationHelper == null) {
-                    sNotificationHelper = new NotificationHelper();
-                }
-            }
-        }
-        return sNotificationHelper;
+    public NotificationHelper(SettingsRepository settingsRepository) {
+        mSettingsRepository = settingsRepository;
     }
 
     public void initLunchNotifications(Activity activity) {
@@ -84,25 +73,5 @@ public class NotificationHelper {
 
     private void deleteLunchNotification(Context context) {
         WorkManager.getInstance(context).cancelAllWorkByTag("LunchNotification");
-    }
-
-    public UserApiFirebase getUserApi() {
-        return mUserApi;
-    }
-
-    public void setUserApi(UserApiFirebase userApi) {
-        mUserApi = userApi;
-    }
-
-    public UserRepository getUserRepository() {
-        return mUserRepository;
-    }
-
-    public void setUserRepository(UserRepository userRepository) {
-        mUserRepository = userRepository;
-    }
-
-    public void setSettingsRepository(SettingsRepository settingsRepository) {
-        mSettingsRepository = settingsRepository;
     }
 }

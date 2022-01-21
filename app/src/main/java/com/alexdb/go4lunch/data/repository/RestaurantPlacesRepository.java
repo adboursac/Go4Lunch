@@ -11,12 +11,13 @@ import com.alexdb.go4lunch.data.model.maps.MapsPlace;
 import com.alexdb.go4lunch.data.model.maps.MapsPlaceDetails;
 import com.alexdb.go4lunch.data.model.maps.MapsPlaceDetailsPage;
 import com.alexdb.go4lunch.data.model.maps.MapsPlacesPage;
-import com.alexdb.go4lunch.data.service.GoogleMapsApiClient;
+import com.alexdb.go4lunch.data.service.GoogleMapsApi;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -28,6 +29,7 @@ import retrofit2.Response;
  */
 public class RestaurantPlacesRepository {
 
+    private final GoogleMapsApi mGoogleMapsApi;
     private final Executor mExecutor;
     private final MutableLiveData<List<MapsPlace>> mRestaurantPlacesMutableLiveData = new MutableLiveData<>();
 
@@ -35,8 +37,9 @@ public class RestaurantPlacesRepository {
         return mRestaurantPlacesMutableLiveData;
     }
 
-    public RestaurantPlacesRepository(Executor executor) {
-        mExecutor = executor;
+    public RestaurantPlacesRepository(GoogleMapsApi googleMapsApi) {
+        mGoogleMapsApi = googleMapsApi;
+        mExecutor = Executors.newSingleThreadExecutor();
     }
 
     /**
@@ -47,7 +50,7 @@ public class RestaurantPlacesRepository {
     public void fetchRestaurantPlaces(Location location) {
         if (location == null) return;
 
-        GoogleMapsApiClient.getRestaurantPlaces(location).enqueue(new Callback<MapsPlacesPage>() {
+        mGoogleMapsApi.getRestaurantPlaces(location).enqueue(new Callback<MapsPlacesPage>() {
             @Override
             public void onResponse(@NonNull Call<MapsPlacesPage> call, @NonNull Response<MapsPlacesPage> response) {
                 if (response.isSuccessful()) {
@@ -80,7 +83,7 @@ public class RestaurantPlacesRepository {
      */
     private void fetchRestaurantPlacesPage(String pageToken, boolean allowRetry) {
 
-        GoogleMapsApiClient.getPlacesPage(pageToken).enqueue(new Callback<MapsPlacesPage>() {
+        mGoogleMapsApi.getPlacesPage(pageToken).enqueue(new Callback<MapsPlacesPage>() {
             @Override
             public void onResponse(@NonNull Call<MapsPlacesPage> call, @NonNull Response<MapsPlacesPage> response) {
                 if (response.isSuccessful()) {
@@ -143,7 +146,7 @@ public class RestaurantPlacesRepository {
     public void requestRestaurant(String placeId) {
         if (placeId == null) return;
 
-        GoogleMapsApiClient.getPlaceDetails(placeId).enqueue(new Callback<MapsPlaceDetailsPage>() {
+        mGoogleMapsApi.getPlaceDetails(placeId).enqueue(new Callback<MapsPlaceDetailsPage>() {
             @Override
             public void onResponse(@NonNull Call<MapsPlaceDetailsPage> call, @NonNull Response<MapsPlaceDetailsPage> response) {
                 if (response.isSuccessful()) {
@@ -169,5 +172,9 @@ public class RestaurantPlacesRepository {
                 Log.d("RestaurantDetailsRepo--", "requestRestaurant failure" + t);
             }
         });
+    }
+
+    public String getPictureUrl(String mapsPhotoReference) {
+        return mGoogleMapsApi.getPictureUrl(mapsPhotoReference);
     }
 }

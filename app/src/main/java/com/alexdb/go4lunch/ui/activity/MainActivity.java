@@ -13,8 +13,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.view.GravityCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -25,11 +23,10 @@ import androidx.navigation.ui.NavigationUI;
 import com.alexdb.go4lunch.R;
 import com.alexdb.go4lunch.data.model.User;
 import com.alexdb.go4lunch.data.viewmodel.MainViewModel;
-import com.alexdb.go4lunch.data.viewmodel.UserViewModel;
 import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
 import com.alexdb.go4lunch.databinding.ActivityMainBinding;
 import com.alexdb.go4lunch.ui.fragment.MapViewFragmentDirections;
-import com.alexdb.go4lunch.ui.helper.NotificationHelper;
+import com.alexdb.go4lunch.data.service.NotificationHelper;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
@@ -58,7 +55,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         drawerBookedPlaceButton = menu.findItem(R.id.menu_drawer_booked_place);
 
         initSignOutButton();
-
     }
 
     /**
@@ -70,7 +66,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         super.onPostCreate(savedInstanceState);
         mBinding.activityMainContent.toolbar.setTitle(R.string.toolbar_default);
         mMainViewModel.requestLocationPermission(this);
-        NotificationHelper.getInstance().initLunchNotifications(this);
+        ViewModelFactory.getInstance().getNotificationHelper().initLunchNotifications(this);
     }
 
     @Override

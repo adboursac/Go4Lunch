@@ -4,7 +4,6 @@ import android.content.res.Resources;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import com.alexdb.go4lunch.R;
@@ -14,7 +13,7 @@ import com.alexdb.go4lunch.data.model.maps.MapsOpeningHours;
 import com.alexdb.go4lunch.data.model.maps.MapsPlaceDetails;
 import com.alexdb.go4lunch.data.repository.RestaurantDetailsRepository;
 import com.alexdb.go4lunch.data.repository.UserRepository;
-import com.alexdb.go4lunch.data.service.GoogleMapsApiClient;
+import com.alexdb.go4lunch.data.service.GoogleMapsApi;
 import com.alexdb.go4lunch.ui.MainApplication;
 
 import java.util.ArrayList;
@@ -91,7 +90,7 @@ public class DetailsViewModel extends ViewModel {
                 placeDetails.getInternational_phone_number(),
                 placeDetails.getFormatted_address(),
                 placeDetails.getRating(),
-                GoogleMapsApiClient.getPictureUrl(placeDetails.getFirstPhotoReference()),
+                mRestaurantDetailsRepository.getPictureUrl(placeDetails.getFirstPhotoReference()),
                 currentUser.hasBookedPlace(placeDetails.getPlace_id()),
                 currentUser.getLikedPlaces().contains(placeDetails.getPlace_id()),
                 getBookedWorkmates(workmates,placeDetails.getPlace_id()));

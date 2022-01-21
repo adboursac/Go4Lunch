@@ -1,7 +1,5 @@
 package com.alexdb.go4lunch.data.viewmodel;
 
-import android.app.Application;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
@@ -12,11 +10,10 @@ import com.alexdb.go4lunch.data.repository.SettingsRepository;
 import com.alexdb.go4lunch.data.repository.RestaurantDetailsRepository;
 import com.alexdb.go4lunch.data.repository.RestaurantPlacesRepository;
 import com.alexdb.go4lunch.data.repository.UserRepository;
+import com.alexdb.go4lunch.data.service.GoogleMapsApi;
 import com.alexdb.go4lunch.data.service.PermissionHelper;
 import com.alexdb.go4lunch.data.service.UserApiFirebase;
-import com.alexdb.go4lunch.ui.MainApplication;
-import com.alexdb.go4lunch.ui.helper.NotificationHelper;
-import com.google.android.gms.location.LocationServices;
+import com.alexdb.go4lunch.data.service.NotificationHelper;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -27,6 +24,10 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     private static volatile ViewModelFactory sFactory;
     @NonNull
     private final PermissionHelper mPermissionHelper;
+    @NonNull
+    private final UserApiFirebase mUserApiFirebase;
+    @NonNull
+    private final GoogleMapsApi mGoogleMapsApi;
     @NonNull
     private final SettingsRepository mSettingsRepository;
     @NonNull
@@ -39,26 +40,8 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     private final RestaurantDetailsRepository mRestaurantDetailsRepository;
     @NonNull
     private final PlacePredictionRepository mPlacePredictionRepository;
-
-    private ViewModelFactory() {
-        Application application = MainApplication.getApplication();
-        UserApiFirebase userApi = new UserApiFirebase();
-
-        mPermissionHelper = new PermissionHelper(application);
-        mSettingsRepository = new SettingsRepository(application);
-        mUserRepository = new UserRepository(userApi);
-        mLocationRepository = new LocationRepository(
-                LocationServices.getFusedLocationProviderClient(application),
-                mPermissionHelper);
-        mMapsPlacesRepository = new RestaurantPlacesRepository(Executors.newSingleThreadExecutor());
-        mRestaurantDetailsRepository = new RestaurantDetailsRepository();
-        mPlacePredictionRepository = new PlacePredictionRepository();
-
-        NotificationHelper notificationHelper = NotificationHelper.getInstance();
-        notificationHelper.setUserApi(userApi);
-        notificationHelper.setUserRepository(mUserRepository);
-        notificationHelper.setSettingsRepository(mSettingsRepository);
-    }
+    @NonNull
+    private final NotificationHelper mNotificationHelper;
 
     public static ViewModelFactory getInstance() {
         if (sFactory == null) {
@@ -70,6 +53,28 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
         }
         return sFactory;
     }
+
+    private ViewModelFactory() {
+        mPermissionHelper = new PermissionHelper();
+        mUserApiFirebase = new UserApiFirebase();
+        mGoogleMapsApi = new GoogleMapsApi();
+        mSettingsRepository = new SettingsRepository();
+        mUserRepository = new UserRepository(mUserApiFirebase);
+        mLocationRepository = new LocationRepository(mPermissionHelper);
+        mMapsPlacesRepository = new RestaurantPlacesRepository(mGoogleMapsApi);
+        mRestaurantDetailsRepository = new RestaurantDetailsRepository(mGoogleMapsApi);
+        mPlacePredictionRepository = new PlacePredictionRepository(mGoogleMapsApi);
+        mNotificationHelper = new NotificationHelper(mSettingsRepository);
+    }
+
+    @NonNull
+    public UserApiFirebase getUserApiFirebase() { return mUserApiFirebase; }
+    @NonNull
+    public GoogleMapsApi getGoogleMapsApi() { return mGoogleMapsApi; }
+    @NonNull
+    public UserRepository getUserRepository() { return mUserRepository; }
+    @NonNull
+    public NotificationHelper getNotificationHelper() { return mNotificationHelper; }
 
     @SuppressWarnings("unchecked")
     @NotNull

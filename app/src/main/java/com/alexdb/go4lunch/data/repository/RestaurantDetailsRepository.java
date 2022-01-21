@@ -8,7 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.alexdb.go4lunch.data.model.maps.MapsPlaceDetails;
 import com.alexdb.go4lunch.data.model.maps.MapsPlaceDetailsPage;
-import com.alexdb.go4lunch.data.service.GoogleMapsApiClient;
+import com.alexdb.go4lunch.data.service.GoogleMapsApi;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -16,7 +16,12 @@ import retrofit2.Response;
 
 public class RestaurantDetailsRepository {
 
-    private final MutableLiveData<MapsPlaceDetails> mRestaurantDetailsMutableLiveData = new MutableLiveData<>();
+    private final GoogleMapsApi mGoogleMapsApi;
+    private MutableLiveData<MapsPlaceDetails> mRestaurantDetailsMutableLiveData = new MutableLiveData<>();
+
+    public RestaurantDetailsRepository(GoogleMapsApi googleMapsApi) {
+        mGoogleMapsApi = googleMapsApi;
+    }
 
     public LiveData<MapsPlaceDetails> getRestaurantDetailsLiveData() {
         return mRestaurantDetailsMutableLiveData;
@@ -30,7 +35,7 @@ public class RestaurantDetailsRepository {
     public void fetchRestaurantDetails(String placeId) {
         if (placeId == null) return;
 
-        GoogleMapsApiClient.getPlaceDetails(placeId).enqueue(new Callback<MapsPlaceDetailsPage>() {
+        mGoogleMapsApi.getPlaceDetails(placeId).enqueue(new Callback<MapsPlaceDetailsPage>() {
             @Override
             public void onResponse(@NonNull Call<MapsPlaceDetailsPage> call, @NonNull Response<MapsPlaceDetailsPage> response) {
                 if (response.isSuccessful()) {
@@ -46,5 +51,9 @@ public class RestaurantDetailsRepository {
                 Log.d("RestaurantDetailsRepo--", "fetchRestaurantDetails failure" + t);
             }
         });
+    }
+
+    public String getPictureUrl(String mapsPhotoReference) {
+        return mGoogleMapsApi.getPictureUrl(mapsPhotoReference);
     }
 }

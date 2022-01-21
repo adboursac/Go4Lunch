@@ -23,12 +23,14 @@ import com.alexdb.go4lunch.data.repository.PlacePredictionRepository;
 import com.alexdb.go4lunch.data.repository.RestaurantPlacesRepository;
 import com.alexdb.go4lunch.data.repository.SettingsRepository;
 import com.alexdb.go4lunch.data.repository.UserRepository;
-import com.alexdb.go4lunch.data.service.GoogleMapsApiClient;
+import com.alexdb.go4lunch.data.service.GoogleMapsApi;
 import com.alexdb.go4lunch.ui.MainApplication;
+import com.alexdb.go4lunch.ui.helper.LocalTimeHelper;
 import com.google.android.gms.tasks.Task;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MainViewModel extends ViewModel {
 
@@ -174,7 +176,7 @@ public class MainViewModel extends ViewModel {
                     p.getLocation(),
                     calculateDistance(userLocation, p.getLocation()),
                     p.getRating(),
-                    GoogleMapsApiClient.getPictureUrl(p.getFirstPhotoReference()),
+                    mMapsPlacesRepository.getPictureUrl(p.getFirstPhotoReference()),
                     calculateBookedWorkmatesAmount(p.getPlaceId(), workmates)
             ));
         }
@@ -253,7 +255,7 @@ public class MainViewModel extends ViewModel {
      */
     public void requestPlacesPredictions(String textInput) {
         mPlacePredictionRepository.requestRestaurantPredictions(mLocationRepository.getLocationLiveData().getValue(),
-                mSettingsRepository.getSearchRadiusLiveData().getValue(),
+                Objects.requireNonNull(mSettingsRepository.getSearchRadiusLiveData().getValue()),
                 textInput);
     }
 

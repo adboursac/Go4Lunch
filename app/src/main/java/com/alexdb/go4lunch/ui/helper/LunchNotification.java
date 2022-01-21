@@ -16,8 +16,10 @@ import com.alexdb.go4lunch.data.model.User;
 import com.alexdb.go4lunch.data.model.maps.MapsPlaceDetails;
 import com.alexdb.go4lunch.data.model.maps.MapsPlaceDetailsPage;
 import com.alexdb.go4lunch.data.repository.UserRepository;
-import com.alexdb.go4lunch.data.service.GoogleMapsApiClient;
+import com.alexdb.go4lunch.data.service.GoogleMapsApi;
+import com.alexdb.go4lunch.data.service.NotificationHelper;
 import com.alexdb.go4lunch.data.service.UserApiFirebase;
+import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +35,7 @@ public class LunchNotification extends Worker {
     public static final String CHANNEL_ID = "1";
     String mMessage = "";
     Context mContext;
+    GoogleMapsApi mGoogleMapsApi;
     UserApiFirebase mUserApiService;
     UserRepository mUserRepository;
     User mCurrentUser;
@@ -46,15 +49,16 @@ public class LunchNotification extends Worker {
     @Override
     public Result doWork() {
         mContext = getApplicationContext();
-        mUserApiService = NotificationHelper.getInstance().getUserApi();
-        mUserRepository = NotificationHelper.getInstance().getUserRepository();
+        mGoogleMapsApi = ViewModelFactory.getInstance().getGoogleMapsApi();
+        mUserApiService = ViewModelFactory.getInstance().getUserApiFirebase();
+        mUserRepository = ViewModelFactory.getInstance().getUserRepository();
         fetchLunchNotificationData();
         return Result.success();
     }
 
     private void fetchLunchNotificationData() {
-        // We can trust user repository for current user's booking placeID
-        // Current user's booking local state is always up to date
+        // We can trust user repository for current user's booking placeID,
+        // as current user's booking local state is always up to date
         mCurrentUser = mUserRepository.getCurrentUserLiveData().getValue();
         if (mCurrentUser == null) return;
         if (mCurrentUser.hasValidBookingDate()) {
@@ -63,8 +67,7 @@ public class LunchNotification extends Worker {
     }
 
     public void fetchRestaurantData(String placeId) {
-
-        GoogleMapsApiClient.getPlaceDetails(placeId).enqueue(new Callback<MapsPlaceDetailsPage>() {
+        mGoogleMapsApi.getPlaceDetails(placeId).enqueue(new Callback<MapsPlaceDetailsPage>() {
             @Override
             public void onResponse(@NonNull Call<MapsPlaceDetailsPage> call, @NonNull Response<MapsPlaceDetailsPage> response) {
                 if (response.isSuccessful()) {
@@ -79,12 +82,12 @@ public class LunchNotification extends Worker {
             @Override
             public void onFailure(@NonNull Call<MapsPlaceDetailsPage> call, @NonNull Throwable t) {
                 Log.d("LunchNotification", "fetchRestaurantDetails failure" + t);
-                //If we failed getting
+                //If we failed getting restaurant address from mGoogleMapsApi we still can use
+                //place name from current user instance, then we fetch workmates list
                 mMessage = getApplicationContext().getString(R.string.notification_lunch);
                 mMessage += " "+mCurrentUser.getBookedPlaceName();
                 fetchWorkmatesList(mCurrentUser.getBookedPlaceId());
             }
-
         });
     }
 
@@ -107,6 +110,7 @@ public class LunchNotification extends Worker {
                 })
                 .addOnFailureListener(e -> {
                     Log.w("LunchNotification", "fetchWorkmates Error", e);
+                    //If we failed getting workmates list we can still send the notification
                     buildAndSendNotification();
                 });
     }

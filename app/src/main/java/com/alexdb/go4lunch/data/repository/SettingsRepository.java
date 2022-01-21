@@ -1,5 +1,6 @@
 package com.alexdb.go4lunch.data.repository;
 
+import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
@@ -12,6 +13,7 @@ import androidx.datastore.rxjava3.RxDataStore;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.alexdb.go4lunch.ui.MainApplication;
 import com.alexdb.go4lunch.ui.helper.LocalTimeHelper;
 
 import java.util.Objects;
@@ -26,8 +28,8 @@ public class SettingsRepository {
 
     RxDataStore<Preferences> mDataStore;
 
-    public SettingsRepository(Context context) {
-        mDataStore = new RxPreferenceDataStoreBuilder(context, "settings").build();
+    public SettingsRepository() {
+        mDataStore = new RxPreferenceDataStoreBuilder(MainApplication.getApplication(), "settings").build();
         readSettings();
     }
 
