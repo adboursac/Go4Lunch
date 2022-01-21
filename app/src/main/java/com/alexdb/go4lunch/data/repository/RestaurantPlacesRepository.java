@@ -149,12 +149,12 @@ public class RestaurantPlacesRepository {
         mGoogleMapsApi.getPlaceDetails(placeId).enqueue(new Callback<MapsPlaceDetailsPage>() {
             @Override
             public void onResponse(@NonNull Call<MapsPlaceDetailsPage> call, @NonNull Response<MapsPlaceDetailsPage> response) {
-                if (response.isSuccessful()) {
+                if (response != null) {
                     MapsPlaceDetailsPage detailsPage = response.body();
                     if (detailsPage != null) {
                         MapsPlaceDetails p = detailsPage.getResult();
-                        List<MapsPlace> placeList = new ArrayList<>();
-                        placeList.add(new MapsPlace(p.getPlace_id(),
+                        List<MapsPlace> placeList = mRestaurantPlacesMutableLiveData.getValue();
+                        placeList.add(0, new MapsPlace(p.getPlace_id(),
                                 p.getName(),
                                 p.getFormatted_address(),
                                 p.getGeometry(),
