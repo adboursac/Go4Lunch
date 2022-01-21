@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.core.view.GravityCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -25,8 +26,9 @@ import com.alexdb.go4lunch.data.model.User;
 import com.alexdb.go4lunch.data.viewmodel.MainViewModel;
 import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
 import com.alexdb.go4lunch.databinding.ActivityMainBinding;
+import com.alexdb.go4lunch.ui.fragment.ListViewFragmentDirections;
 import com.alexdb.go4lunch.ui.fragment.MapViewFragmentDirections;
-import com.alexdb.go4lunch.data.service.NotificationHelper;
+import com.alexdb.go4lunch.ui.fragment.WorkmatesViewFragmentDirections;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
@@ -163,10 +165,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         if (currentUser.hasValidBookingDate()) {
             drawerBookedPlaceButton.setOnMenuItemClickListener(i -> {
                 mBinding.drawerLayout.closeDrawer(GravityCompat.START);
-                mNavController.getCurrentDestination();
-                mNavController.navigate(
-                        MapViewFragmentDirections.navigateToDetails().setPlaceId(currentUser.getBookedPlaceId())
-                );
+                navigateToDetailView(currentUser.getBookedPlaceId());
                 return true;
             });
         } else {
@@ -174,6 +173,30 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
                 showSnackBar(getResources().getString(R.string.navigation_drawer_no_booking_yet));
                 return true;
             });
+        }
+    }
+
+    /**
+     * Navigate to details view according current destination
+     */
+    @SuppressLint("NonConstantResourceId")
+    public void navigateToDetailView(String placeId) {
+        NavDestination currentDestination = mNavController.getCurrentDestination();
+        switch (currentDestination.getId()) {
+            case R.id.nav_workmates_view_fragment:
+                mNavController.navigate(
+                        WorkmatesViewFragmentDirections.navigateToDetails().setPlaceId(placeId)
+                );
+                break;
+            case R.id.nav_list_view_fragment:
+                mNavController.navigate(
+                        ListViewFragmentDirections.navigateToDetails().setPlaceId(placeId)
+                );
+                break;
+            default:
+                mNavController.navigate(
+                        MapViewFragmentDirections.navigateToDetails().setPlaceId(placeId)
+                );
         }
     }
 
