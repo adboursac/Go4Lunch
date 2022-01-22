@@ -132,7 +132,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Arr
      * @param selected  if true marker will display in green, red instead.
      * @param placeId   id of the place
      */
-    private void createRestaurantMarker(Location location, String placeName, boolean selected, String placeId) {
+    private void createRestaurantMarker(Location location, String placeName, boolean selected, String placeId, boolean displayInfo) {
         if (location == null || mMap == null) return;
         LatLng cord = new LatLng(location.getLatitude(), location.getLongitude());
         float hue = selected ? BitmapDescriptorFactory.HUE_GREEN : BitmapDescriptorFactory.HUE_ORANGE;
@@ -140,7 +140,10 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Arr
                 .position(cord)
                 .title(placeName)
                 .icon(BitmapDescriptorFactory.defaultMarker(hue)));
-        if (marker != null) marker.setTag(placeId);
+        if (marker != null) {
+            marker.setTag(placeId);
+            if (displayInfo) marker.showInfoWindow();
+        }
     }
 
     /**
@@ -148,7 +151,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Arr
      *
      * @param restaurants list of restaurants to display as markers
      */
-    public void updateEveryRestaurantsMarkers(List<RestaurantStateItem> restaurants) {
+    public void updateEveryRestaurantsMarkers(List<RestaurantStateItem> restaurants, String displayPlaceId) {
         if (mMap == null) return;
         mMap.clear();
         for (RestaurantStateItem restaurant : restaurants) {
@@ -156,7 +159,9 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Arr
                     restaurant.getLocation(),
                     restaurant.getName(),
                     restaurant.getWorkmatesAmount() > 0,
-                    restaurant.getPlaceId());
+                    restaurant.getPlaceId(),
+                    displayPlaceId != null && restaurant.getPlaceId().contentEquals(displayPlaceId)
+            );
         }
     }
 
@@ -171,12 +176,13 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Arr
 
         //New restaurants data triggers markers update and optional camera move
         mMainViewModel.getRestaurantsLiveData().observe(getViewLifecycleOwner(), restaurants -> {
-            updateEveryRestaurantsMarkers(restaurants);
-            //Move camera if we are displaying a search result
+            //Move camera and display info if we are displaying a search result
             if (mMainViewModel.getCurrentSearchQuery().length() > 0) {
+                updateEveryRestaurantsMarkers(restaurants, restaurants.get(0).getPlaceId());
                 Location searchResultLocation = restaurants.get(0).getLocation();
                 moveCamera(searchResultLocation);
             }
+            else updateEveryRestaurantsMarkers(restaurants, null);
         });
 
         //New search predictions data triggers a display
@@ -206,9 +212,10 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Arr
         if (mMainViewModel.getCurrentSearchQuery().length() > 0) {
             List<RestaurantStateItem> currentRestaurants = mMainViewModel.getRestaurantsLiveData().getValue();
             if (currentRestaurants == null) return;
+            updateEveryRestaurantsMarkers(currentRestaurants, currentRestaurants.get(0).getPlaceId());
             moveCamera(currentRestaurants.get(0).getLocation());
         }
-        // If we don't, we fetch restaurants and move camera on currentLocation
+        // Instead, we fetch restaurants and move camera on currentLocation
         else {
             mMainViewModel.fetchRestaurants(location);
             moveCamera(location);
