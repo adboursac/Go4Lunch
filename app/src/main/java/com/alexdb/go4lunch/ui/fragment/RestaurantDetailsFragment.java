@@ -125,7 +125,7 @@ public class RestaurantDetailsFragment extends Fragment {
     }
 
     private void initWebsiteButton() {
-        mBinding.website.setOnClickListener(v -> {
+        mBinding.websiteButton.setOnClickListener(v -> {
             if (mCurrentDetails.getWebsite() != null) {
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mCurrentDetails.getWebsite())));
             } else {

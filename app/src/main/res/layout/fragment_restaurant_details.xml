@@ -119,70 +119,99 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <ImageButton
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/call_button"
         android:layout_width="@dimen/button_medium_size"
         android:layout_height="@dimen/button_medium_size"
-        android:layout_marginStart="52dp"
-        android:background="@color/fui_transparent"
+        android:layout_marginStart="@dimen/large_margin"
         android:contentDescription="@string/restaurant_call"
-        android:src="@drawable/ic_baseline_phone_24"
         app:layout_constraintBottom_toBottomOf="@id/guideline3"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/guideline2" />
+        app:layout_constraintTop_toBottomOf="@id/guideline2">
 
-    <ImageButton
+        <ImageView
+            android:layout_width="@dimen/button_icon_medium_size"
+            android:layout_height="@dimen/button_icon_medium_size"
+            android:background="@color/fui_transparent"
+            android:layout_marginTop="@dimen/default_margin"
+            android:contentDescription="@string/restaurant_call"
+            android:src="@drawable/ic_baseline_phone_24"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/restaurant_call"
+            android:textColor="@color/orange_500"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/like_button"
         android:layout_width="@dimen/button_medium_size"
         android:layout_height="@dimen/button_medium_size"
-        android:background="@color/fui_transparent"
         android:contentDescription="@string/restaurant_like"
-        android:src="@drawable/ic_baseline_orange_star_24"
+        app:layout_constraintBottom_toBottomOf="@id/guideline3"
         app:layout_constraintEnd_toStartOf="@id/website_button"
         app:layout_constraintStart_toEndOf="@id/call_button"
-        app:layout_constraintTop_toTopOf="@id/call_button" />
+        app:layout_constraintTop_toBottomOf="@id/guideline2">
 
-    <ImageButton
+        <ImageView
+            android:layout_width="@dimen/button_icon_medium_size"
+            android:layout_height="@dimen/button_icon_medium_size"
+            android:layout_marginTop="@dimen/default_margin"
+            android:background="@color/fui_transparent"
+            android:contentDescription="@string/restaurant_like"
+            android:src="@drawable/ic_baseline_orange_star_24"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/restaurant_like"
+            android:textColor="@color/orange_500"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/website_button"
         android:layout_width="@dimen/button_medium_size"
         android:layout_height="@dimen/button_medium_size"
-        android:layout_marginEnd="52dp"
-        android:background="@color/fui_transparent"
+        android:layout_marginEnd="@dimen/large_margin"
         android:contentDescription="@string/restaurant_website"
-        android:src="@drawable/ic_round_public_24"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/call_button" />
-
-    <TextView
-        android:id="@+id/call"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/restaurant_call"
-        android:textColor="@color/orange_500"
         app:layout_constraintBottom_toBottomOf="@id/guideline3"
-        app:layout_constraintEnd_toEndOf="@id/call_button"
-        app:layout_constraintStart_toStartOf="@id/call_button"
-        app:layout_constraintTop_toBottomOf="@id/call_button" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/guideline2">
 
-    <TextView
-        android:id="@+id/like"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/restaurant_like"
-        android:textColor="@color/orange_500"
-        app:layout_constraintBottom_toBottomOf="@id/call"
-        app:layout_constraintEnd_toEndOf="@id/like_button"
-        app:layout_constraintStart_toStartOf="@id/like_button" />
+        <ImageView
+            android:layout_width="@dimen/button_icon_medium_size"
+            android:layout_height="@dimen/button_icon_medium_size"
+            android:layout_marginTop="@dimen/default_margin"
+            android:background="@color/fui_transparent"
+            android:contentDescription="@string/restaurant_website"
+            android:src="@drawable/ic_round_public_24"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/website"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/restaurant_website"
-        android:textColor="@color/orange_500"
-        app:layout_constraintBottom_toBottomOf="@id/call"
-        app:layout_constraintEnd_toEndOf="@id/website_button"
-        app:layout_constraintStart_toStartOf="@id/website_button" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/restaurant_website"
+            android:textColor="@color/orange_500"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview"
