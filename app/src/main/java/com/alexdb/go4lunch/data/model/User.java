@@ -4,6 +4,7 @@ import android.text.format.DateUtils;
 
 import com.google.firebase.firestore.ServerTimestamp;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -32,6 +33,7 @@ public class User {
 
     public User(String uid) {
         this.uid = uid;
+        this.likedPlaces = new ArrayList<>();
     }
 
     public String getUid() {
