@@ -50,7 +50,7 @@ public class PlacePredictionRepository {
         mGoogleMapsApi.getPlacesPredictions(location, searchRadius, textInput).enqueue(new Callback<MapsPlacePredictionsPage>() {
             @Override
             public void onResponse(@NonNull Call<MapsPlacePredictionsPage> call, @NonNull Response<MapsPlacePredictionsPage> response) {
-                if (response.isSuccessful()) {
+                if (response != null) {
                     MapsPlacePredictionsPage predictionsPage = response.body();
                     if (predictionsPage != null) {
                         mRestaurantPredictions.setValue(predictionsPage.getPredictions());
