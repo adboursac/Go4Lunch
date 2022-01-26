@@ -14,6 +14,8 @@ import com.alexdb.go4lunch.data.service.GoogleMapsApi;
 import com.alexdb.go4lunch.data.service.PermissionHelper;
 import com.alexdb.go4lunch.data.service.UserApiFirebase;
 import com.alexdb.go4lunch.data.service.NotificationHelper;
+import com.alexdb.go4lunch.ui.MainApplication;
+import com.google.android.gms.location.LocationServices;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -60,7 +62,8 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
         mGoogleMapsApi = new GoogleMapsApi();
         mSettingsRepository = new SettingsRepository();
         mUserRepository = new UserRepository(mUserApiFirebase);
-        mLocationRepository = new LocationRepository(mPermissionHelper);
+        mLocationRepository = new LocationRepository(mPermissionHelper,
+                LocationServices.getFusedLocationProviderClient(MainApplication.getApplication()));
         mMapsPlacesRepository = new RestaurantPlacesRepository(mGoogleMapsApi);
         mRestaurantDetailsRepository = new RestaurantDetailsRepository(mGoogleMapsApi);
         mPlacePredictionRepository = new PlacePredictionRepository(mGoogleMapsApi);

@@ -6,12 +6,10 @@ import android.location.Location;
 import android.os.Looper;
 
 import com.alexdb.go4lunch.data.service.PermissionHelper;
-import com.alexdb.go4lunch.ui.MainApplication;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresPermission;
@@ -37,8 +35,9 @@ public class LocationRepository {
 
     private LocationCallback mCallback;
 
-    public LocationRepository(@NonNull PermissionHelper permissionHelper) {
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainApplication.getApplication());
+    public LocationRepository(@NonNull PermissionHelper permissionHelper,
+                              @NonNull FusedLocationProviderClient fusedLocationProviderClient) {
+        mFusedLocationProviderClient = fusedLocationProviderClient;
         mPermissionHelper = permissionHelper;
         denyLocationPermission();
     }
