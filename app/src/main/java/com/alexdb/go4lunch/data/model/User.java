@@ -1,9 +1,9 @@
 package com.alexdb.go4lunch.data.model;
 
-import android.text.format.DateUtils;
-
 import com.google.firebase.firestore.ServerTimestamp;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -91,7 +91,8 @@ public class User {
 
     public boolean hasValidBookingDate() {
         if (bookedDate == null || bookedPlaceId == null) return false;
-        return DateUtils.isToday(bookedDate.getTime());
+        LocalDate localBookedDate = bookedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return localBookedDate.isEqual(LocalDate.now());
     }
 
     public boolean hasBookedPlace(String placeId) {

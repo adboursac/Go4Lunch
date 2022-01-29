@@ -13,8 +13,6 @@ import com.alexdb.go4lunch.data.model.maps.MapsOpeningHours;
 import com.alexdb.go4lunch.data.model.maps.MapsPlaceDetails;
 import com.alexdb.go4lunch.data.repository.RestaurantDetailsRepository;
 import com.alexdb.go4lunch.data.repository.UserRepository;
-import com.alexdb.go4lunch.data.service.GoogleMapsApi;
-import com.alexdb.go4lunch.ui.MainApplication;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +23,12 @@ public class DetailsViewModel extends ViewModel {
     private final RestaurantDetailsRepository mRestaurantDetailsRepository;
     private final UserRepository mUserRepository;
     private MediatorLiveData<RestaurantDetailsStateItem> mRestaurantDetailsLiveData;
+    private Resources mResources;
 
-    DetailsViewModel(RestaurantDetailsRepository restaurantDetailsRepository, UserRepository userRepository) {
+    public DetailsViewModel(RestaurantDetailsRepository restaurantDetailsRepository, UserRepository userRepository, Resources resources) {
         mRestaurantDetailsRepository = restaurantDetailsRepository;
         mUserRepository = userRepository;
+        mResources = resources;
         initRestaurantDetailsLiveData();
     }
 
@@ -98,12 +98,11 @@ public class DetailsViewModel extends ViewModel {
         mRestaurantDetailsLiveData.setValue(restaurantDetailsStateItem);
     }
 
-    private String mapOpeningStatus(MapsOpeningHours openingHours) {
-        Resources resources = MainApplication.getApplication().getResources();
-        if (openingHours == null) return resources.getString(R.string.restaurant_no_schedule);
+    public String mapOpeningStatus(MapsOpeningHours openingHours) {
+        if (openingHours == null) return mResources.getString(R.string.restaurant_no_schedule);
         else {
-            return openingHours.getOpen_now() ? resources.getString(R.string.restaurant_open)
-                    : resources.getString(R.string.restaurant_closed);
+            return openingHours.getOpen_now() ? mResources.getString(R.string.restaurant_open)
+                    : mResources.getString(R.string.restaurant_closed);
         }
     }
 
