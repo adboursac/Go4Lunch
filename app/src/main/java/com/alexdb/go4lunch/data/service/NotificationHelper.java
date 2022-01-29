@@ -10,7 +10,7 @@ import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
 import com.alexdb.go4lunch.data.repository.SettingsRepository;
-import com.alexdb.go4lunch.ui.helper.LocalTimeHelper;
+import com.alexdb.go4lunch.ui.helper.LocalDateTimeHelper;
 import com.alexdb.go4lunch.ui.helper.LunchNotification;
 
 import java.time.LocalTime;
@@ -41,7 +41,7 @@ public class NotificationHelper {
     }
 
     public void requestLunchNotification(String notificationLocalTime, Context context) {
-        LocalTime dueTime = LocalTimeHelper.stringToTime(notificationLocalTime, null);
+        LocalTime dueTime = LocalDateTimeHelper.stringToTime(notificationLocalTime, null);
         if (dueTime == null) return;
 
         Calendar currentDate = Calendar.getInstance();

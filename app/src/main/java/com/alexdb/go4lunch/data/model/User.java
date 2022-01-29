@@ -1,5 +1,6 @@
 package com.alexdb.go4lunch.data.model;
 
+import com.alexdb.go4lunch.ui.helper.LocalDateTimeHelper;
 import com.google.firebase.firestore.ServerTimestamp;
 
 import java.time.LocalDate;
@@ -90,9 +91,8 @@ public class User {
     public void setBookedPlaceName(String bookedPlaceName) { this.bookedPlaceName = bookedPlaceName; }
 
     public boolean hasValidBookingDate() {
-        if (bookedDate == null || bookedPlaceId == null) return false;
-        LocalDate localBookedDate = bookedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        return localBookedDate.isEqual(LocalDate.now());
+        if (bookedPlaceId == null) return false;
+        return LocalDateTimeHelper.isToday(bookedDate);
     }
 
     public boolean hasBookedPlace(String placeId) {

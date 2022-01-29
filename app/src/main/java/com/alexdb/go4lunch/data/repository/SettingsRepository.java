@@ -9,7 +9,7 @@ import androidx.datastore.rxjava3.RxDataStore;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.alexdb.go4lunch.ui.helper.LocalTimeHelper;
+import com.alexdb.go4lunch.ui.helper.LocalDateTimeHelper;
 
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -73,7 +73,7 @@ public class SettingsRepository {
      */
     public static final Preferences.Key<String> KEY_NOTIFICATION_TIME = PreferencesKeys.stringKey("notification_time");
     public static final String DEFAULT_NOTIFICATION_TIME = "12:00";
-    public Predicate<String> notificationTimePredicate = timeString -> LocalTimeHelper.stringToTime(timeString, null) != null;
+    public Predicate<String> notificationTimePredicate = timeString -> LocalDateTimeHelper.stringToTime(timeString, null) != null;
     private final MutableLiveData<String> mNotificationTimeLiveData = new MutableLiveData<>();
     public LiveData<String> getNotificationTimeLiveData() { return mNotificationTimeLiveData; }
 
