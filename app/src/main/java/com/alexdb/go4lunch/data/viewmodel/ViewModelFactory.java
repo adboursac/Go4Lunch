@@ -1,6 +1,7 @@
 package com.alexdb.go4lunch.data.viewmodel;
 
 import androidx.annotation.NonNull;
+import androidx.datastore.preferences.rxjava3.RxPreferenceDataStoreBuilder;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -60,7 +61,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
         mPermissionHelper = new PermissionHelper();
         mUserApiFirebase = new UserApiFirebase();
         mGoogleMapsApi = new GoogleMapsApi();
-        mSettingsRepository = new SettingsRepository();
+        mSettingsRepository = new SettingsRepository(new RxPreferenceDataStoreBuilder(MainApplication.getApplication(), "settings").build());
         mUserRepository = new UserRepository(mUserApiFirebase);
         mLocationRepository = new LocationRepository(mPermissionHelper,
                 LocationServices.getFusedLocationProviderClient(MainApplication.getApplication()));
