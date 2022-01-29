@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.alexdb.go4lunch.R;
 import com.alexdb.go4lunch.data.model.RestaurantStateItem;
 import com.alexdb.go4lunch.data.viewmodel.MainViewModel;
-import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
+import com.alexdb.go4lunch.ViewModelFactory;
 import com.alexdb.go4lunch.databinding.FragmentListViewBinding;
 import com.alexdb.go4lunch.ui.helper.ArrayAdapterSearchView;
 

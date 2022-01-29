@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.alexdb.go4lunch.R;
 import com.alexdb.go4lunch.data.model.User;
 import com.alexdb.go4lunch.data.viewmodel.UserViewModel;
-import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
+import com.alexdb.go4lunch.ViewModelFactory;
 import com.alexdb.go4lunch.databinding.FragmentWorkmatesViewBinding;
 import com.alexdb.go4lunch.ui.helper.ArrayAdapterSearchView;
 
@@ -26,7 +26,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class WorkmatesViewFragment extends Fragment implements ArrayAdapterSearchView.OnQueryTextListener {
 

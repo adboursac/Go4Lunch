@@ -17,9 +17,8 @@ import com.alexdb.go4lunch.data.model.maps.MapsPlaceDetails;
 import com.alexdb.go4lunch.data.model.maps.MapsPlaceDetailsPage;
 import com.alexdb.go4lunch.data.repository.UserRepository;
 import com.alexdb.go4lunch.data.service.GoogleMapsApi;
-import com.alexdb.go4lunch.data.service.NotificationHelper;
 import com.alexdb.go4lunch.data.service.UserApiFirebase;
-import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
+import com.alexdb.go4lunch.ViewModelFactory;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import org.jetbrains.annotations.NotNull;

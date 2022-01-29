@@ -1,4 +1,4 @@
-package com.alexdb.go4lunch.data.viewmodel;
+package com.alexdb.go4lunch;
 
 import androidx.annotation.NonNull;
 import androidx.datastore.preferences.rxjava3.RxPreferenceDataStoreBuilder;
@@ -15,12 +15,13 @@ import com.alexdb.go4lunch.data.service.GoogleMapsApi;
 import com.alexdb.go4lunch.data.service.PermissionHelper;
 import com.alexdb.go4lunch.data.service.UserApiFirebase;
 import com.alexdb.go4lunch.data.service.NotificationHelper;
-import com.alexdb.go4lunch.ui.MainApplication;
+import com.alexdb.go4lunch.data.viewmodel.DetailsViewModel;
+import com.alexdb.go4lunch.data.viewmodel.MainViewModel;
+import com.alexdb.go4lunch.data.viewmodel.SettingsViewModel;
+import com.alexdb.go4lunch.data.viewmodel.UserViewModel;
 import com.google.android.gms.location.LocationServices;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.util.concurrent.Executors;
 
 public class ViewModelFactory implements ViewModelProvider.Factory {
 

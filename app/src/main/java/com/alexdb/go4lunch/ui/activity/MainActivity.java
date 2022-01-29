@@ -24,7 +24,7 @@ import androidx.navigation.ui.NavigationUI;
 import com.alexdb.go4lunch.R;
 import com.alexdb.go4lunch.data.model.User;
 import com.alexdb.go4lunch.data.viewmodel.MainViewModel;
-import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
+import com.alexdb.go4lunch.ViewModelFactory;
 import com.alexdb.go4lunch.databinding.ActivityMainBinding;
 import com.alexdb.go4lunch.ui.fragment.ListViewFragmentDirections;
 import com.alexdb.go4lunch.ui.fragment.MapViewFragmentDirections;
@@ -182,6 +182,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     @SuppressLint("NonConstantResourceId")
     public void navigateToDetailView(String placeId) {
         NavDestination currentDestination = mNavController.getCurrentDestination();
+        if (currentDestination == null) return;
         switch (currentDestination.getId()) {
             case R.id.nav_workmates_view_fragment:
                 mNavController.navigate(

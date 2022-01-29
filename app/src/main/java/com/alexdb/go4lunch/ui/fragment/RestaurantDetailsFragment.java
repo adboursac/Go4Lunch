@@ -18,7 +18,7 @@ import com.alexdb.go4lunch.R;
 import com.alexdb.go4lunch.data.model.RestaurantDetailsStateItem;
 import com.alexdb.go4lunch.data.model.User;
 import com.alexdb.go4lunch.data.viewmodel.DetailsViewModel;
-import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
+import com.alexdb.go4lunch.ViewModelFactory;
 import com.alexdb.go4lunch.databinding.FragmentRestaurantDetailsBinding;
 import com.alexdb.go4lunch.ui.helper.RatingHelper;
 import com.bumptech.glide.Glide;

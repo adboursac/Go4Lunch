@@ -10,7 +10,6 @@ import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
 import com.alexdb.go4lunch.data.repository.SettingsRepository;
-import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
 import com.alexdb.go4lunch.ui.helper.LocalTimeHelper;
 import com.alexdb.go4lunch.ui.helper.LunchNotification;
 

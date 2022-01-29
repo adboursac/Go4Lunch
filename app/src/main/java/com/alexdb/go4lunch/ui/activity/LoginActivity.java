@@ -10,7 +10,7 @@ import android.os.Bundle;
 import com.alexdb.go4lunch.R;
 import com.alexdb.go4lunch.databinding.ActivityLoginBinding;
 import com.alexdb.go4lunch.data.viewmodel.UserViewModel;
-import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
+import com.alexdb.go4lunch.ViewModelFactory;
 import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;

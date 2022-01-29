@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.alexdb.go4lunch.R;
 import com.alexdb.go4lunch.data.viewmodel.SettingsViewModel;
-import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
+import com.alexdb.go4lunch.ViewModelFactory;
 import com.alexdb.go4lunch.databinding.FragmentSettingsBinding;
 
 import org.jetbrains.annotations.NotNull;

@@ -23,9 +23,7 @@ import com.alexdb.go4lunch.data.repository.PlacePredictionRepository;
 import com.alexdb.go4lunch.data.repository.RestaurantPlacesRepository;
 import com.alexdb.go4lunch.data.repository.SettingsRepository;
 import com.alexdb.go4lunch.data.repository.UserRepository;
-import com.alexdb.go4lunch.data.service.GoogleMapsApi;
-import com.alexdb.go4lunch.ui.MainApplication;
-import com.alexdb.go4lunch.ui.helper.LocalTimeHelper;
+import com.alexdb.go4lunch.MainApplication;
 import com.google.android.gms.tasks.Task;
 
 import java.util.ArrayList;

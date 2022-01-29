@@ -18,7 +18,7 @@ import androidx.navigation.Navigation;
 import com.alexdb.go4lunch.R;
 import com.alexdb.go4lunch.data.model.RestaurantStateItem;
 import com.alexdb.go4lunch.data.viewmodel.MainViewModel;
-import com.alexdb.go4lunch.data.viewmodel.ViewModelFactory;
+import com.alexdb.go4lunch.ViewModelFactory;
 import com.alexdb.go4lunch.databinding.FragmentMapViewBinding;
 import com.alexdb.go4lunch.ui.helper.ArrayAdapterSearchView;
 import com.google.android.gms.maps.CameraUpdateFactory;
