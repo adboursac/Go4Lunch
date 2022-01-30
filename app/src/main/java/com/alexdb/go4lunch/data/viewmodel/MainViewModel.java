@@ -23,7 +23,7 @@ import com.alexdb.go4lunch.data.repository.PlacePredictionRepository;
 import com.alexdb.go4lunch.data.repository.RestaurantPlacesRepository;
 import com.alexdb.go4lunch.data.repository.SettingsRepository;
 import com.alexdb.go4lunch.data.repository.UserRepository;
-import com.alexdb.go4lunch.MainApplication;
+import com.alexdb.go4lunch.ui.helper.MapsOpeningHoursHelper;
 import com.google.android.gms.tasks.Task;
 
 import java.util.ArrayList;
@@ -43,6 +43,8 @@ public class MainViewModel extends ViewModel {
     @NonNull
     private final SettingsRepository mSettingsRepository;
 
+    private Resources mResources;
+
     private MediatorLiveData<List<RestaurantStateItem>> mRestaurantsLiveData;
 
     public MainViewModel(
@@ -50,13 +52,15 @@ public class MainViewModel extends ViewModel {
             @NonNull RestaurantPlacesRepository mapsPlacesRepository,
             @NonNull UserRepository userRepository,
             @NonNull PlacePredictionRepository placePredictionRepository,
-            @NonNull SettingsRepository settingsRepository
+            @NonNull SettingsRepository settingsRepository,
+            @NonNull Resources resources
     ) {
         mLocationRepository = locationRepository;
         mMapsPlacesRepository = mapsPlacesRepository;
         mUserRepository = userRepository;
         mPlacePredictionRepository = placePredictionRepository;
         mSettingsRepository = settingsRepository;
+        mResources = resources;
         initRestaurantsLiveData();
     }
 
@@ -164,12 +168,17 @@ public class MainViewModel extends ViewModel {
      */
     private void mergeDataToViewState(List<MapsPlace> places, Location userLocation, List<User> workmates) {
         if ((places == null) || (userLocation == null) || (workmates == null)) return;
+
         List<RestaurantStateItem> stateItems = new ArrayList<>();
+
         for (MapsPlace p : places) {
+            boolean[] closingSoon = {false};
+            String openingStatus = MapsOpeningHoursHelper.generateOpeningString(p.getOpening_hours(), closingSoon, mResources);
             stateItems.add(new RestaurantStateItem(
                     p.getPlaceId(),
                     p.getName(),
-                    openingStatusToString(p.getOpening_hours()),
+                    openingStatus,
+                    closingSoon[0],
                     p.getVicinity(),
                     p.getLocation(),
                     calculateDistance(userLocation, p.getLocation()),
@@ -200,22 +209,6 @@ public class MainViewModel extends ViewModel {
 
     public void refreshLocation() {
         mLocationRepository.refreshLocation();
-    }
-
-    /**
-     * Transform maps opening data into String
-     *
-     * @param openingHours map opening data
-     * @return String representation of opening data
-     */
-    private String openingStatusToString(MapsOpeningHours openingHours) {
-        Resources resources = MainApplication.getApplication().getResources();
-        if (openingHours == null || openingHours.getOpen_now() == null)
-            return resources.getString(R.string.restaurant_no_schedule);
-        else {
-            return openingHours.getOpen_now() ? resources.getString(R.string.restaurant_open)
-                    : resources.getString(R.string.restaurant_closed);
-        }
     }
 
     /**

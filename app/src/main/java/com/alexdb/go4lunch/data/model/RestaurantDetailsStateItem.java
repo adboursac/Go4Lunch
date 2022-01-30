@@ -8,6 +8,7 @@ public class RestaurantDetailsStateItem {
     private String placeId;
     private String name;
     private String openStatus;
+    private boolean closingSoon;
     private String website;
     private String phoneNumber;
     private String address;
@@ -17,10 +18,11 @@ public class RestaurantDetailsStateItem {
     private boolean liked;
     private List<User> bookedWorkmates;
 
-    public RestaurantDetailsStateItem(String placeId, String name, String openStatus, String website, String phoneNumber, String address, Float rating, String photoUrl, boolean booked, boolean liked, List<User> bookedWorkmates) {
+    public RestaurantDetailsStateItem(String placeId, String name, String openStatus, boolean closingSoon, String website, String phoneNumber, String address, Float rating, String photoUrl, boolean booked, boolean liked, List<User> bookedWorkmates) {
         this.placeId = placeId;
         this.name = name;
         this.openStatus = openStatus;
+        this.closingSoon = closingSoon;
         this.website = website;
         this.phoneNumber = phoneNumber;
         this.address = address;
@@ -66,16 +68,16 @@ public class RestaurantDetailsStateItem {
 
     public boolean isBooked() { return booked; }
 
-    public void setBooked(boolean booked) { this.booked = booked; }
 
     public boolean isLiked() { return liked; }
 
-    public void setLiked(boolean liked) { this.liked = liked; }
 
     public List<User> getBookedWorkmates() {
         if (bookedWorkmates == null) return new ArrayList<>();
         return bookedWorkmates; }
 
-    public void setBookedWorkmates(List<User> bookedWorkmates) { this.bookedWorkmates = bookedWorkmates; }
+    public boolean isClosingSoon() {
+        return closingSoon;
+    }
 }
 

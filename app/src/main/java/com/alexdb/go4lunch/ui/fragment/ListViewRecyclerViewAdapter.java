@@ -1,9 +1,11 @@
 package com.alexdb.go4lunch.ui.fragment;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.navigation.Navigation;
@@ -52,6 +54,7 @@ public class ListViewRecyclerViewAdapter extends RecyclerView.Adapter<ListViewRe
         holder.mBinding.name.setText(restaurant.getName());
         holder.mBinding.address.setText(restaurant.getAddress());
         holder.mBinding.openingStatus.setText(restaurant.getOpenStatus());
+        setOpenStatusTextAppearance(holder.mBinding.openingStatus, restaurant.isClosingSoon());
         holder.mBinding.distance.setText(distanceToString(restaurant.getDistance()));
         holder.mBinding.workmatesAmount.setText(workmatesAmountToString(restaurant.getWorkmatesAmount()));
 
@@ -68,6 +71,16 @@ public class ListViewRecyclerViewAdapter extends RecyclerView.Adapter<ListViewRe
                         ListViewFragmentDirections.navigateToDetails().setPlaceId(restaurant.getPlaceId())
                 )
         );
+    }
+
+    public void setOpenStatusTextAppearance(TextView textView, boolean closingSoon) {
+        if (closingSoon) {
+            textView.setTypeface(null, Typeface.BOLD);
+            textView.setTextColor(mContext.getResources().getColor(R.color.red));
+        } else {
+            textView.setTypeface(null, Typeface.NORMAL);
+            textView.setTextColor(mContext.getResources().getColor(R.color.grey));
+        }
     }
 
     @Override

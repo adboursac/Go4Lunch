@@ -13,6 +13,7 @@ import com.alexdb.go4lunch.data.model.maps.MapsOpeningHours;
 import com.alexdb.go4lunch.data.model.maps.MapsPlaceDetails;
 import com.alexdb.go4lunch.data.repository.RestaurantDetailsRepository;
 import com.alexdb.go4lunch.data.repository.UserRepository;
+import com.alexdb.go4lunch.ui.helper.MapsOpeningHoursHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,10 +83,14 @@ public class DetailsViewModel extends ViewModel {
     private void mapDataToViewState(MapsPlaceDetails placeDetails, User currentUser, List<User> workmates) {
             if ((placeDetails == null)||(currentUser == null)) return;
 
+        boolean[] closingSoon = {false};
+        String openingStatus = MapsOpeningHoursHelper.generateOpeningString(placeDetails.getOpening_hours(), closingSoon, mResources);
+
         RestaurantDetailsStateItem restaurantDetailsStateItem = new RestaurantDetailsStateItem(
                 placeDetails.getPlace_id(),
                 placeDetails.getName(),
-                mapOpeningStatus(placeDetails.getOpening_hours()),
+                openingStatus,
+                closingSoon[0],
                 placeDetails.getWebsite(),
                 placeDetails.getInternational_phone_number(),
                 placeDetails.getFormatted_address(),
@@ -96,14 +101,6 @@ public class DetailsViewModel extends ViewModel {
                 getBookedWorkmates(workmates,placeDetails.getPlace_id()));
 
         mRestaurantDetailsLiveData.setValue(restaurantDetailsStateItem);
-    }
-
-    public String mapOpeningStatus(MapsOpeningHours openingHours) {
-        if (openingHours == null) return mResources.getString(R.string.restaurant_no_schedule);
-        else {
-            return openingHours.getOpen_now() ? mResources.getString(R.string.restaurant_open)
-                    : mResources.getString(R.string.restaurant_closed);
-        }
     }
 
     public void toggleRestaurantBookingStatus() {

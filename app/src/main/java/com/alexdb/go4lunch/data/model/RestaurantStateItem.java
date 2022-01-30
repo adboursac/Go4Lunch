@@ -6,6 +6,7 @@ public class RestaurantStateItem {
     private String placeId;
     private String name;
     private String openStatus;
+    private boolean closingSoon;
     private String address;
     private Location location;
     private int distance;
@@ -13,10 +14,11 @@ public class RestaurantStateItem {
     private String photoUrl;
     private int workmatesAmount;
 
-    public RestaurantStateItem(String placeId, String name, String openStatus, String address, Location location, int distance, Float rating, String photoUrl, int workmatesAmount) {
+    public RestaurantStateItem(String placeId, String name, String openStatus, boolean closingSoon, String address, Location location, int distance, Float rating, String photoUrl, int workmatesAmount) {
         this.placeId = placeId;
         this.name = name;
         this.openStatus = openStatus;
+        this.closingSoon = closingSoon;
         this.address = address;
         this.location = location;
         this.distance = distance;
@@ -45,16 +47,10 @@ public class RestaurantStateItem {
         return openStatus;
     }
 
-    public void setOpenStatus(String openStatus) {
-        this.openStatus = openStatus;
-    }
+    public boolean isClosingSoon() { return closingSoon; }
 
     public String getAddress() {
         return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
     }
 
     public Location getLocation() {
@@ -67,27 +63,15 @@ public class RestaurantStateItem {
 
     public int getDistance() { return distance; }
 
-    public void setDistance(int distance) {
-        this.distance = distance;
-    }
-
     public Float getRating() {
+        if (rating == null) return 0F;
         return rating;
-    }
-
-    public void setRating(Float rating) {
-        this.rating = rating;
     }
 
     public String getPhotoUrl() {
         return photoUrl;
     }
 
-    public void setPhotoUrl(String photoUrl) {
-        this.photoUrl = photoUrl;
-    }
-
     public int getWorkmatesAmount() { return workmatesAmount; }
 
-    public void setWorkmatesAmount(int workmatesAmount) { this.workmatesAmount = workmatesAmount; }
 }

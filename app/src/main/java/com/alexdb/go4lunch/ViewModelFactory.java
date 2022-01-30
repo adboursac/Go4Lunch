@@ -92,7 +92,13 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
             return (T) new UserViewModel(mUserRepository);
         }
         else if (modelClass.isAssignableFrom(MainViewModel.class)) {
-            return (T) new MainViewModel(mLocationRepository, mMapsPlacesRepository, mUserRepository, mPlacePredictionRepository, mSettingsRepository);
+            return (T) new MainViewModel(
+                    mLocationRepository,
+                    mMapsPlacesRepository,
+                    mUserRepository,
+                    mPlacePredictionRepository,
+                    mSettingsRepository,
+                    MainApplication.getApplication().getResources());
         }
         else if (modelClass.isAssignableFrom(DetailsViewModel.class)) {
             return (T) new DetailsViewModel(mRestaurantDetailsRepository, mUserRepository, MainApplication.getApplication().getResources());
