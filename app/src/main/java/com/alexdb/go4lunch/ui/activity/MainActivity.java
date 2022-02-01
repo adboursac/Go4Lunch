@@ -21,6 +21,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.alexdb.go4lunch.BuildConfig;
 import com.alexdb.go4lunch.R;
 import com.alexdb.go4lunch.data.model.User;
 import com.alexdb.go4lunch.data.viewmodel.MainViewModel;
@@ -29,6 +30,7 @@ import com.alexdb.go4lunch.databinding.ActivityMainBinding;
 import com.alexdb.go4lunch.ui.fragment.ListViewFragmentDirections;
 import com.alexdb.go4lunch.ui.fragment.MapViewFragmentDirections;
 import com.alexdb.go4lunch.ui.fragment.WorkmatesViewFragmentDirections;
+import com.alexdb.go4lunch.ui.helper.DataFetcher;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
@@ -48,15 +50,17 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initViewModel();
+        mMainViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(MainViewModel.class);
+
         initNavigationComponents();
         ConfigureNavigationComponentsDisplayRules();
-
-        Menu menu = mBinding.drawerContent.getMenu();
-        drawerSignOutButton = menu.findItem(R.id.menu_drawer_logout);
-        drawerBookedPlaceButton = menu.findItem(R.id.menu_drawer_booked_place);
-
+        initMenuObjects();
+        initObservers();
         initSignOutButton();
+
+        mMainViewModel.fetchCurrentUser();
+        mMainViewModel.fetchWorkmates();
+        mMainViewModel.requestLocationPermission(this);
     }
 
     /**
@@ -76,17 +80,20 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         return ActivityMainBinding.inflate(getLayoutInflater());
     }
 
-    /**
-     * Get required View Model for Main Activity
-     */
-    private void initViewModel() {
-        mMainViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(MainViewModel.class);
+    private void initMenuObjects() {
+        Menu menu = mBinding.drawerContent.getMenu();
+        drawerSignOutButton = menu.findItem(R.id.menu_drawer_logout);
+        drawerBookedPlaceButton = menu.findItem(R.id.menu_drawer_booked_place);
+    }
 
+    private void initObservers() {
         mMainViewModel.getCurrentUserLiveData().observe(this, currentUser -> {
             updateDrawerHeaderData(currentUser);
             updateBookedPlaceButton(currentUser);
         });
-        mMainViewModel.fetchCurrentUser();
+
+        // New location triggers a restaurant list fetch
+        mMainViewModel.getLocationLiveData().observe(this, location -> mMainViewModel.fetchRestaurantPlaces(location));
     }
 
     /**

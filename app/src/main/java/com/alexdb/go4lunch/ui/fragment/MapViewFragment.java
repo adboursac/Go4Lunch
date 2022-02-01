@@ -1,6 +1,7 @@
 package com.alexdb.go4lunch.ui.fragment;
 
 import android.annotation.SuppressLint;
+import android.app.appsearch.SearchResult;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.alexdb.go4lunch.R;
+import com.alexdb.go4lunch.data.model.RestaurantDetailsStateItem;
 import com.alexdb.go4lunch.data.model.RestaurantStateItem;
 import com.alexdb.go4lunch.data.viewmodel.MainViewModel;
 import com.alexdb.go4lunch.ViewModelFactory;
@@ -33,6 +35,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -43,6 +46,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Arr
     private FragmentMapViewBinding mBinding;
     private MainViewModel mMainViewModel;
     private ArrayAdapterSearchView mSearchView;
+    private Location mLastLocation;
 
     public MapViewFragment() {
     }
@@ -52,7 +56,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Arr
                              ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentMapViewBinding.inflate(inflater, container, false);
-        initData();
+        mMainViewModel = new ViewModelProvider(requireActivity(), ViewModelFactory.getInstance()).get(MainViewModel.class);
         setHasOptionsMenu(true);
         return mBinding.getRoot();
     }
@@ -72,6 +76,9 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Arr
     public void onMapReady(@NotNull GoogleMap googleMap) {
         mMap = googleMap;
         configureMapObjects();
+        initObservers();
+        // We manually update location data
+        handleNewLocation(mMainViewModel.getLocationLiveData().getValue());
     }
 
     /**
@@ -81,23 +88,20 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Arr
         mMap.setMapStyle(
                 MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.google_map_style));
 
-        //Click on target button moves camera on current location
+        // Click on target button moves camera on current location
         mBinding.floatingActionButton.setOnClickListener(view -> {
-            Location currentLocation = mMainViewModel.getLocationLiveData().getValue();
-            if (currentLocation != null) moveCamera(currentLocation);
+            if (mLastLocation != null) moveCamera(mLastLocation);
         });
 
-        //Click on markers info navigate to details activity
-        mMap.setOnInfoWindowClickListener(marker ->
+        // Click on markers info navigate to details activity
+        mMap.setOnInfoWindowClickListener(marker -> {
+                if (marker.getTag() == null) return;
                 Navigation.findNavController(mBinding.getRoot()).navigate(
                         MapViewFragmentDirections.navigateToDetails()
-                                .setPlaceId((String) Objects.requireNonNull(marker.getTag()))
-                ));
-
+                                .setPlaceId((String) Objects.requireNonNull(marker.getTag())));
+        });
 
         if (mMainViewModel.hasLocationPermission()) configureLocationRelatedObjects();
-        Location currentLocation = mMainViewModel.getLocationLiveData().getValue();
-        if (currentLocation != null) handleNewLocation(currentLocation);
 
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
     }
@@ -129,13 +133,13 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Arr
      *
      * @param location  place location
      * @param placeName place name
-     * @param selected  if true marker will display in green, red instead.
+     * @param bookedByWorkmates  if true marker will display in green, red instead.
      * @param placeId   id of the place
      */
-    private void createRestaurantMarker(Location location, String placeName, boolean selected, String placeId, boolean displayInfo) {
+    private void createRestaurantMarker(Location location, String placeName, boolean bookedByWorkmates, String placeId, boolean displayInfo) {
         if (location == null || mMap == null) return;
         LatLng cord = new LatLng(location.getLatitude(), location.getLongitude());
-        float hue = selected ? BitmapDescriptorFactory.HUE_GREEN : BitmapDescriptorFactory.HUE_ORANGE;
+        float hue = bookedByWorkmates ? BitmapDescriptorFactory.HUE_GREEN : BitmapDescriptorFactory.HUE_ORANGE;
         Marker marker = mMap.addMarker(new MarkerOptions()
                 .position(cord)
                 .title(placeName)
@@ -166,26 +170,23 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Arr
     }
 
     /**
-     * Init view model and data behaviour of the fragment
+     * Create all the markers in a search result context.
+     * Move camera on search result marker and display its info window
+     *
+     * @param restaurants list of restaurants to display as markers
      */
-    private void initData() {
-        mMainViewModel = new ViewModelProvider(requireActivity(), ViewModelFactory.getInstance()).get(MainViewModel.class);
+    private void displayMarkersWithSearchResult(List<RestaurantStateItem> restaurants) {
+        if (restaurants == null) return;
+        updateEveryRestaurantsMarkers(restaurants, restaurants.get(0).getPlaceId());
+        Location searchResultLocation = restaurants.get(0).getLocation();
+        moveCamera(searchResultLocation);
+    }
 
-        //New location data triggers camera move and an optional restaurants fetch
-        mMainViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), this::handleNewLocation);
-
-        //New restaurants data triggers markers update and optional camera move
-        mMainViewModel.getRestaurantsLiveData().observe(getViewLifecycleOwner(), restaurants -> {
-            //Move camera and display info if we are displaying a search result
-            if (mMainViewModel.getCurrentSearchQuery().length() > 0) {
-                updateEveryRestaurantsMarkers(restaurants, restaurants.get(0).getPlaceId());
-                Location searchResultLocation = restaurants.get(0).getLocation();
-                moveCamera(searchResultLocation);
-            }
-            else updateEveryRestaurantsMarkers(restaurants, null);
-        });
-
-        //New search predictions data triggers a display
+    /**
+     * Init viewModels observers reactions
+     */
+    private void initObservers() {
+        // New search predictions data triggers a display
         mMainViewModel.getRestaurantPredictionsLivaData().observe(getViewLifecycleOwner(), predictionList -> {
             if (mSearchView != null) {
                 List<String> predictionsStrings = mMainViewModel.predictionsToStrings(predictionList);
@@ -193,32 +194,51 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Arr
             }
         });
 
-        //Configure location related objects as soon as permission is granted
+        // New location data triggers camera move
+        mMainViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), this::handleNewLocation);
+
+        // New restaurants data triggers markers update and camera moves
+        mMainViewModel.getRestaurantsLiveData().observe(getViewLifecycleOwner(), this::handleNewRestaurantList);
+
+        // Configure location related objects as soon as permission is granted
         mMainViewModel.getLocationPermissionLiveData().observe(getViewLifecycleOwner(), permitted -> {
             if (permitted) configureLocationRelatedObjects();
         });
 
-        //Init map zoom default value
+        // Init map zoom default value
         mMainViewModel.getMapZoomLiveData().observe(getViewLifecycleOwner(), zoom -> mMapZoom = zoom);
     }
 
     /**
-     * Manage the update of elements when the location has changed
+     * Handle location change. Moves camera on the right spot
      *
      * @param location new updated location
      */
     private void handleNewLocation(Location location) {
-        // If we are displaying search result, we don't fetch but camera move on search result location.
+        mLastLocation = location;
+        if (location == null) return;
+        // If we are displaying search result
         if (mMainViewModel.getCurrentSearchQuery().length() > 0) {
-            List<RestaurantStateItem> currentRestaurants = mMainViewModel.getRestaurantsLiveData().getValue();
-            if (currentRestaurants == null) return;
-            updateEveryRestaurantsMarkers(currentRestaurants, currentRestaurants.get(0).getPlaceId());
-            moveCamera(currentRestaurants.get(0).getLocation());
+            displayMarkersWithSearchResult(mMainViewModel.getRestaurantsLiveData().getValue());
         }
-        // Instead, we fetch restaurants and move camera on currentLocation
-        else {
-            mMainViewModel.fetchRestaurants(location);
-            moveCamera(location);
+        // Instead, we only move camera on currentLocation
+        else moveCamera(location);
+    }
+
+    /**
+     * Handle restaurant list change. Update markers and moves camera
+     *
+     * @param restaurants new restaurant list
+     */
+    private void  handleNewRestaurantList(List<RestaurantStateItem> restaurants) {
+        if (restaurants == null || restaurants.size() == 0) return;
+        // If we are displaying search result
+        if (mMainViewModel.getCurrentSearchQuery().length() > 0) {
+            displayMarkersWithSearchResult(restaurants);
+        } else {
+            // Update markers and move camera on last Location
+            updateEveryRestaurantsMarkers(restaurants, null);
+            if (mLastLocation != null) moveCamera(mLastLocation);
         }
     }
 
@@ -238,8 +258,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Arr
     public boolean onQueryTextChange(String newText) {
         if (newText.length() > 2) {
             mMainViewModel.requestPlacesPredictions(newText);
-        } else {
-            mSearchView.hideSuggestions();
         }
         return false;
     }
@@ -255,6 +273,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Arr
         mSearchView.setOnItemClickListener((parent, view, position, id) -> {
             String selectedString = mSearchView.applySelection(position);
             mMainViewModel.applySearch(selectedString);
+            mSearchView.setQuery(selectedString, true);
         });
 
         //Handle clear button

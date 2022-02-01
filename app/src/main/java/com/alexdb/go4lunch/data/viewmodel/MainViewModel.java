@@ -26,6 +26,7 @@ import com.alexdb.go4lunch.data.repository.UserRepository;
 import com.alexdb.go4lunch.ui.helper.MapsOpeningHoursHelper;
 import com.google.android.gms.tasks.Task;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -44,7 +45,6 @@ public class MainViewModel extends ViewModel {
     private final SettingsRepository mSettingsRepository;
 
     private Resources mResources;
-
     private MediatorLiveData<List<RestaurantStateItem>> mRestaurantsLiveData;
 
     public MainViewModel(
@@ -63,6 +63,8 @@ public class MainViewModel extends ViewModel {
         mResources = resources;
         initRestaurantsLiveData();
     }
+
+    // --- LiveData ---
 
     public LiveData<Location> getLocationLiveData() {
         return mLocationRepository.getLocationLiveData();
@@ -104,27 +106,18 @@ public class MainViewModel extends ViewModel {
         });
     }
 
-    public String getCurrentSearchQuery() {
-        return mPlacePredictionRepository.getCurrentSearchQuery();
-    }
+    // --- Fetch requests ---
 
-    /**
-     * refresh current user data
-     */
     public void fetchCurrentUser() {
         mUserRepository.fetchCurrentUser();
     }
 
-    /**
-     * refresh Restaurants data
-     */
-    public void fetchRestaurants(Location location) {
-        if (location == null) {
-            mLocationRepository.refreshLocation();
-            return;
-        }
-        mMapsPlacesRepository.fetchRestaurantPlaces(location);
+    public void fetchWorkmates() {
         mUserRepository.fetchWorkmates();
+    }
+
+    public void fetchRestaurantPlaces(Location location) {
+        mMapsPlacesRepository.fetchRestaurantPlaces(location);
     }
 
     /**
@@ -158,6 +151,8 @@ public class MainViewModel extends ViewModel {
         );
     }
 
+    // --- State item generation ---
+
     /**
      * Merge restaurant places, location, and workmates data from repositories to view data as a RestaurantStateItem instance,
      * and store it in the Mediator Live Data mRestaurantsLiveData
@@ -172,8 +167,10 @@ public class MainViewModel extends ViewModel {
         List<RestaurantStateItem> stateItems = new ArrayList<>();
 
         for (MapsPlace p : places) {
+
             boolean[] closingSoon = {false};
             String openingStatus = MapsOpeningHoursHelper.generateOpeningString(p.getOpening_hours(), closingSoon, mResources);
+
             stateItems.add(new RestaurantStateItem(
                     p.getPlaceId(),
                     p.getName(),
@@ -190,26 +187,6 @@ public class MainViewModel extends ViewModel {
         mRestaurantsLiveData.setValue(stateItems);
     }
 
-    public boolean hasLocationPermission() {
-        return mLocationRepository.hasLocationPermission();
-    }
-
-    public void requestLocationPermission(Activity activity) {
-        if (!mLocationRepository.hasLocationPermission())
-            mLocationRepository.requestLocationPermission(activity);
-    }
-
-    public void denyLocationPermission() {
-        mLocationRepository.denyLocationPermission();
-    }
-
-    public void grantLocationPermission() {
-        mLocationRepository.grantLocationPermission();
-    }
-
-    public void refreshLocation() {
-        mLocationRepository.refreshLocation();
-    }
 
     /**
      * Calculate distance between two given locations
@@ -237,6 +214,31 @@ public class MainViewModel extends ViewModel {
             if (workmate.hasBookedPlace(placeId)) amount++;
         }
         return amount;
+    }
+
+    // --- Localisation ---
+
+    public boolean hasLocationPermission() {
+        return mLocationRepository.hasLocationPermission();
+    }
+
+    public void requestLocationPermission(Activity activity) {
+        if (!mLocationRepository.hasLocationPermission())
+            mLocationRepository.requestLocationPermission(activity);
+    }
+
+    public void denyLocationPermission() {
+        mLocationRepository.denyLocationPermission();
+    }
+
+    public void grantLocationPermission() {
+        mLocationRepository.grantLocationPermission();
+    }
+
+    // --- Search feature ---
+
+    public String getCurrentSearchQuery() {
+        return mPlacePredictionRepository.getCurrentSearchQuery();
     }
 
     /**

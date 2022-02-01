@@ -15,6 +15,7 @@ import com.alexdb.go4lunch.data.service.GoogleMapsApi;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -27,6 +28,8 @@ import retrofit2.Response;
  * List of places is updated according to location criteria as MapsPlace model objects
  */
 public class RestaurantPlacesRepository {
+
+    public static final int RETRY_DELAY = 5000;
 
     private final GoogleMapsApi mGoogleMapsApi;
     private final Executor mExecutor;
@@ -96,7 +99,7 @@ public class RestaurantPlacesRepository {
 
                         //request for more results if possible
                         if (placesPage.getNext_page_token() != null) {
-                            //fetchRestaurantPlacesPage(placesPage.getNext_page_token(), true);
+                            fetchRestaurantPlacesPage(placesPage.getNext_page_token(), true);
                         }
                     }
                 }
@@ -112,7 +115,7 @@ public class RestaurantPlacesRepository {
 
     /*
      * Check page request status. If status is INVALID_REQUEST and allowRetry set to true,
-     * it retries the request in a background thread after waiting for 2 seconds.
+     * it retries the request in a background thread after waiting for RETRY_DELAY milliseconds.
      *
      * @param pageToken  requested page token
      * @param status     the status of the request
@@ -126,7 +129,7 @@ public class RestaurantPlacesRepository {
             Log.d("RestaurantRepository", "getRestaurantsPage status: INVALID_REQUEST, retrying in background thread");
             mExecutor.execute(() -> {
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(RETRY_DELAY);
                     fetchRestaurantPlacesPage(pageToken, false);
                 } catch (InterruptedException e) {
                     e.printStackTrace();

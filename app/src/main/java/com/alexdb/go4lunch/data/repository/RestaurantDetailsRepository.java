@@ -20,16 +20,14 @@ import retrofit2.Response;
 public class RestaurantDetailsRepository {
 
     private final GoogleMapsApi mGoogleMapsApi;
-    private MutableLiveData<MapsPlaceDetails> mRestaurantDetailsMutableLiveData = new MutableLiveData<>();
-    // Caching responses with placeId
-    private final Map<String, MapsPlaceDetails> mCache = new HashMap<>();
+    private final MutableLiveData<Map<String, MapsPlaceDetails>> mRestaurantsDetailsLiveData = new MutableLiveData<>(new HashMap<>());
 
     public RestaurantDetailsRepository(GoogleMapsApi googleMapsApi) {
         mGoogleMapsApi = googleMapsApi;
     }
 
-    public LiveData<MapsPlaceDetails> getRestaurantDetailsLiveData() {
-        return mRestaurantDetailsMutableLiveData;
+    public LiveData<Map<String, MapsPlaceDetails>> getRestaurantDetailsLiveData() {
+        return mRestaurantsDetailsLiveData;
     }
 
     /**
@@ -38,23 +36,19 @@ public class RestaurantDetailsRepository {
      * @param placeId place id of the restaurant
      */
     public void fetchRestaurantDetails(String placeId) {
-        if (placeId == null) return;
+        Map<String, MapsPlaceDetails> currentDetails = mRestaurantsDetailsLiveData.getValue();
+        if (currentDetails == null || placeId == null) return;
 
-        MapsPlaceDetails cachedResult = mCache.get(placeId);
-        if (cachedResult != null) {
-            mRestaurantDetailsMutableLiveData.setValue(cachedResult);
-            return;
-        }
+        // If we already fetched this result we ignore this fetch request
+        if (currentDetails.get(placeId) != null) return;
 
         mGoogleMapsApi.getPlaceDetails(placeId).enqueue(new Callback<MapsPlaceDetailsPage>() {
             @Override
             public void onResponse(@NonNull Call<MapsPlaceDetailsPage> call, @NonNull Response<MapsPlaceDetailsPage> response) {
-                if (response != null) {
-                    MapsPlaceDetailsPage detailsPage = response.body();
-                    if (detailsPage != null) {
-                        mCache.put(placeId, detailsPage.getResult());
-                        mRestaurantDetailsMutableLiveData.setValue(detailsPage.getResult());
-                    }
+                MapsPlaceDetailsPage detailsPage = response.body();
+                if (detailsPage != null) {
+                    currentDetails.put(placeId, detailsPage.getResult());
+                    mRestaurantsDetailsLiveData.setValue(currentDetails);
                 }
             }
 

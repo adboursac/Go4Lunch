@@ -41,6 +41,7 @@ public class RestaurantDetailsFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private RestaurantDetailsStateItem mCurrentDetails;
     private List<User> mBookedUsers = new ArrayList<>();
+    private String mPlaceId;
 
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater,
@@ -77,8 +78,8 @@ public class RestaurantDetailsFragment extends Fragment {
             }
         });
 
-        String placeId = RestaurantDetailsFragmentArgs.fromBundle(requireArguments()).getPlaceId();
-        mDetailsViewModel.fetchRestaurantDetails(placeId);
+        mPlaceId = RestaurantDetailsFragmentArgs.fromBundle(requireArguments()).getPlaceId();
+        mDetailsViewModel.getRestaurantDetails(mPlaceId);
     }
 
     private void populateDetails(RestaurantDetailsStateItem details) {

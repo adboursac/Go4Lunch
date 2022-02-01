@@ -17,6 +17,7 @@ import com.alexdb.go4lunch.ui.helper.MapsOpeningHoursHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DetailsViewModel extends ViewModel {
@@ -25,6 +26,7 @@ public class DetailsViewModel extends ViewModel {
     private final UserRepository mUserRepository;
     private MediatorLiveData<RestaurantDetailsStateItem> mRestaurantDetailsLiveData;
     private Resources mResources;
+    private String currentPlaceId;
 
     public DetailsViewModel(RestaurantDetailsRepository restaurantDetailsRepository, UserRepository userRepository, Resources resources) {
         mRestaurantDetailsRepository = restaurantDetailsRepository;
@@ -37,9 +39,9 @@ public class DetailsViewModel extends ViewModel {
         return mRestaurantDetailsLiveData;
     }
 
-    public void fetchRestaurantDetails(String placeId) {
+    public void getRestaurantDetails(String placeId) {
+        currentPlaceId = placeId;
         mRestaurantDetailsRepository.fetchRestaurantDetails(placeId);
-        mUserRepository.fetchWorkmates();
     }
 
     /**
@@ -47,7 +49,7 @@ public class DetailsViewModel extends ViewModel {
      */
     public void initRestaurantDetailsLiveData() {
         mRestaurantDetailsLiveData = new MediatorLiveData<>();
-        LiveData<MapsPlaceDetails> placeDetailsLiveData = mRestaurantDetailsRepository.getRestaurantDetailsLiveData();
+        LiveData<Map<String, MapsPlaceDetails>> placeDetailsLiveData = mRestaurantDetailsRepository.getRestaurantDetailsLiveData();
         LiveData<User> currentUserLiveData = mUserRepository.getCurrentUserLiveData();
         LiveData<List<User>> workmatesLiveData = mUserRepository.getWorkmatesLiveData();
 
@@ -77,11 +79,13 @@ public class DetailsViewModel extends ViewModel {
     /**
      * Map restaurant Details and current user data from repositories to view data as a RestaurantDetailsStateItem instance,
      * and store it in the Mediator Live Data mRestaurantDetailsLiveData
-     * @param placeDetails data from restaurant detail repository
+     * @param placeDetailsMap data from restaurant detail repository
      * @param currentUser current user data from user repository
      */
-    private void mapDataToViewState(MapsPlaceDetails placeDetails, User currentUser, List<User> workmates) {
-            if ((placeDetails == null)||(currentUser == null)) return;
+    private void mapDataToViewState(Map<String, MapsPlaceDetails> placeDetailsMap, User currentUser, List<User> workmates) {
+
+        MapsPlaceDetails placeDetails = placeDetailsMap.get(currentPlaceId);
+        if (placeDetails == null) return;
 
         boolean[] closingSoon = {false};
         String openingStatus = MapsOpeningHoursHelper.generateOpeningString(placeDetails.getOpening_hours(), closingSoon, mResources);

@@ -39,7 +39,6 @@ public class LocationRepository {
                               @NonNull FusedLocationProviderClient fusedLocationProviderClient) {
         mFusedLocationProviderClient = fusedLocationProviderClient;
         mPermissionHelper = permissionHelper;
-        denyLocationPermission();
     }
 
     public LiveData<Location> getLocationLiveData() {
@@ -50,9 +49,10 @@ public class LocationRepository {
     /**
      * Grant location permission and update live data
      */
+    @SuppressLint("MissingPermission")
     public void grantLocationPermission() {
         mLocationPermissionMutableLiveData.setValue(true);
-        refreshLocation();
+        startLocationUpdatesLoop();
     }
 
     /**
