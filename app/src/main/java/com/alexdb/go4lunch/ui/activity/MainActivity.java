@@ -21,7 +21,6 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.alexdb.go4lunch.BuildConfig;
 import com.alexdb.go4lunch.R;
 import com.alexdb.go4lunch.data.model.User;
 import com.alexdb.go4lunch.data.viewmodel.MainViewModel;
@@ -30,7 +29,6 @@ import com.alexdb.go4lunch.databinding.ActivityMainBinding;
 import com.alexdb.go4lunch.ui.fragment.ListViewFragmentDirections;
 import com.alexdb.go4lunch.ui.fragment.MapViewFragmentDirections;
 import com.alexdb.go4lunch.ui.fragment.WorkmatesViewFragmentDirections;
-import com.alexdb.go4lunch.ui.helper.DataFetcher;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
@@ -44,6 +42,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     private NavController mNavController;
     private MenuItem drawerSignOutButton;
     private MenuItem drawerBookedPlaceButton;
+    private MainActivityDataFetcher mMainActivityDataFetcher;
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 767967;
 
@@ -51,6 +50,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mMainViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(MainViewModel.class);
+        mMainActivityDataFetcher = new MainActivityDataFetcher(getLifecycle(), mMainViewModel);
 
         initNavigationComponents();
         ConfigureNavigationComponentsDisplayRules();
@@ -58,26 +58,28 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         initObservers();
         initSignOutButton();
 
-        mMainViewModel.fetchCurrentUser();
-        mMainViewModel.fetchWorkmates();
-        mMainViewModel.requestLocationPermission(this);
+        initData();
+        // init Lunch notification service
+        ViewModelFactory.getInstance().getNotificationHelper().initLunchNotifications(this);
     }
 
-    /**
-     * Set toolbar_default label instead of app name as toolbar title when MainActivity starts,
-     * requests location permission, requests lunch notification
-     */
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+        //Set toolbar_default label instead of app name as toolbar title when MainActivity start
         mBinding.activityMainContent.toolbar.setTitle(R.string.toolbar_default);
-        mMainViewModel.requestLocationPermission(this);
-        ViewModelFactory.getInstance().getNotificationHelper().initLunchNotifications(this);
     }
 
     @Override
     ActivityMainBinding getViewBinding() {
         return ActivityMainBinding.inflate(getLayoutInflater());
+    }
+
+    private void initData() {
+        mMainViewModel.fetchCurrentUser();
+        mMainViewModel.fetchWorkmates();
+        mMainViewModel.requestLocationPermission(this);
+        mMainActivityDataFetcher.enable();
     }
 
     private void initMenuObjects() {
