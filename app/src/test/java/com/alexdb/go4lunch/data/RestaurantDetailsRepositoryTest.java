@@ -24,10 +24,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.Map;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+@SuppressWarnings("all")
 @RunWith(MockitoJUnitRunner.class)
 public class RestaurantDetailsRepositoryTest {
 
@@ -53,7 +56,7 @@ public class RestaurantDetailsRepositoryTest {
 
     @Test
     public void fetchRestaurantDetails_test() {
-        LiveData<MapsPlaceDetails> result = restaurantDetailsRepository.getRestaurantDetailsLiveData();
+        LiveData<Map<String,MapsPlaceDetails>> result = restaurantDetailsRepository.getRestaurantDetailsLiveData();
 
         // Let's call the repository method
         restaurantDetailsRepository.fetchRestaurantDetails("placeId");
@@ -65,7 +68,10 @@ public class RestaurantDetailsRepositoryTest {
         callbackArgumentCaptor.getValue().onResponse(mockedCall, mockedResponse);
 
         // Assert the result is posted to the LiveData
-        LiveDataTestUtils.observeForTesting(result, liveData -> assertEquals(mockedMapsPlaceDetails, liveData.getValue()));
+        LiveDataTestUtils.observeForTesting(result, liveData -> {
+            MapsPlaceDetails details = liveData.getValue().get("placeId");
+            assertEquals(mockedMapsPlaceDetails, details);
+        });
     }
 
     @Test

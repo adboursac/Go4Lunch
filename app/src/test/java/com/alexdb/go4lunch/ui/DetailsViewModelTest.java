@@ -30,7 +30,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -49,7 +51,7 @@ public class DetailsViewModelTest {
 
     @Mock
     private RestaurantDetailsRepository mRestaurantDetailsRepository;
-    MutableLiveData<MapsPlaceDetails> mDetailsLiveData;
+    private MutableLiveData<Map<String, MapsPlaceDetails>> mDetailsLiveDataDummy;
 
     @Mock
     private UserRepository mUserRepository;
@@ -59,10 +61,13 @@ public class DetailsViewModelTest {
     @Before
     public void setUp() {
         // mRestaurantDetailsRepository Mock
-        mDetailsLiveData = new MutableLiveData<>();
-        given(mRestaurantDetailsRepository.getRestaurantDetailsLiveData()).willReturn(mDetailsLiveData);
+        mDetailsLiveDataDummy = new MutableLiveData<>();
+        given(mRestaurantDetailsRepository.getRestaurantDetailsLiveData()).willReturn(mDetailsLiveDataDummy);
+        // fetchRestaurantDetails mock : adds place_1_DetailsDummy in liveData map
         doAnswer(invocation -> {
-            mDetailsLiveData.setValue(place_1_DetailsDummy);
+            Map<String, MapsPlaceDetails> mDetailsMapDummy = new HashMap<>();
+            mDetailsMapDummy.put("placeId_1", place_1_DetailsDummy);
+            mDetailsLiveDataDummy.setValue(mDetailsMapDummy);
             return null;
         }).when(mRestaurantDetailsRepository).fetchRestaurantDetails("placeId_1");
 
@@ -82,13 +87,14 @@ public class DetailsViewModelTest {
     }
 
     @Test
-    public void getRestaurantsDetailsLiveData_test() {
+    public void getRestaurantDetails_test() {
         // When we fetch dummy details of restaurant with id : placeId_1
-        mRestaurantDetailsRepository.fetchRestaurantDetails("placeId_1");
+        mDetailsViewModel.getRestaurantDetails("placeId_1");
 
         // Assert that restaurant state item resulting from merging both user and detail repository is correct
         LiveDataTestUtils.observeForTesting(mDetailsViewModel.getRestaurantsDetailsLiveData(), liveData -> {
             RestaurantDetailsStateItem detailsState = liveData.getValue();
+
             // comparing dummy details values with detail state item
             assertEquals(place_1_DetailsDummy.getPlace_id(), detailsState.getPlaceId());
             assertEquals(place_1_DetailsDummy.getName(), detailsState.getName());
