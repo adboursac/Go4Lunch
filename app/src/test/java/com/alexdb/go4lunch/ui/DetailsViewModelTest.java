@@ -123,8 +123,10 @@ public class DetailsViewModelTest {
         });
     }
 
-    ///// Dummy Data :
-    // Current displayed place has id placeId_1, both booked by currentUser and Paul
+    // ------ Dummy and Mocked Data ------
+    // Scenario :
+    // Current displayed place has id placeId_1
+    // placeId_1 is booked by both currentUser and Paul
     // Lisa booked another place
 
     User currentUserDummy = new User("currentUser_id",

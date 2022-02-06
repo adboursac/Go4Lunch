@@ -86,10 +86,6 @@ public class MainViewModel extends ViewModel {
         return mSettingsRepository.getMapZoomLiveData();
     }
 
-    public LiveData<Integer> getSearchRadiusLiveData() {
-        return mSettingsRepository.getSearchRadiusLiveData();
-    }
-
     public LiveData<List<PredictionStateItem>> getRestaurantPredictionsLivaData() {
         return Transformations.map(mPlacePredictionRepository.getRestaurantPredictionsLiveData(), predictions -> {
             List<PredictionStateItem> predictionsItems = new ArrayList<>();
@@ -195,7 +191,7 @@ public class MainViewModel extends ViewModel {
      * @param placeLocation place location
      * @return Distance in meters
      */
-    private int calculateDistance(Location userLocation, Location placeLocation) {
+    public int calculateDistance(Location userLocation, Location placeLocation) {
         if ((userLocation == null) || (placeLocation == null)) return -1;
         return Math.round(userLocation.distanceTo(placeLocation));
     }
@@ -269,14 +265,14 @@ public class MainViewModel extends ViewModel {
     /**
      * Apply a query choice obtained from autocomplete and request places list to be updated to match the query
      *
-     * @param query text query that should come from autocomplete predictions
+     * @param restaurantName restaurant name that should come from autocomplete predictions
      */
-    public void applySearch(String query) {
-        mPlacePredictionRepository.setCurrentSearchQuery(query);
+    public void applySearch(String restaurantName) {
+        mPlacePredictionRepository.setCurrentSearchQuery(restaurantName);
         List<MapsPlacePrediction> currentPredictions = mPlacePredictionRepository.getRestaurantPredictionsLiveData().getValue();
         if (currentPredictions == null) return;
         for (MapsPlacePrediction p : currentPredictions) {
-            if (query.contentEquals(p.getStructured_formatting().getMain_text())) {
+            if (restaurantName.contentEquals(p.getStructured_formatting().getMain_text())) {
                 mMapsPlacesRepository.requestRestaurant(p.getPlace_id());
             }
         }
