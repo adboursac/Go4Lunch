@@ -15,7 +15,6 @@ import com.alexdb.go4lunch.data.service.GoogleMapsApi;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -149,19 +148,21 @@ public class RestaurantPlacesRepository {
     public void requestRestaurant(String placeId) {
         if (placeId == null) return;
 
+        // if we already have this placeId in our list, we won't fetch it again
+        // we just place it at index 0
+        if (findPlaceAndMoveItAtFirstIndex(placeId)) return;
+
         mGoogleMapsApi.getPlaceDetails(placeId).enqueue(new Callback<MapsPlaceDetailsPage>() {
             @Override
             public void onResponse(@NonNull Call<MapsPlaceDetailsPage> call, @NonNull Response<MapsPlaceDetailsPage> response) {
                 MapsPlaceDetailsPage detailsPage = response.body();
                 if (detailsPage != null) {
+                    List<MapsPlace> currentPlaceList = mRestaurantPlacesMutableLiveData.getValue();
                     MapsPlaceDetails placeDetails = detailsPage.getResult();
-                    if (placeDetails != null) {
-                        List<MapsPlace> placeList = mRestaurantPlacesMutableLiveData.getValue();
-                        if (placeList != null) {
-                            MapsPlace place = transformPlaceDetailsToMapPlace(placeDetails);
-                            placeList.add(0, place);
-                            mRestaurantPlacesMutableLiveData.setValue(placeList);
-                        }
+                    if (placeDetails != null && currentPlaceList != null) {
+                        MapsPlace place = transformPlaceDetailsToMapPlace(placeDetails);
+                        currentPlaceList.add(0, place);
+                        mRestaurantPlacesMutableLiveData.setValue(currentPlaceList);
                     }
                 }
             }
@@ -185,5 +186,26 @@ public class RestaurantPlacesRepository {
                 p.getOpening_hours(),
                 p.getRating(),
                 p.getPhotos());
+    }
+
+    /**
+     * Find place with given id and move it at first index.
+     * Returns true if element has been found, false instead.
+     *
+     * @param placeId id of place to move at first index/
+     * @return true if place has been found, false instead.
+     */
+    public boolean findPlaceAndMoveItAtFirstIndex(String placeId) {
+        List<MapsPlace> currentPlaceList = mRestaurantPlacesMutableLiveData.getValue();
+        if (currentPlaceList == null) return false;
+        for (MapsPlace p : currentPlaceList) {
+            if (p.getPlaceId().contentEquals(placeId)) {
+                currentPlaceList.remove(p);
+                currentPlaceList.set(0, p);
+                mRestaurantPlacesMutableLiveData.setValue(currentPlaceList);
+                return true;
+            }
+        }
+        return false;
     }
 }
