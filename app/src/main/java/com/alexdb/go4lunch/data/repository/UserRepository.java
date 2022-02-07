@@ -122,6 +122,7 @@ public class UserRepository {
                     currentUser.setBookedPlaceId(placeId);
                     currentUser.setBookedPlaceName(placeName);
                     currentUser.setBookedDate(now);
+                    mCurrentUserLiveData.setValue(currentUser);
                 })
                 .addOnFailureListener(e -> Log.w("User Repository", "updateCurrentUserBooking Error", e));
     }
