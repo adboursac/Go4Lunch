@@ -56,8 +56,11 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Arr
                              ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentMapViewBinding.inflate(inflater, container, false);
+
         mMainViewModel = new ViewModelProvider(requireActivity(), ViewModelFactory.getInstance()).get(MainViewModel.class);
         setHasOptionsMenu(true);
+        initSearchPredictionsObserver();
+
         return mBinding.getRoot();
     }
 
@@ -186,14 +189,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Arr
      * Init viewModels observers reactions
      */
     private void initObservers() {
-        // New search predictions data triggers a display
-        mMainViewModel.getRestaurantPredictionsLivaData().observe(getViewLifecycleOwner(), predictionList -> {
-            if (mSearchView != null) {
-                List<String> predictionsStrings = mMainViewModel.predictionsToStrings(predictionList);
-                mSearchView.setSuggestionsList(predictionsStrings, true);
-            }
-        });
-
         // New location data triggers camera move
         mMainViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), this::handleNewLocation);
 
@@ -207,6 +202,23 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Arr
 
         // Init map zoom default value
         mMainViewModel.getMapZoomLiveData().observe(getViewLifecycleOwner(), zoom -> mMapZoom = zoom);
+    }
+
+    /**
+     * Init search prediction observation.
+     * This observer is implemented separately from other observers and called at fragment creation.
+     * Goal is to set it before SearchView creation and avoid unnecessary prediction display at fragment launch.
+     */
+    private void initSearchPredictionsObserver() {
+        // Search view observer is initiated separately, to be set before SearchView creation
+        // and
+        // New search predictions data triggers a display.
+        mMainViewModel.getRestaurantPredictionsLivaData().observe(getViewLifecycleOwner(), predictionList -> {
+            if (mSearchView != null) {
+                List<String> predictionsStrings = mMainViewModel.predictionsToStrings(predictionList);
+                mSearchView.setSuggestionsList(predictionsStrings, true);
+            }
+        });
     }
 
     /**
