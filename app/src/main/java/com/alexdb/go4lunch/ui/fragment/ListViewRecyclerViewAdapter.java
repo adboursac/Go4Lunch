@@ -3,6 +3,7 @@ package com.alexdb.go4lunch.ui.fragment;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -18,6 +19,8 @@ import com.alexdb.go4lunch.ui.helper.RatingHelper;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -48,9 +51,10 @@ public class ListViewRecyclerViewAdapter extends RecyclerView.Adapter<ListViewRe
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(@NotNull final ViewHolder holder, int position) {
         RestaurantStateItem restaurant = mRestaurants.get(position);
 
+        renderLikeIcon(holder, restaurant.isLiked());
         holder.mBinding.name.setText(restaurant.getName());
         holder.mBinding.address.setText(restaurant.getAddress());
         holder.mBinding.openingStatus.setText(restaurant.getOpenStatus());
@@ -81,6 +85,11 @@ public class ListViewRecyclerViewAdapter extends RecyclerView.Adapter<ListViewRe
             textView.setTypeface(null, Typeface.NORMAL);
             textView.setTextColor(mContext.getResources().getColor(R.color.grey));
         }
+    }
+
+    public void renderLikeIcon(final ViewHolder holder, boolean liked) {
+        if (liked) holder.mBinding.likeIcon.setVisibility(View.VISIBLE);
+        else holder.mBinding.likeIcon.setVisibility(View.GONE);
     }
 
     @Override

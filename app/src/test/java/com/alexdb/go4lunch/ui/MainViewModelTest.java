@@ -117,6 +117,8 @@ public class MainViewModelTest {
         // UserRepository Mock
         given(mUserRepository.getWorkmatesLiveData())
                 .willReturn(new MutableLiveData<>(workmatesDummy));
+        given(mUserRepository.getCurrentUserLiveData())
+                .willReturn(new MutableLiveData<>(currentUserDummy));
 
         // Resources strings mock. We use lenient() but actually avoiding this mock would generate null pointer exceptions
         lenient().when(mResources.getString(R.string.restaurant_open_until)).thenReturn("Open until %s");

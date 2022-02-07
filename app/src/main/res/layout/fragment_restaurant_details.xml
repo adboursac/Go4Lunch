@@ -162,6 +162,7 @@
         app:layout_constraintTop_toBottomOf="@id/guideline2">
 
         <ImageView
+            android:id="@+id/like_button_icon"
             android:layout_width="@dimen/button_icon_medium_size"
             android:layout_height="@dimen/button_icon_medium_size"
             android:layout_marginTop="@dimen/default_margin"

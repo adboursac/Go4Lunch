@@ -93,6 +93,7 @@ public class RestaurantDetailsFragment extends Fragment {
                 mBinding.star2,
                 mBinding.star3);
         renderBookingButton(details.isBooked());
+        renderLikeButton(details.isLiked());
     }
 
     private void renderBookingButton(boolean booked) {
@@ -102,6 +103,16 @@ public class RestaurantDetailsFragment extends Fragment {
         } else {
             mBinding.bookingButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_person_add_alt_1_24));
             mBinding.bookingButton.getDrawable().setTint(getResources().getColor(R.color.orange_500));
+        }
+    }
+
+    private void renderLikeButton(boolean liked) {
+        if (liked) {
+            mBinding.likeButtonIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_heart_24));
+            mBinding.likeButtonIcon.getDrawable().setTint(getResources().getColor(R.color.red_heart));
+        } else {
+            mBinding.likeButtonIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_heart_stroke_24));
+            mBinding.likeButtonIcon.getDrawable().setTint(getResources().getColor(R.color.orange_500));
         }
     }
 

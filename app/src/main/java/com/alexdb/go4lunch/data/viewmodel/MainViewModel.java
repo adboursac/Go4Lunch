@@ -124,26 +124,38 @@ public class MainViewModel extends ViewModel {
         LiveData<List<MapsPlace>> placesLiveData = mMapsPlacesRepository.getRestaurantPlacesLiveData();
         LiveData<Location> locationLiveData = mLocationRepository.getLocationLiveData();
         LiveData<List<User>> workmatesLiveData = mUserRepository.getWorkmatesLiveData();
+        LiveData<User> currentUserLiveData = mUserRepository.getCurrentUserLiveData();
 
         mRestaurantsLiveData.addSource(placesLiveData, places ->
                 mergeDataToViewState(
                         places,
                         locationLiveData.getValue(),
-                        workmatesLiveData.getValue())
+                        workmatesLiveData.getValue(),
+                        currentUserLiveData.getValue())
         );
 
         mRestaurantsLiveData.addSource(locationLiveData, location ->
                 mergeDataToViewState(
                         placesLiveData.getValue(),
                         location,
-                        workmatesLiveData.getValue())
+                        workmatesLiveData.getValue(),
+                        currentUserLiveData.getValue())
         );
 
         mRestaurantsLiveData.addSource(workmatesLiveData, workmates ->
                 mergeDataToViewState(
                         placesLiveData.getValue(),
                         locationLiveData.getValue(),
-                        workmates)
+                        workmates,
+                        currentUserLiveData.getValue())
+        );
+
+        mRestaurantsLiveData.addSource(currentUserLiveData, currentUser ->
+                mergeDataToViewState(
+                        placesLiveData.getValue(),
+                        locationLiveData.getValue(),
+                        workmatesLiveData.getValue(),
+                        currentUser)
         );
     }
 
@@ -157,7 +169,10 @@ public class MainViewModel extends ViewModel {
      * @param userLocation current user location
      * @param workmates    workmates data from User repository
      */
-    private void mergeDataToViewState(List<MapsPlace> places, Location userLocation, List<User> workmates) {
+    private void mergeDataToViewState(List<MapsPlace> places,
+                                      Location userLocation,
+                                      List<User> workmates,
+                                      User currentUser) {
         if ((places == null) || (userLocation == null) || (workmates == null)) return;
 
         List<RestaurantStateItem> stateItems = new ArrayList<>();
@@ -177,7 +192,8 @@ public class MainViewModel extends ViewModel {
                     calculateDistance(userLocation, p.getLocation()),
                     p.getRating(),
                     mMapsPlacesRepository.getPictureUrl(p.getFirstPhotoReference()),
-                    calculateBookedWorkmatesAmount(p.getPlaceId(), workmates)
+                    calculateBookedWorkmatesAmount(p.getPlaceId(), workmates),
+                    currentUser.getLikedPlaces().contains(p.getPlaceId())
             ));
         }
         mRestaurantsLiveData.setValue(stateItems);

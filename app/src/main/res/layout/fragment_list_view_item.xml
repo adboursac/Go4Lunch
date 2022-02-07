@@ -15,6 +15,18 @@
         app:layout_constraintTop_toTopOf="parent"
         android:contentDescription="@null" />
 
+    <ImageView
+        android:id="@+id/likeIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_baseline_heart_24"
+        android:tint="@color/red_heart"
+        android:paddingEnd="@dimen/mini_margin"
+        android:paddingStart="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@null" />
+
     <TextView
         android:id="@+id/name"
         android:layout_width="wrap_content"
@@ -23,7 +35,7 @@
         android:textSize="@dimen/default_text_size"
         android:textStyle="bold"
         android:text="@string/restaurant_name"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/likeIcon"
         app:layout_constraintTop_toTopOf="@id/picture"/>
 
     <TextView
