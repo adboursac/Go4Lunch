@@ -32,6 +32,7 @@ import retrofit2.Response;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -62,7 +63,9 @@ public class RestaurantPlacesRepositoryTest {
         //fetchRestaurantPlaces_test Mock
         given(mGoogleMapsApi.getRestaurantPlaces(mockedLocation)).willReturn(mockedCall);
         given(mockedResponse.body()).willReturn(mockedMapsPlacesPage);
-        given(mockedMapsPlacesPage.getResults()).willReturn(mockedMapsPlacesList);
+        given(mockedMapsPlacesPage.getResults()).willReturn(mapsPlacesListDummy);
+        mapsPlacesListDummy.add(mockedPlace);
+        given(mockedPlace.hasSameId(anyList())).willReturn(false);
 
         //requestRestaurant_test Mock
         given(mGoogleMapsApi.getPlaceDetails("placeId")).willReturn(detailsMockedCall);
@@ -87,7 +90,8 @@ public class RestaurantPlacesRepositoryTest {
         callbackArgumentCaptor.getValue().onResponse(mockedCall, mockedResponse);
 
         // Assert the result is posted to the LiveData
-        LiveDataTestUtils.observeForTesting(result, liveData -> assertEquals(mockedMapsPlacesList, liveData.getValue()));
+        // Asserts that requested mapPlace has been addedplace to our liveData
+        LiveDataTestUtils.observeForTesting(result, liveData -> assertEquals(mapsPlacesListDummy.get(0), liveData.getValue().get(0)));
     }
 
     @Test
@@ -141,12 +145,15 @@ public class RestaurantPlacesRepositoryTest {
     //< OUT
     @Mock
     private Response<MapsPlacesPage> mockedResponse;
-    @Mock
-    private List<MapsPlace> mockedMapsPlacesList;
+
+    private List<MapsPlace> mapsPlacesListDummy = new ArrayList<>();
+
     @Mock
     private MapsPlacesPage mockedMapsPlacesPage;
     @Mock
     private Location mockedLocation;
+    @Mock
+    private MapsPlace mockedPlace;
 
     ///// requestRestaurant_test Mocks
     // IN

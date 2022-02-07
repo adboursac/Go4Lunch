@@ -82,4 +82,15 @@ public class MapsPlace {
     public MapsOpeningHours getOpening_hours() {
         return opening_hours;
     }
+
+    public boolean hasSameId (MapsPlace place) {
+        return this.getPlaceId().contentEquals(place.getPlaceId());
+    }
+
+    public boolean hasSameId (List<MapsPlace> list) {
+        for (MapsPlace p : list) {
+            if (hasSameId(p)) return true;
+        }
+        return false;
+    }
 }

@@ -14,7 +14,9 @@ import com.alexdb.go4lunch.data.model.maps.MapsPlacesPage;
 import com.alexdb.go4lunch.data.service.GoogleMapsApi;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -56,7 +58,7 @@ public class RestaurantPlacesRepository {
             public void onResponse(@NonNull Call<MapsPlacesPage> call, @NonNull Response<MapsPlacesPage> response) {
                 MapsPlacesPage placesPage = response.body();
                 if (placesPage != null) {
-                    mRestaurantPlacesMutableLiveData.setValue(placesPage.getResults());
+                    addPlacesAvoidDuplicates(placesPage.getResults());
 
                         /*//request for more results if possible
                         if (placesPage.getNext_page_token() != null) {
@@ -207,5 +209,23 @@ public class RestaurantPlacesRepository {
             }
         }
         return false;
+    }
+
+    /**
+     * Add new places list to liveData avoiding duplicates
+     *
+     * @param newList list of places to add
+     */
+    public void addPlacesAvoidDuplicates(List<MapsPlace> newList) {
+        List<MapsPlace> currentList = mRestaurantPlacesMutableLiveData.getValue();
+        if (currentList == null) return;
+        List<MapsPlace> checkedList = new ArrayList<>();
+
+        for (MapsPlace newPlace : newList) {
+            if (! newPlace.hasSameId(currentList)) checkedList.add(newPlace);
+        }
+
+        currentList.addAll(checkedList);
+        mRestaurantPlacesMutableLiveData.setValue(currentList);
     }
 }

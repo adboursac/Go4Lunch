@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.alexdb.go4lunch.R;
 import com.alexdb.go4lunch.data.model.RestaurantStateItem;
+import com.alexdb.go4lunch.data.model.maps.MapsPlace;
 import com.alexdb.go4lunch.data.viewmodel.MainViewModel;
 import com.alexdb.go4lunch.ViewModelFactory;
 import com.alexdb.go4lunch.databinding.FragmentListViewBinding;
@@ -61,14 +62,7 @@ public class ListViewFragment extends Fragment implements ArrayAdapterSearchView
      */
     private void initData() {
         mMainViewModel = new ViewModelProvider(requireActivity(), ViewModelFactory.getInstance()).get(MainViewModel.class);
-        mMainViewModel.getRestaurantsLiveData().observe(getViewLifecycleOwner(), restaurants -> {
-            mRestaurants.clear();
-            mRestaurants.addAll(restaurants);
-            if (mRestaurants.size() == 0) {
-                Log.d("ListVewFragment", "restaurant list is empty");
-            }
-            Objects.requireNonNull(mRecyclerView.getAdapter()).notifyDataSetChanged();
-        });
+        mMainViewModel.getRestaurantsLiveData().observe(getViewLifecycleOwner(), this::handleNewRestaurantList);
 
         mMainViewModel.getRestaurantPredictionsLivaData().observe(getViewLifecycleOwner(), predictionList -> {
             if (mSearchView != null) {
@@ -96,6 +90,23 @@ public class ListViewFragment extends Fragment implements ArrayAdapterSearchView
             mMainViewModel.requestPlacesPredictions(newText);
         }
         return false;
+    }
+
+    public void handleNewRestaurantList(List<RestaurantStateItem> restaurants) {
+        if (mMainViewModel.getCurrentSearchQuery().contentEquals("")) {
+            mMainViewModel.sortByDistanceAsc(restaurants);
+        } else {
+            RestaurantStateItem searchResult = restaurants.get(0);
+            restaurants.remove(0);
+            mMainViewModel.sortByDistanceAsc(restaurants);
+            restaurants.add(0, searchResult);
+        }
+
+        mRestaurants.clear();
+        mRestaurants.addAll(restaurants);
+        Objects.requireNonNull(mRecyclerView.getAdapter()).notifyDataSetChanged();
+
+        if (restaurants.size() == 0) Log.d("ListVewFragment", "restaurant list is empty");
     }
 
     /**
