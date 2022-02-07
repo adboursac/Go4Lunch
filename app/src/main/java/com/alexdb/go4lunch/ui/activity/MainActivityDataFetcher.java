@@ -1,6 +1,7 @@
 package com.alexdb.go4lunch.ui.activity;
 
 import android.os.Handler;
+import android.os.Looper;
 
 import androidx.lifecycle   .DefaultLifecycleObserver;
 import androidx.lifecycle.Lifecycle;
@@ -23,7 +24,7 @@ public class MainActivityDataFetcher implements DefaultLifecycleObserver {
 
     private boolean mEnabled = false;
     private Lifecycle mLifecycle;
-    private Handler mTaskHandler = new android.os.Handler();
+    private Handler mTaskHandler = new Handler(Looper.getMainLooper());
 
     private MainViewModel mMainViewModel;
 
@@ -36,6 +37,9 @@ public class MainActivityDataFetcher implements DefaultLifecycleObserver {
 
     public void enable() {
         mEnabled = true;
+        // fetch user's data
+        mMainViewModel.fetchCurrentUser();
+
         if (mLifecycle.getCurrentState().isAtLeast(STARTED)) {
             startDataFetching();
         }
@@ -54,11 +58,17 @@ public class MainActivityDataFetcher implements DefaultLifecycleObserver {
     }
 
     private void startDataFetching() {
+        // location data
+        mMainViewModel.refreshLocation();
+        // workmates data
         mTaskHandler.removeCallbacks(refreshWorkmatesTask);
         mTaskHandler.postDelayed(refreshWorkmatesTask, WORKMATES_FETCH_INTERVAL_MS);
     }
 
     private void stopDataFetching() {
+        // location data
+        mMainViewModel.denyLocationPermission();
+        // workmates data {
         mTaskHandler.removeCallbacks(refreshWorkmatesTask);
     }
 

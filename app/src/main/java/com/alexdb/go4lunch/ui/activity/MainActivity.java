@@ -76,9 +76,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     }
 
     private void initData() {
-        mMainViewModel.fetchCurrentUser();
-        mMainViewModel.fetchWorkmates();
-        mMainViewModel.requestLocationPermission(this);
+        //mMainViewModel.fetchCurrentUser();
+        //mMainViewModel.fetchWorkmates();
+        //if (mMainViewModel.getLocationLiveData().getValue() == null) mMainViewModel.refreshLocation();
+        if (!mMainViewModel.hasLocationPermission()) mMainViewModel.requestLocationPermission(this);
         mMainActivityDataFetcher.enable();
     }
 

@@ -113,7 +113,7 @@ public class MainViewModel extends ViewModel {
     }
 
     public void fetchRestaurantPlaces(Location location) {
-        mMapsPlacesRepository.fetchRestaurantPlaces(location);
+        if (location != null) mMapsPlacesRepository.fetchRestaurantPlaces(location);
     }
 
     /**
@@ -235,7 +235,6 @@ public class MainViewModel extends ViewModel {
     }
 
     public void requestLocationPermission(Activity activity) {
-        if (!mLocationRepository.hasLocationPermission())
             mLocationRepository.requestLocationPermission(activity);
     }
 
@@ -246,6 +245,8 @@ public class MainViewModel extends ViewModel {
     public void grantLocationPermission() {
         mLocationRepository.grantLocationPermission();
     }
+
+    public void refreshLocation() { mLocationRepository.refreshLocation(); }
 
     // --- Search feature ---
 

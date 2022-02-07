@@ -270,7 +270,6 @@ public class MainViewModelTest {
 
     @Test
     public void requestLocationPermission_test() {
-        given(mLocationRepository.hasLocationPermission()).willReturn(false);
         mMainViewModel.requestLocationPermission(mainActivityMock);
         verify(mLocationRepository).requestLocationPermission(mainActivityMock);
     }
