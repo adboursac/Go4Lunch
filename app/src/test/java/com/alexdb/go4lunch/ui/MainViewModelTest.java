@@ -114,6 +114,9 @@ public class MainViewModelTest {
             return null;
         }).when(mRestaurantPlacesRepository).fetchRestaurantPlaces(currentUserLocationMock);
 
+        // restaurantDetailsRepository Mock
+        given(mRestaurantDetailsRepository.getRestaurantDetailsLiveData()).willReturn(mDetailsLiveDataDummy);
+
         // UserRepository Mock
         given(mUserRepository.getWorkmatesLiveData())
                 .willReturn(new MutableLiveData<>(workmatesDummy));
@@ -128,6 +131,7 @@ public class MainViewModelTest {
 
         mMainViewModel = new MainViewModel(mLocationRepository,
                 mRestaurantPlacesRepository,
+                mRestaurantDetailsRepository,
                 mUserRepository,
                 mPlacePredictionRepository,
                 mSettingsRepository,

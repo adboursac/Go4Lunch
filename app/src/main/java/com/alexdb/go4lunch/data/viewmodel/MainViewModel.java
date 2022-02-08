@@ -11,25 +11,25 @@ import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
-import com.alexdb.go4lunch.R;
 import com.alexdb.go4lunch.data.model.RestaurantStateItem;
 import com.alexdb.go4lunch.data.model.User;
-import com.alexdb.go4lunch.data.model.maps.MapsOpeningHours;
 import com.alexdb.go4lunch.data.model.maps.MapsPlace;
+import com.alexdb.go4lunch.data.model.maps.MapsPlaceDetails;
 import com.alexdb.go4lunch.data.model.maps.MapsPlacePrediction;
 import com.alexdb.go4lunch.data.model.PredictionStateItem;
 import com.alexdb.go4lunch.data.repository.LocationRepository;
 import com.alexdb.go4lunch.data.repository.PlacePredictionRepository;
+import com.alexdb.go4lunch.data.repository.RestaurantDetailsRepository;
 import com.alexdb.go4lunch.data.repository.RestaurantPlacesRepository;
 import com.alexdb.go4lunch.data.repository.SettingsRepository;
 import com.alexdb.go4lunch.data.repository.UserRepository;
 import com.alexdb.go4lunch.ui.helper.MapsOpeningHoursHelper;
 import com.google.android.gms.tasks.Task;
 
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -39,6 +39,8 @@ public class MainViewModel extends ViewModel {
     private final LocationRepository mLocationRepository;
     @NonNull
     private final RestaurantPlacesRepository mMapsPlacesRepository;
+    @NonNull
+    private final RestaurantDetailsRepository mRestaurantDetailsRepository;
     @NonNull
     private final UserRepository mUserRepository;
     @NonNull
@@ -52,6 +54,7 @@ public class MainViewModel extends ViewModel {
     public MainViewModel(
             @NonNull LocationRepository locationRepository,
             @NonNull RestaurantPlacesRepository mapsPlacesRepository,
+            @NonNull RestaurantDetailsRepository restaurantDetailsRepository,
             @NonNull UserRepository userRepository,
             @NonNull PlacePredictionRepository placePredictionRepository,
             @NonNull SettingsRepository settingsRepository,
@@ -59,6 +62,7 @@ public class MainViewModel extends ViewModel {
     ) {
         mLocationRepository = locationRepository;
         mMapsPlacesRepository = mapsPlacesRepository;
+        mRestaurantDetailsRepository = restaurantDetailsRepository;
         mUserRepository = userRepository;
         mPlacePredictionRepository = placePredictionRepository;
         mSettingsRepository = settingsRepository;
@@ -119,7 +123,7 @@ public class MainViewModel extends ViewModel {
     }
 
     /**
-     * Merge restaurant places, location and workmates live data from repositories into a single observable live data
+     * Merge LiveData from repositories into a single observable live data
      */
     public void initRestaurantsLiveData() {
         mRestaurantsLiveData = new MediatorLiveData<>();
@@ -127,13 +131,15 @@ public class MainViewModel extends ViewModel {
         LiveData<Location> locationLiveData = mLocationRepository.getLocationLiveData();
         LiveData<List<User>> workmatesLiveData = mUserRepository.getWorkmatesLiveData();
         LiveData<User> currentUserLiveData = mUserRepository.getCurrentUserLiveData();
+        LiveData<Map<String, MapsPlaceDetails>> detailsLiveData = mRestaurantDetailsRepository.getRestaurantDetailsLiveData();
 
         mRestaurantsLiveData.addSource(placesLiveData, places ->
                 mergeDataToViewState(
                         places,
                         locationLiveData.getValue(),
                         workmatesLiveData.getValue(),
-                        currentUserLiveData.getValue())
+                        currentUserLiveData.getValue(),
+                        detailsLiveData.getValue())
         );
 
         mRestaurantsLiveData.addSource(locationLiveData, location ->
@@ -141,7 +147,8 @@ public class MainViewModel extends ViewModel {
                         placesLiveData.getValue(),
                         location,
                         workmatesLiveData.getValue(),
-                        currentUserLiveData.getValue())
+                        currentUserLiveData.getValue(),
+                        detailsLiveData.getValue())
         );
 
         mRestaurantsLiveData.addSource(workmatesLiveData, workmates ->
@@ -149,7 +156,8 @@ public class MainViewModel extends ViewModel {
                         placesLiveData.getValue(),
                         locationLiveData.getValue(),
                         workmates,
-                        currentUserLiveData.getValue())
+                        currentUserLiveData.getValue(),
+                        detailsLiveData.getValue())
         );
 
         mRestaurantsLiveData.addSource(currentUserLiveData, currentUser ->
@@ -157,32 +165,59 @@ public class MainViewModel extends ViewModel {
                         placesLiveData.getValue(),
                         locationLiveData.getValue(),
                         workmatesLiveData.getValue(),
-                        currentUser)
+                        currentUser,
+                        detailsLiveData.getValue())
+        );
+
+        mRestaurantsLiveData.addSource(detailsLiveData, detailsMap ->
+                mergeDataToViewState(
+                        placesLiveData.getValue(),
+                        locationLiveData.getValue(),
+                        workmatesLiveData.getValue(),
+                        currentUserLiveData.getValue(),
+                        detailsMap)
         );
     }
 
     // --- State item generation ---
 
     /**
-     * Merge restaurant places, location, and workmates data from repositories to view data as a RestaurantStateItem instance,
+     * Merge data from repositories to view data as a RestaurantStateItem instance,
      * and store it in the Mediator Live Data mRestaurantsLiveData
      *
      * @param places       data from restaurant places repository
      * @param userLocation current user location
      * @param workmates    workmates data from User repository
+     * @param currentUser currentUser data from User repository
+     * @param currentDetailsMap details Map object from details repository
      */
     private void mergeDataToViewState(List<MapsPlace> places,
                                       Location userLocation,
                                       List<User> workmates,
-                                      User currentUser) {
+                                      User currentUser,
+                                      Map<String, MapsPlaceDetails> currentDetailsMap) {
         if ((places == null) || (userLocation == null) || (workmates == null)) return;
 
         List<RestaurantStateItem> stateItems = new ArrayList<>();
 
         for (MapsPlace p : places) {
 
+            // Preparing opening hours data
+            String openingStatus;
+            // ClosingSoon status will be updated while calling generateOpeningString method
+            // to avoid going through openHours twice
             boolean[] closingSoon = {false};
-            String openingStatus = MapsOpeningHoursHelper.generateOpeningString(p.getOpening_hours(), closingSoon, mResources);
+            MapsPlaceDetails placeDetails = getPlaceDetails(p.getPlaceId(), currentDetailsMap);
+
+            // If We have already cached this place details,
+            if (placeDetails != null) {
+                //  We can get openHours from it
+                openingStatus = MapsOpeningHoursHelper.generateOpeningString(placeDetails.getOpening_hours(), closingSoon, mResources);
+            } else {
+                // Instead we will use openHours from mapPlace this time, but we fetch its details for the next time
+                openingStatus = MapsOpeningHoursHelper.generateOpeningString(p.getOpening_hours(), closingSoon, mResources);
+                mRestaurantDetailsRepository.fetchRestaurantDetails(p.getPlaceId());
+            }
 
             stateItems.add(new RestaurantStateItem(
                     p.getPlaceId(),
@@ -201,6 +236,10 @@ public class MainViewModel extends ViewModel {
         mRestaurantsLiveData.setValue(stateItems);
     }
 
+    public MapsPlaceDetails getPlaceDetails(String placeId, Map<String, MapsPlaceDetails>  currentDetailsMap) {
+        if (currentDetailsMap == null) return null;
+        return currentDetailsMap.get(placeId);
+    }
 
     /**
      * Calculate distance between two given locations

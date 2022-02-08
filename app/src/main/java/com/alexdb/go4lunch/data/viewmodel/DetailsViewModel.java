@@ -40,8 +40,16 @@ public class DetailsViewModel extends ViewModel {
     }
 
     public void getRestaurantDetails(String placeId) {
+        // setting currentPlaceId will define which details data mRestaurantDetailsLiveData has to contain.
         currentPlaceId = placeId;
-        mRestaurantDetailsRepository.fetchRestaurantDetails(placeId);
+        Map<String, MapsPlaceDetails> detailsMap = mRestaurantDetailsRepository.getRestaurantDetailsLiveData().getValue();
+        // If we didn't retrieved currentPlaceId's details, we fetch it now
+        if (detailsMap == null || detailsMap.get(currentPlaceId) == null) mRestaurantDetailsRepository.fetchRestaurantDetails(placeId);
+        // else we update liveData with currentPlaceId details
+        else mapDataToViewState(
+                detailsMap,
+                mUserRepository.getCurrentUserLiveData().getValue(),
+                mUserRepository.getWorkmatesLiveData().getValue());
     }
 
     /**

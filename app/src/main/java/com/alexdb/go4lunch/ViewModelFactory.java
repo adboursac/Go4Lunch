@@ -95,6 +95,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
             return (T) new MainViewModel(
                     mLocationRepository,
                     mMapsPlacesRepository,
+                    mRestaurantDetailsRepository,
                     mUserRepository,
                     mPlacePredictionRepository,
                     mSettingsRepository,
