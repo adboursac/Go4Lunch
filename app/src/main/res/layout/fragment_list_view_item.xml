@@ -29,13 +29,18 @@
 
     <TextView
         android:id="@+id/name"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textColor="@color/black"
+        android:layout_marginEnd="@dimen/mini_margin"
         android:textSize="@dimen/default_text_size"
         android:textStyle="bold"
         android:text="@string/restaurant_name"
+        android:textAlignment="textStart"
+        android:ellipsize="end"
+        android:maxLines="1"
         app:layout_constraintStart_toEndOf="@id/likeIcon"
+        app:layout_constraintEnd_toStartOf="@id/distance"
         app:layout_constraintTop_toTopOf="@id/picture"/>
 
     <TextView
